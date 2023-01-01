@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services\ImageLoadingService;
+
+
+use App\Exceptions\ImageSavingException;
+use App\Jobs\CompressImageJob;
+use Illuminate\Support\Facades\Storage;
+
+class ImageLoadingService implements ImageLoadingInterface
+{
+    public  function loadingImage(string $destinationFolder, string $sourceUrl, string $fileName): array
+    {
+        try {
+            $imageName = $this->getFileName($sourceUrl, $fileName);
+
+            $destinationPath = $destinationFolder . $imageName;
+
+            $size = 'no_exist';
+            if (! (is_file($destinationPath) && file_exists($destinationPath)) ) {
+                $fileContent = file_get_contents($sourceUrl);
+
+                if ($fileContent) {
+                    Storage::put($destinationPath, $fileContent);
+                    //$size = file_put_contents($destinationPath, $fileContent);
+                    //Storage::path($destinationPath);
+                    $imageSavePath = Storage::url($destinationPath);
+
+                    CompressImageJob::dispatch($imageSavePath);
+                }
+            } else  {
+                //$size = exif_imagetype($filePath);
+                $size = @getimagesize($destinationPath);
+            }
+
+            return  [$imageSavePath, $size];
+
+        } catch (\Throwable $e) {
+            throw new ImageSavingException($e->getMessage());
+        }
+    }
+
+
+    protected function getFileName(string $sourceUrl, string $fileName = '')
+    {
+        $imageUrlParts = explode('/', $sourceUrl);
+        $imageName = $imageUrlParts[count($imageUrlParts) - 1];
+        if ($fileName !== "") {
+            $fileName = preg_replace('#\*#', '_', $fileName);
+            $fileName = preg_replace("#[/:*?\"<>|+%!@]#", '', $fileName);
+
+            $imageNameParts = explode('.', $imageName);
+            $extension = $imageNameParts[count($imageNameParts) - 1];
+            $imageName = $fileName . '.' . $extension;
+        }
+        return $imageName;
+    }
+}

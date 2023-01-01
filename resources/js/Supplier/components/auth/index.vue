@@ -1,0 +1,287 @@
+<template>
+    <div class="container">
+        <div class="block">
+            Наш сайт помогает пользователю подобрать и купить нужный товар.
+            Для того, чтобы Ваш интернет-магазин появился в списке продавцов на нашем сайте необходимо заполнить форму-заявку
+            или отправить письмо-запрос на подключение к системе.
+            Узнать подробнее о размещении прайс-листов и условиях подключения можно здесь.
+        </div>
+
+        <div class="auth">
+            <div class="auth__header">
+                <h3 class="auth__title">{{ isLoginForm ? 'Войти' : 'Регистрация' }}</h3>
+
+                <div class="auth__icon">
+                    <svg class="headerLogo" viewBox="0 0 231 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M11.172 3.804C11.076 3.972 10.972 4.096 10.86 4.176C10.756 4.248 10.624 4.284 10.464 4.284C10.296 4.284 10.112 4.224 9.912 4.104C9.72 3.976 9.488 3.836 9.216 3.684C8.944 3.532 8.624 3.396 8.256 3.276C7.896 3.148 7.468 3.084 6.972 3.084C6.524 3.084 6.132 3.14 5.796 3.252C5.46 3.356 5.176 3.504 4.944 3.696C4.72 3.888 4.552 4.12 4.44 4.392C4.328 4.656 4.272 4.948 4.272 5.268C4.272 5.676 4.384 6.016 4.608 6.288C4.84 6.56 5.144 6.792 5.52 6.984C5.896 7.176 6.324 7.348 6.804 7.5C7.284 7.652 7.776 7.816 8.28 7.992C8.784 8.16 9.276 8.36 9.756 8.592C10.236 8.816 10.664 9.104 11.04 9.456C11.416 9.8 11.716 10.224 11.94 10.728C12.172 11.232 12.288 11.844 12.288 12.564C12.288 13.348 12.152 14.084 11.88 14.772C11.616 15.452 11.224 16.048 10.704 16.56C10.192 17.064 9.564 17.464 8.82 17.76C8.076 18.048 7.224 18.192 6.264 18.192C5.712 18.192 5.168 18.136 4.632 18.024C4.096 17.92 3.58 17.768 3.084 17.568C2.596 17.368 2.136 17.128 1.704 16.848C1.272 16.568 0.888 16.256 0.552 15.912L1.5 14.364C1.58 14.252 1.684 14.16 1.812 14.088C1.94 14.008 2.076 13.968 2.22 13.968C2.42 13.968 2.636 14.052 2.868 14.22C3.1 14.38 3.376 14.56 3.696 14.76C4.016 14.96 4.388 15.144 4.812 15.312C5.244 15.472 5.76 15.552 6.36 15.552C7.28 15.552 7.992 15.336 8.496 14.904C9 14.464 9.252 13.836 9.252 13.02C9.252 12.564 9.136 12.192 8.904 11.904C8.68 11.616 8.38 11.376 8.004 11.184C7.628 10.984 7.2 10.816 6.72 10.68C6.24 10.544 5.752 10.396 5.256 10.236C4.76 10.076 4.272 9.884 3.792 9.66C3.312 9.436 2.884 9.144 2.508 8.784C2.132 8.424 1.828 7.976 1.596 7.44C1.372 6.896 1.26 6.228 1.26 5.436C1.26 4.804 1.384 4.188 1.632 3.588C1.888 2.988 2.256 2.456 2.736 1.992C3.216 1.528 3.808 1.156 4.512 0.875999C5.216 0.596 6.024 0.456 6.936 0.456C7.96 0.456 8.904 0.616 9.768 0.935999C10.632 1.256 11.368 1.704 11.976 2.28L11.172 3.804ZM33.9199 0.647999V18H31.0759V6.792C31.0759 6.344 31.0999 5.86 31.1479 5.34L25.9039 15.192C25.6559 15.664 25.2759 15.9 24.7639 15.9H24.3079C23.7959 15.9 23.4159 15.664 23.1679 15.192L17.8639 5.304C17.8879 5.568 17.9079 5.828 17.9239 6.084C17.9399 6.34 17.9479 6.576 17.9479 6.792V18H15.1039V0.647999H17.5399C17.6839 0.647999 17.8079 0.651999 17.9119 0.659999C18.0159 0.667999 18.1079 0.687999 18.1879 0.719999C18.2759 0.751999 18.3519 0.803999 18.4159 0.875999C18.4879 0.947999 18.5559 1.044 18.6199 1.164L23.8159 10.8C23.9519 11.056 24.0759 11.32 24.1879 11.592C24.3079 11.864 24.4239 12.144 24.5359 12.432C24.6479 12.136 24.7639 11.852 24.8839 11.58C25.0039 11.3 25.1319 11.032 25.2679 10.776L30.3919 1.164C30.4559 1.044 30.5239 0.947999 30.5959 0.875999C30.6679 0.803999 30.7439 0.751999 30.8239 0.719999C30.9119 0.687999 31.0079 0.667999 31.1119 0.659999C31.2159 0.651999 31.3399 0.647999 31.4839 0.647999H33.9199ZM46.9594 11.448L44.8474 5.676C44.7434 5.42 44.6354 5.116 44.5234 4.764C44.4114 4.412 44.2994 4.032 44.1874 3.624C44.0834 4.032 43.9754 4.416 43.8634 4.776C43.7514 5.128 43.6434 5.436 43.5394 5.7L41.4394 11.448H46.9594ZM52.6594 18H50.1634C49.8834 18 49.6554 17.932 49.4794 17.796C49.3034 17.652 49.1714 17.476 49.0834 17.268L47.7874 13.728H40.5994L39.3034 17.268C39.2394 17.452 39.1154 17.62 38.9314 17.772C38.7474 17.924 38.5194 18 38.2474 18H35.7274L42.5554 0.647999H45.8434L52.6594 18ZM59.6994 8.904C60.3074 8.904 60.8354 8.828 61.2834 8.676C61.7394 8.524 62.1114 8.316 62.3994 8.052C62.6954 7.78 62.9154 7.46 63.0594 7.092C63.2034 6.724 63.2754 6.32 63.2754 5.88C63.2754 5 62.9834 4.324 62.3994 3.852C61.8234 3.38 60.9394 3.144 59.7474 3.144H57.6834V8.904H59.6994ZM68.0034 18H65.0874C64.5354 18 64.1354 17.784 63.8874 17.352L60.2394 11.796C60.1034 11.588 59.9514 11.44 59.7834 11.352C59.6234 11.264 59.3834 11.22 59.0634 11.22H57.6834V18H54.4554V0.647999H59.7474C60.9234 0.647999 61.9314 0.771999 62.7714 1.02C63.6194 1.26 64.3114 1.6 64.8474 2.04C65.3914 2.48 65.7914 3.008 66.0474 3.624C66.3034 4.232 66.4314 4.904 66.4314 5.64C66.4314 6.224 66.3434 6.776 66.1674 7.296C65.9994 7.816 65.7514 8.288 65.4234 8.712C65.1034 9.136 64.7034 9.508 64.2234 9.828C63.7514 10.148 63.2114 10.4 62.6034 10.584C62.8114 10.704 63.0034 10.848 63.1794 11.016C63.3554 11.176 63.5154 11.368 63.6594 11.592L68.0034 18ZM81.552 3.3H76.32V18H73.092V3.3H67.86V0.647999H81.552V3.3ZM81.8055 9.516H88.0215V11.988H81.8055V9.516ZM97.8146 15.48C98.4146 15.48 98.9186 15.408 99.3266 15.264C99.7346 15.12 100.059 14.928 100.299 14.688C100.547 14.448 100.723 14.168 100.827 13.848C100.939 13.528 100.995 13.188 100.995 12.828C100.995 12.452 100.935 12.116 100.815 11.82C100.695 11.516 100.507 11.26 100.251 11.052C99.9946 10.836 99.6626 10.672 99.2546 10.56C98.8546 10.448 98.3706 10.392 97.8026 10.392H94.5506V15.48H97.8146ZM94.5506 3.144V8.16H97.1186C98.2226 8.16 99.0546 7.96 99.6146 7.56C100.183 7.16 100.467 6.524 100.467 5.652C100.467 4.748 100.211 4.104 99.6986 3.72C99.1866 3.336 98.3866 3.144 97.2986 3.144H94.5506ZM97.2986 0.647999C98.4346 0.647999 99.4066 0.755999 100.215 0.972C101.023 1.188 101.683 1.496 102.195 1.896C102.715 2.296 103.095 2.78 103.335 3.348C103.575 3.916 103.695 4.556 103.695 5.268C103.695 5.676 103.635 6.068 103.515 6.444C103.395 6.812 103.207 7.16 102.951 7.488C102.703 7.808 102.383 8.1 101.991 8.364C101.607 8.628 101.147 8.852 100.611 9.036C102.995 9.572 104.187 10.86 104.187 12.9C104.187 13.636 104.047 14.316 103.767 14.94C103.487 15.564 103.079 16.104 102.543 16.56C102.007 17.008 101.347 17.36 100.563 17.616C99.7786 17.872 98.8826 18 97.8746 18H91.3226V0.647999H97.2986ZM110.36 3.216V8.028H116.432V10.512H110.36V15.42H118.064V18H107.12V0.647999H118.064V3.216H110.36ZM130.092 11.448L127.98 5.676C127.876 5.42 127.768 5.116 127.656 4.764C127.544 4.412 127.432 4.032 127.32 3.624C127.216 4.032 127.108 4.416 126.996 4.776C126.884 5.128 126.776 5.436 126.672 5.7L124.572 11.448H130.092ZM135.792 18H133.296C133.016 18 132.788 17.932 132.612 17.796C132.436 17.652 132.304 17.476 132.216 17.268L130.92 13.728H123.732L122.436 17.268C122.372 17.452 122.248 17.62 122.064 17.772C121.88 17.924 121.652 18 121.38 18H118.86L125.688 0.647999H128.976L135.792 18ZM144.15 15.396C144.774 15.396 145.33 15.292 145.818 15.084C146.314 14.876 146.73 14.584 147.066 14.208C147.402 13.832 147.658 13.376 147.834 12.84C148.018 12.304 148.11 11.704 148.11 11.04V0.647999H151.338V11.04C151.338 12.072 151.17 13.028 150.834 13.908C150.506 14.78 150.03 15.536 149.406 16.176C148.79 16.808 148.038 17.304 147.15 17.664C146.262 18.016 145.262 18.192 144.15 18.192C143.03 18.192 142.026 18.016 141.138 17.664C140.25 17.304 139.494 16.808 138.87 16.176C138.254 15.536 137.778 14.78 137.442 13.908C137.114 13.028 136.95 12.072 136.95 11.04V0.647999H140.178V11.028C140.178 11.692 140.266 12.292 140.442 12.828C140.626 13.364 140.886 13.824 141.222 14.208C141.566 14.584 141.982 14.876 142.47 15.084C142.966 15.292 143.526 15.396 144.15 15.396ZM167.099 3.3H161.867V18H158.639V3.3H153.407V0.647999H167.099V3.3ZM172.61 18H169.37V0.647999H172.61V18ZM179.735 3.216V8.352H186.239V10.932H179.735V18H176.495V0.647999H187.439V3.216H179.735ZM197.072 15.396C197.696 15.396 198.252 15.292 198.74 15.084C199.236 14.876 199.652 14.584 199.988 14.208C200.324 13.832 200.58 13.376 200.756 12.84C200.94 12.304 201.032 11.704 201.032 11.04V0.647999H204.26V11.04C204.26 12.072 204.092 13.028 203.756 13.908C203.428 14.78 202.952 15.536 202.328 16.176C201.712 16.808 200.96 17.304 200.072 17.664C199.184 18.016 198.184 18.192 197.072 18.192C195.952 18.192 194.948 18.016 194.06 17.664C193.172 17.304 192.416 16.808 191.792 16.176C191.176 15.536 190.7 14.78 190.364 13.908C190.036 13.028 189.872 12.072 189.872 11.04V0.647999H193.1V11.028C193.1 11.692 193.188 12.292 193.364 12.828C193.548 13.364 193.808 13.824 194.144 14.208C194.488 14.584 194.904 14.876 195.392 15.084C195.888 15.292 196.448 15.396 197.072 15.396ZM218.065 15.336V18H207.901V0.647999H211.129V15.336H218.065ZM230.534"
+                            fill="black"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="auth__body">
+                <form v-if="isLoginForm" class="connect" @submit.prevent="signin">
+                    <div class="connect__row">
+                        <div class="connect__item connect__item-full">
+                            <input class="input" type="text" v-model="loginForm.email" placeholder="email магазина">
+                            <div class="invalid-feedback" v-for="error of v$.loginForm.email.$errors"
+                                 :key="error.$uid">
+                                {{ error.$message }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="connect__row">
+                        <div class="connect__item connect__item-full">
+                            <input class="input" type="password" v-model="loginForm.password" placeholder="Пароль">
+                            <div class="invalid-feedback" v-for="error of v$.loginForm.password.$errors"
+                                 :key="error.$uid">
+                                {{ error.$message }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="connect__item connect__row">
+                        <button class="connect__button connect__button-active " type="submit">Войти поставщику</button>
+                    </div>
+                    <div class="connect__item connect__row">
+                        <button type="button" class="connect__button" @click="showRegistration">Регистрация поставщика
+                        </button>
+                    </div>
+                </form>
+                <form v-else class="connect" @submit.prevent="signup">
+                    <div class="connect__row">
+                        <div class="connect__item connect__item-full">
+                            <input class="input" type="text" v-model="registerForm.name" placeholder="Имя">
+                            <div class="invalid-feedback" v-for="error of v$.registerForm.name.$errors"
+                                 :key="error.$uid">
+                                {{ error.$message }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="connect__row">
+                        <div class="connect__item connect__item-full">
+                            <input class="input" type="text" v-model="registerForm.email" placeholder="email магазина">
+                            <div class="invalid-feedback" v-for="error of v$.registerForm.email.$errors"
+                                 :key="error.$uid">
+                                {{ error.$message }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="connect__row">
+                        <div class="connect__item connect__item-full">
+                            <input class="input" type="password" v-model="registerForm.password" placeholder="Пароль">
+                            <div class="invalid-feedback" v-for="error of v$.registerForm.password.$errors"
+                                 :key="error.$uid">
+                                {{ error.$message }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="connect__row">
+                        <div class="connect__item connect__item-full">
+                            <input class="input" type="password" v-model="registerForm.password_confirmation" placeholder="Подтвердите пароль">
+                            <div class="invalid-feedback" v-for="error of v$.registerForm.password_confirmation.$errors"
+                                 :key="error.$uid">
+                                {{ error.$message }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="connect__item connect__row">
+                        <button class="connect__button connect__button-active" type="submit">Регистрация поставщика</button>
+                    </div>
+                    <div class="connect__item connect__row">
+                        <button type="button" class="connect__button" @click="showLogin">Войти</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    import {mapActions} from "vuex";
+    import useVuelidate from '@vuelidate/core'
+    import {required, email, helpers, minLength} from '@vuelidate/validators'
+    export default {
+        name: "auth",
+        setup () {
+            return { v$: useVuelidate() }
+        },
+        validations () {
+            return {
+                registerForm: {
+                    name: { required:  helpers.withMessage('Поле должно быть заполнено', required) },
+                    email: {
+                        required:  helpers.withMessage('Поле должно быть заполнено', required),
+                        email: helpers.withMessage('Не правильно введен email', email)
+                    },
+                    password: {
+                        required:  helpers.withMessage('Поле должно быть заполнено', required),
+                        minLength: helpers.withMessage('Должно быть не меньше 8 символов', minLength(8))
+                    },
+                    password_confirmation: {
+                        required:  helpers.withMessage('Поле должно быть заполнено', required),
+                        minLength: helpers.withMessage('Должно быть не меньше 8 символов', minLength(8))
+                    },
+                },
+                loginForm: {
+                    email: {
+                        required:  helpers.withMessage('Поле должно быть заполнено', required),
+                        email
+                    },
+                    password: {
+                        required:  helpers.withMessage('Поле должно быть заполнено', required),
+                        minLength: helpers.withMessage('Должно быть не меньше 8 символов', minLength(8))
+                    }
+                }
+            }
+        },
+        data() {
+            return {
+                registerForm: {
+                    name: '',
+                    email:'',
+                    password: '',
+                    password_confirmation: ''
+                },
+                loginForm:{
+                    email:'',
+                    password: ''
+                },
+                isLoginForm: true
+            }
+        },
+        methods:{
+            ...mapActions('auth', ['register', 'login']),
+            showRegistration() {
+                this.isLoginForm = false
+            },
+            showLogin() {
+                this.isLoginForm = true
+            },
+            async signup() {
+                const result = await this.v$.registerForm.$validate()
+                if (result) {
+                    await this.register(this.registerForm)
+                    this.v$.$reset()
+                    this.registerForm = {
+                        name: '',
+                        email: '',
+                        password: '',
+                        password_confirmation: ''
+                    }
+                    this.showLogin()
+                }
+            },
+            async signin() {
+                const result = await this.v$.loginForm.$validate()
+                if (result) {
+                    await this.login(this.loginForm)
+                    this.v$.$reset()
+                    this.loginForm = {
+                        email: '',
+                        password: ''
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+    .auth {
+        width: 400px;
+        margin: 20px auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 6px 40px 0 rgba(56,69,94,.07);
+        &__header {
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+        }
+        &__title {
+            margin: 0;
+            font-size: 20px;
+        }
+        &__icon {
+            max-width: 140px;
+        }
+        &__body {
+            display: flex;
+            align-items: center;
+            flex-flow: column nowrap;
+            padding: 20px;
+            width: 100%;
+        }
+        & h3 {
+            width: 100%;
+        }
+    }
+
+    .connect {
+        width: 100%;
+        &__row {
+            width:100%;
+            display: flex;
+            justify-content: center;
+            flex-wrap:wrap;
+        }
+        &__item {
+            margin-bottom: 20px;
+            &-full {
+                width: 100%;
+            }
+            &:not(:last-child) {
+                margin-right: 10px;
+            }
+        }
+        &__button {
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 40px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #000;
+            text-transform: uppercase;
+            font-weight:bold;
+            background-color: #fff;
+            transition: background-color 0.3s ease 0s, border-color 0.3s ease 0s;
+            padding: 0 30px;
+            &:hover {
+                background-color: #dcdcdc;
+            }
+            &-active {
+                background-color: #1867c0;
+                color: #fff;
+                border: none;
+                &:hover {
+                    background-color: #3b75c0;
+                }
+            }
+        }
+    }
+
+    .input {
+        width: 100%;
+        outline: #000 none medium;
+        overflow: visible;
+        transition: background-color 0.3s ease 0s, border-color 0.3s ease 0s;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 8px;
+        &:hover {
+            border-color: rgb(192, 201, 240);
+            transition: border-color 0.3s ease 0s;
+        }
+        &:focus {
+            border-color: rgb(59, 87, 208);
+            transition: background-color 0.3s ease 0s, border-color 0.3s ease 0s;
+        }
+    }
+    .invalid-feedback {
+        color: red;
+    }
+</style>

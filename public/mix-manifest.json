@@ -1,0 +1,12 @@
+{
+    "/js/app.js": "/js/app.js",
+    "/js/admin.js": "/js/admin.js",
+    "/js/supplier.js": "/js/supplier.js",
+    "/js/pdfmake.js": "/js/pdfmake.js",
+    "/js/canvg.js": "/js/canvg.js",
+    "/js/xlsx.js": "/js/xlsx.js",
+    "/css/supplier.css": "/css/supplier.css",
+    "/css/app.css": "/css/app.css",
+    "/css/article.css": "/css/article.css",
+    "/css/admin.css": "/css/admin.css"
+}
