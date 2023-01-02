@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LinkController;
-use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\MainController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -20,15 +19,11 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/clear-cache', function() {
-    $exitCode = Artisan::call('cache:clear');
-    $exitCode = Artisan::call('config:cache');
+    Artisan::call('cache:clear');
+    Artisan::call('config:cache');
     return 'DONE'; //Return anything
 });
 
-
-
-
-//Route::get('/article/{id}', [ArticleController::class, 'article']);
 
 
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'emailVerify'])

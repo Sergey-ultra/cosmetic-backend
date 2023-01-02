@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Traits;
 
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use ReflectionClass;
 
 
 trait DataProvider
 {
-    protected function prepareModel(Request $request, $query, bool $isJoin = false)
+    protected function prepareModel(Request $request, EloquentBuilder|Builder $query, bool $isJoin = false)
     {
         if ($request->filter) {
             $this->filterModel($query, $isJoin, $request->filter);
@@ -26,7 +28,7 @@ trait DataProvider
 
     protected function filterModel($query, bool $isJoin, array $filter)
     {
-        $isQueryBuilder = $isJoin && $query instanceof \Illuminate\Database\Query\Builder;
+        $isQueryBuilder = $isJoin && $query instanceof Builder;
 
         if ($isQueryBuilder) {
             $columns = [];
@@ -59,7 +61,7 @@ trait DataProvider
         }
     }
 
-    protected function addCondition($query, string $column, $param)
+    protected function addCondition($query, string $column, string|array $param)
     {
 
         if (is_string($param)) {
