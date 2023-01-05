@@ -66,7 +66,10 @@ class FilterController extends Controller
 
        $skusGroupByQuery = DB::table('sku_store')->distinct()->select('sku_id');
 
-       $skuProductIdsSubQuery = Sku::select('skus.product_id as product_id', 'skus.volume as volume')
+       $skuProductIdsSubQuery = Sku::select(
+           'skus.product_id as product_id',
+           'skus.volume as volume'
+       )
            ->joinSub($skusGroupByQuery, 'sku_store', function ($join) {
                $join->on( 'skus.id', '=', 'sku_store.sku_id');
            });
@@ -81,7 +84,11 @@ class FilterController extends Controller
 
 
 
-       $skuWithPricesSubQuery = Sku::select('sku_store.price as price', 'skus.product_id as product_id', 'skus.volume as volume')
+       $skuWithPricesSubQuery = Sku::select(
+           'sku_store.price as price',
+           'skus.product_id as product_id',
+           'skus.volume as volume'
+       )
            ->join('sku_store', 'skus.id', '=', 'sku_store.sku_id');
 
        $select[] = 'skus.price as price';

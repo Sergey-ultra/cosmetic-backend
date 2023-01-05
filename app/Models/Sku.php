@@ -3,10 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Sku extends Model
 {
     protected $fillable = ['product_id', 'images', 'volume', 'rating', 'reviews_count'];
+
+    protected $casts = [
+        'images' => 'array'
+    ];
+
+    protected function image(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, $attributes) => json_decode($attributes['images'], true)[0] ?? null
+        );
+    }
 
     public function product()
     {

@@ -27,7 +27,9 @@ class PriceParsingByCronService
         try {
             if ($this->configuration->getWeekStatus()) {
                 $linksWithSkuIdsAndStoreIds = $this->actualPriceParsingService->index(rand(10,17));
-                $linesCount = count($linksWithSkuIdsAndStoreIds);
+
+                $linesCount = $linksWithSkuIdsAndStoreIds->count();
+
 
                 if ($linesCount === 0) {
                     $this->actualPriceParsingService->copyLinksToActualPriceParsingTable();
@@ -43,13 +45,12 @@ class PriceParsingByCronService
                     $parsedLinkIdsString = '';
 
                     foreach ($linksWithSkuIdsAndStoreIds as $line) {
-                        $parsedActualIds[] = $line['id'];
+                        $parsedActualIds[] = $line->id;
 
-
-                        foreach ($line['links_by_time'] as $link) {
+                        $this->priceParser->setRequestsCountBeforeChangingProxy(count($line->links_by_time));
+                        foreach ($line->links_by_time as $link) {
                             try {
                                 [$status, $price] = $this->priceParser->parsePricesByLink($link['link'], $link['priceTag']);
-
                                 $parsedLinkIdsString .= "Ссылка с id  {$link['link_id']} статус $status store_id - {$link['store_id']}\r\n";
 
                                 if (in_array($status, [200, 301, 404])) {

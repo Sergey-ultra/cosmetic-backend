@@ -1,5 +1,5 @@
 import axios from 'axios'
-//import store from '@/store'
+import store from '../store'
 
 
 const instance = axios.create({
@@ -17,7 +17,7 @@ instance.interceptors.request.use(
         return config
     },
     e => {
-        console.log('request reject ', e) // TODO remove all console logs on release
+        // console.log('request reject ', e) // TODO remove all console logs on release
         return Promise.resolve()
     }
 )
@@ -53,28 +53,26 @@ instance.interceptors.response.use(
         return response.data;
     },
     error => {
-        console.log('response reject ', error) // TODO remove all console logs on release
-/*
-        if (error.response.data.error.error) {
-            const e = error.response.data.error.error;
+        if (error.response.data) {
+            const data = error.response.data
 
-            if (e.code === 404) {
-                //store.commit('notification/abort404')
-            } else if (e.code === 401) {
+            console.log(data);
+            const status = error.response.status;
+
+            if (status === 401) {
                 //store.commit('auth/removeToken')
                 //store.commit('notification/abort401')
             } else {
-                //store.commit('notification/setError', {
-                   // message: e.message,
-                   // messageData: e.data
-                //})
+                store.dispatch('notification/setError', {
+                    message:data.message,
+                    file: data.file,
+                    line: data.line
+                });
             }
         } else {
-            //store.commit('notification/setError', {
-               // message: 'Ошибка подключения'
-           // })
-        }*/
-        return Promise.reject(error)
+            store.dispatch('notification/setError', { message: 'Ошибка подключения' })
+        }
+        return {};
     }
 )
 

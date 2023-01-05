@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\FilterController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\PriceHistoryController;
 use App\Http\Controllers\Api\RouteController;
+use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\SkuController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\RatingController;
@@ -121,6 +122,9 @@ Route::get('/categories/nested', [CategoryController::class, 'nested']);
 Route::get('/show-compared-skus', [SkuController::class, 'showComparedSkus']);
 Route::get('/skus/by-sku-id/{skuId}', [SkuController::class, 'bySkuId']);
 Route::get('/skus/main', [SkuController::class, 'mainIndex']);
+
+
+Route::get('/suggest', [SearchController::class, 'index']);
 
 Route::get('/skus/viewed', [SkuController::class, 'viewed']);
 

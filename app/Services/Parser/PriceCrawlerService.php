@@ -15,6 +15,11 @@ class PriceCrawlerService implements IPriceParser
 
     public function __construct(protected ProxyHttpClientInterface $httpClient) {}
 
+    public function setRequestsCountBeforeChangingProxy(int $count): void
+    {
+        $this->httpClient->setRequestsCountBeforeChangingProxy($count);
+    }
+
     public function parsePricesByLink(string $link, string $priceTag): array
     {
         $response = $this->httpClient->request($link);

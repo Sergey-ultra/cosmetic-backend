@@ -14,7 +14,8 @@
             },
             color: {
                 type: String,
-                default: '#1867c0'
+                // default: '#1867c0',
+                default: 'rgb(0, 91, 255)'
             },
             disabled: {
                 type: Boolean,

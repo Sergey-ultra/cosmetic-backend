@@ -15,6 +15,7 @@ class Proxy6NetService implements ProxyServersInterface
         try {
             $response = $this->httpClient->request('GET', config('proxyapi.proxy6_net_url'));
             $body = json_decode($response->getBody()->getContents(), true);
+
             if ('yes' === $body['status']) {
                 $list = $body['list'];
                 return array_map(

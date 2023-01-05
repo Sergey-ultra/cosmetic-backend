@@ -7,12 +7,15 @@ namespace App\Services\Parser;
 
 use App\Models\ActualPriceParsing;
 use App\Models\PriceHistory;
+use Illuminate\Database\Eloquent\Collection;
+
 
 class ActualPriceParsingService
 {
 
-    public function index(int $count): array
+    public function index(int $count): Collection
     {
+        return ActualPriceParsing::select('id', 'links_by_time')->limit($count)->get();
         return array_map(
             function($el) {
                 $el['links_by_time'] = json_decode($el['links_by_time'], true);
