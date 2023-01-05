@@ -35,7 +35,7 @@ class Sku extends Model
 
     public function priceDynamics()
     {
-        return $this->hasMany(PriceHistory::class)->whereNotNull('price');
+        return $this->hasMany(PriceHistory::class, 'sku_id', 'id')->whereNotNull('price');
     }
 
     public function prices()

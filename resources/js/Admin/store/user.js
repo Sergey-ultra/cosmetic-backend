@@ -60,6 +60,12 @@ export default {
             commit('setTableOptionsToDefault')
             dispatch('loadUsers')
         },
+        loadAllUsers: async({ commit }) => {
+            const { data } = await api.get(`/users`, { params: { per_page: -1 } })
+            if (data) {
+                commit('setAllUsers', data)
+            }
+        },
         loadUsers: async ({ commit, state }) => {
             commit('setIsLoading', true)
 

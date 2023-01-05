@@ -2,6 +2,24 @@
     <form class="form">
         <div>Заглавная картинка статьи</div>
         <one-image-upload v-model:image="editedArticle.image"/>
+        <div class="invalid-feedback" v-for="error of v$.editedArticle.image.$errors" :key="error.$uid">
+            {{ error.$message }}
+        </div>
+
+        <div class="input-group" v-if="$route.params.id">
+            <label>
+                Автор
+                <select v-model="editedArticle.user_id" class="form-control input">
+                    <option
+                        v-for="option in allUsers"
+                        :key="option.id"
+                        :value="option.id"
+                    >
+                        {{ option.name }}
+                    </option>
+                </select>
+            </label>
+        </div>
 
         <div class="input-group">
             <label>
@@ -16,6 +34,10 @@
                     </option>
                 </select>
             </label>
+
+            <div class="invalid-feedback" v-for="error of v$.editedArticle.article_category_id.$errors" :key="error.$uid">
+                {{ error.$message }}
+            </div>
         </div>
 
 
@@ -53,6 +75,10 @@
                 Заголовок
                 <input v-model="editedArticle.title" type="text" class="form-control input">
             </label>
+
+            <div class="invalid-feedback" v-for="error of v$.editedArticle.title.$errors" :key="error.$uid">
+                {{ error.$message }}
+            </div>
         </div>
 
 
@@ -61,6 +87,11 @@
                 Превью
                 <textarea v-model="editedArticle.preview" class="form-control textarea"></textarea>
             </label>
+
+
+            <div class="invalid-feedback" v-for="error of v$.editedArticle.preview.$errors" :key="error.$uid">
+                {{ error.$message }}
+            </div>
         </div>
         <div class="input-group">
             Статья
@@ -89,6 +120,8 @@
     import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
     import UploadAdapter from '../../utils/customCKEditorUploader';
     import {mapActions, mapState} from "vuex";
+    import useVuelidate from "@vuelidate/core";
+    import {email, helpers, minLength, required} from "@vuelidate/validators";
 
 
     const uploader = function (editor) {
@@ -103,6 +136,33 @@
             selectElement,
             oneImageUpload,
         },
+        setup () {
+            return { v$: useVuelidate() }
+        },
+        validations () {
+            return {
+                editedArticle: {
+                    article_category_id: {
+                        required:  helpers.withMessage('Поле должно быть заполнено', required)
+                    },
+                    image: {
+                        required:  helpers.withMessage('Нужно выбрать картинку', required),
+                    },
+                    title: {
+                        required:  helpers.withMessage('Поле должно быть заполнено', required),
+                        minLength: helpers.withMessage('Заголовок должен быть не меньше 5 символов', minLength(5))
+                    },
+                    preview: {
+                        required:  helpers.withMessage('Поле должно быть заполнено', required),
+                        minLength: helpers.withMessage('Должно быть не меньше 5 символов', minLength(5))
+                    },
+                    body: {
+                        required:  helpers.withMessage('Поле должно быть заполнено', required),
+                        minLength: helpers.withMessage('Статья должна быть не меньше 10 символов', minLength(10))
+                    }
+                }
+            }
+        },
         data() {
             return {
                 editor: ClassicEditor,
@@ -115,6 +175,7 @@
         },
         computed: {
             ...mapState('article', ['currentArticle', 'articleCategories']),
+            ...mapState('user', ['allUsers']),
             ...mapState('tag', ['availableTags']),
             selectedTagIds: {
                 get() {
@@ -137,6 +198,7 @@
         async created() {
             this.loadAvailableTags();
             this.loadArticleCategories();
+            this.loadAllUsers();
             if (this.$route.params.id) {
                 await this.loadItem(this.$route.params.id)
                 this.initEditedObject()
@@ -148,16 +210,13 @@
                     await this.loadItem(value)
                     this.initEditedObject()
                 } else {
-                    this.editedArticle = {
-                        article_category_id: null,
-                        tag_ids:[]
-                    }
+                    this.initNewObject();
                 }
-            },
-
+            }
         },
         methods: {
             ...mapActions('article', ['loadItem', 'createItem', 'updateItem', 'loadArticleCategories']),
+            ...mapActions('user', ['loadAllUsers']),
             ...mapActions('tag', ['loadAvailableTags']),
             toggleSelectedTag(id) {
                 const index =  this.editedArticle.tag_ids.indexOf(id);
@@ -175,11 +234,23 @@
                         : []
                 }
             },
+            initNewObject() {
+                this.editedArticle = {
+                    article_category_id: null,
+                    tag_ids:[]
+                }
+            },
             async save() {
-                if (!this.$route.params.id) {
-                    await this.createItem(this.editedArticle)
-                }  else {
-                    await this.updateItem(this.editedArticle)
+                const validated = await this.v$.editedArticle.$validate();
+                if (validated) {
+                    if (!this.$route.params.id) {
+                        await this.createItem(this.editedArticle)
+                    } else {
+                        await this.updateItem(this.editedArticle)
+                    }
+
+                    this.initNewObject();
+                    this.v$.$reset();
                 }
             }
         }
@@ -315,4 +386,9 @@
             }
         }
     }
+
+    .invalid-feedback {
+        color: red;
+    }
+
 </style>

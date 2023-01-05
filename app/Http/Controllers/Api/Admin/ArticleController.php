@@ -67,7 +67,7 @@ class ArticleController extends Controller
      */
     public function show(int $id): ArticleSingleResource
     {
-        $article = Article::select('id', 'title', 'slug', 'preview', 'body', 'article_category_id', 'status', 'image')
+        $article = Article::select('id', 'title', 'slug', 'preview', 'body', 'article_category_id', 'status', 'image', 'user_id')
             ->where('id', $id)
             ->first();
 

@@ -17,9 +17,9 @@ class ArticleSingleResource extends JsonResource
      */
     public function toArray($request)
     {
-        $tag_ids = [];
+        $tagIds = [];
         if ($this->tags) {
-            $tag_ids = $this->tags->map(function ($item, $key) {
+            $tagIds = $this->tags->map(function ($item, $key) {
                 return $item->pivot->tag_id;
             });
         }
@@ -34,7 +34,8 @@ class ArticleSingleResource extends JsonResource
             'article_category_id' => $this->article_category_id,
             'image' => $this->image,
             'status' => $this->status,
-            'tag_ids' => $tag_ids
+            'user_id' => $this->user_id,
+            'tag_ids' => $tagIds
         ];
     }
 }
