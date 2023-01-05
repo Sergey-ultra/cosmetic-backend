@@ -24,7 +24,7 @@ class ComparedSkuResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'image' =>  json_decode($this->images, true)[0],
+            'image' =>  $this->image,
             'name' => $product->name,
             'code' => $product->code,
             'rating' => number_format((float) $this->rating, 1, '.', ''),
