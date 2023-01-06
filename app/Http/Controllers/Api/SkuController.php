@@ -227,7 +227,7 @@ class SkuController extends Controller
                     'rating' => $currentSku->rating,
                     'reviews_count' => $currentSku->reviews_count,
                     'question_count' => 0,
-                    'images' => $currentSku->images? json_decode($currentSku->images, true) : []
+                    'images' => $currentSku->images ?? []
                 ]
             ]);
 
