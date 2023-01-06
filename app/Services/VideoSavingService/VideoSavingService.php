@@ -12,23 +12,28 @@ class VideoSavingService implements VideoSavingInterface
     {
 
         if (preg_match('/^data:video\/(.*);base64,/', $stringData) || preg_match('/;base64,/', $stringData)) {
-            //$type = mime_content_type($stringData);
 
-            $extension = explode('/', explode(':', substr($stringData, 0, strpos($stringData, ';')))[1])[1];
-
-            $extension = str_replace('+xml', '', $extension);
 
             $replace = substr($stringData, 0, strpos($stringData, ',') + 1);
 
             $video = str_replace($replace, '', $stringData);
             $video = str_replace(' ', '+', $video);
 
-            $destinationPath = $folder . $fileName . '.' . $extension;
+            $destinationPath = $folder . $fileName . '.' . $this->getExtension($stringData);
 
             Storage::put($destinationPath, base64_decode($video));
             return Storage::url($destinationPath);
         }
 
        return $stringData;
+    }
+
+    protected function getExtension(string $stringData): string
+    {
+        $type = mime_content_type($stringData);
+
+        $extension = explode('-', explode('/', $type)[1])[1];
+
+        return str_replace('+xml', '', $extension);
     }
 }
