@@ -7,7 +7,7 @@ namespace App\Services\Parser;
 
 class Text
 {
-    public static function makeProductCode(string $brand, string $name)
+    public static function makeProductCode(string $brand, string $name): string
     {
         $brand = trim(preg_replace('~[Tt]he|~', '', $brand));
         $brand = mb_strtolower($brand, 'UTF-8');
@@ -19,7 +19,7 @@ class Text
         //return $string = iconv("utf-8", "us-ascii//TRANSLIT", $string);
         $name = preg_replace('#\+\s+|\"|\-\s+#u', '', $name);
         $name = preg_replace('#\s+|\'|\`#u', ' ', $name);
-        return self::makeCode($name);
+        return self::changeLangToEnglish($name);
 
 
         //$array[] = preg_replace('~[^-a-z0-9%_]+~', '-', $string);
@@ -27,31 +27,31 @@ class Text
         //return $array;
     }
 
-    public static function makeBrandCode(string $name)
+    public static function makeCode(string $name): string
     {
         $name = mb_strtolower($name, 'UTF-8');
         $name = preg_replace('#\+\s+|\"|\-\s+#u', '', $name);
         $name = preg_replace('#\s+|\'|\`#u', ' ', $name);
-        return self::makeCode($name);
+        return self::changeLangToEnglish($name);
     }
 
 
 
-    public static function makeIngredientCode($string)
+    public static function makeIngredientCode(string $string): string
     {
         $string = str_replace(' (Water)', '', $string);
-        return self::makeCode($string);
+        return self::changeLangToEnglish($string);
     }
 
-    public static function makeCode($string)
+    public static function changeLangToEnglish(string $string): string
     {
         $string = mb_strtolower($string, 'UTF-8');
         return self::latin($string);
     }
 
-    private static function latin($st)
+    private static function latin(string $st): string
     {
-        $char= ['а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'e','ё'=>'e','з'=>'z','и'=>'i',
+        $char = ['а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'e','ё'=>'e','з'=>'z','и'=>'i',
             'й'=>'y','к'=>'k','л'=>'l','м'=>'m','н'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t',
             ' '=>'-','+' => '','/' => '-',
             'у'=>'u','ф'=>'f','х'=>'h',"'"=>'','ы'=>'i','э'=>'e','ж'=>'zh','ц'=>'ts','ч'=>'ch','ш'=>'sh',
@@ -63,7 +63,7 @@ class Text
     }
 
 
-    public static function random($length = 16)
+    public static function random(int $length = 16): string
     {
         $string = '';
 

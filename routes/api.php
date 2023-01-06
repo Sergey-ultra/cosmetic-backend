@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\SkuController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\RatingController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\SkuVideoController;
 use App\Http\Controllers\Api\SocialController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TrackingController;
@@ -164,6 +165,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/reviews/my', [ReviewController::class, 'my']);
     Route::post('/review/check-existing-review', [ReviewController::class, 'checkExistingReview']);
     Route::post('/reviews', [ReviewController::class, 'updateOrCreate']);
+    Route::post('/reviews/add-video', [SkuVideoController::class, 'addOrUpdateVideo']);
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 
     Route::get('/questions/my', [QuestionController::class, 'my']);

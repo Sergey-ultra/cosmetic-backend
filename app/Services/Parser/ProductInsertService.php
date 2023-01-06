@@ -101,7 +101,7 @@ class ProductInsertService extends ProductInsertReturnArrayService
 
                             $insertedBrand = Brand::create([
                                 "name" => $insertRow->brand,
-                                "code" => Text::makeBrandCode($insertRow->brand),
+                                "code" => Text::makeCode($insertRow->brand),
                                 "country_id" => $countryId
                             ]);
                             $brandId = (int)$insertedBrand->id;

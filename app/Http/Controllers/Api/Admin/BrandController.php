@@ -91,7 +91,7 @@ class BrandController extends Controller
         if ($request->image) {
             $params['image'] = $imageSavingService->saveOneImage($request->image, self::IMAGES_FOLDER, $request->name);
         }
-        $params['code'] = Text::makeBrandCode($params['name']);
+        $params['code'] = Text::makeCode($params['name']);
 
         $newBrand = Brand::create($params);
 
@@ -120,7 +120,7 @@ class BrandController extends Controller
             if ($request->image) {
                 $params['image'] = $imageSavingService->saveOneImage($request->image, self::IMAGES_FOLDER, $request->name);
             }
-            $params['code'] = Text::makeBrandCode($params['name']);
+            $params['code'] = Text::makeCode($params['name']);
 
             $brand->update($params);
 

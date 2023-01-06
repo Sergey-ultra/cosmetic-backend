@@ -29,7 +29,7 @@
 </script>
 
 <style scoped>
-    svg{
+    svg {
         width: 40px;
         height: 40px;
         display:inline-block;

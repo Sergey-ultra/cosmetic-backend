@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 class ReviewController extends Controller
 {
     use DataProvider;
+
     /**
      *
      * @return \Illuminate\Http\Resources\Json\ResourceCollection

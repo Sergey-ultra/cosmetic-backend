@@ -62,6 +62,8 @@ instance.interceptors.response.use(
             if (status === 401) {
                 //store.commit('auth/removeToken')
                 //store.commit('notification/abort401')
+            } else if (status === 419) {
+
             } else {
                 store.dispatch('notification/setError', {
                     message:data.message,

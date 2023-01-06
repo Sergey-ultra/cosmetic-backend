@@ -102,7 +102,7 @@ class ProductInsertReturnArrayService
 
                         $brandId = $this->brand->insert([
                             "name" => $insertRow['brand'],
-                            "code" => Text::makeBrandCode($insertRow['brand']),
+                            "code" => Text::makeCode($insertRow['brand']),
                             "country_id" => $countryId
                         ]);
                         $brandIdsAndName[$brandName] = $brandId;

@@ -24,7 +24,7 @@ class LinkCrawlerParser implements ILinkParser
         string $storeUrl,
         string $productLink,
         bool $relatedProductLink,
-        string $nextPage,
+        ?string $nextPage,
         bool $isRelatedPageUrl
     ): array
     {
