@@ -31,9 +31,13 @@ class VideoSavingService implements VideoSavingInterface
     protected function getExtension(string $stringData): string
     {
         $type = mime_content_type($stringData);
+        $extension = explode('/', $type)[1];
+        $extension =  str_replace('+xml', '', $extension);;
 
-        $extension = explode('-', explode('/', $type)[1])[1];
+        if (str_contains($extension, '-')) {
+            $extension = explode('-', $extension)[1];
+        }
 
-        return str_replace('+xml', '', $extension);
+        return $extension;
     }
 }
