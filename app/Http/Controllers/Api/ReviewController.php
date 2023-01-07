@@ -11,11 +11,13 @@ use App\Http\Resources\ReviewCollection;
 use App\Models\Review;
 use App\Models\Sku;
 use App\Models\SkuRating;
+use App\Models\SkuVideo;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
 
 class ReviewController extends Controller
@@ -70,6 +72,39 @@ class ReviewController extends Controller
     public function additionalInfoBySkuId(int $id): JsonResponse
     {
 
+        $videos = SkuVideo::where(['sku_id' => $id, 'status' => 'published'])->get();
+
+        $info = $videos->reduce(
+            function(array $common, SkuVideo $skuVideo): array {
+                try {
+                    $videoPath =  str_replace('/storage', '', $skuVideo->video);
+                    $frameContents = FFMpeg::fromDisk('public')
+                        ->open($videoPath)
+                        ->getFrameFromSeconds(2)
+                        ->export()
+                        ->getFrameContents();
+//                    dd(mime_content_type($frameContents));
+                    $frameContents = mb_convert_encoding($frameContents, 'UTF-8', 'UTF-8');
+
+
+                    if ($frameContents) {
+                        $common[] = [
+                            'type' => 'video',
+                            'url' => $skuVideo->video,
+                            'thumbnail' => $frameContents
+                        ];
+                    }
+                } catch (\Throwable $e) {
+                   throw $e;
+                }
+
+                return $common;
+            },
+            []
+        );
+
+
+
         $reviews = Review::select(
             'reviews.images',
             'sku_ratings.rating'
@@ -81,12 +116,19 @@ class ReviewController extends Controller
             ])
             ->get();
 
-        $images = $reviews->reduce(function($common, $review) {
-            if ($review->images) {
-                return array_merge($common, $review->images);
-            }
-            return $common;
-        }, []);
+
+
+        $info = $reviews->reduce(
+            function(array $common, Review $review): array {
+                if ($review->images && count($review->images)) {
+                    foreach ( $review->images as $image) {
+                        $common[] = ['type' => 'image', 'url' => $image];
+                    }
+                }
+                return $common;
+            },
+            $info
+        );
 
         $ratingFilter = $reviews->groupBy('rating')->map(function($group) {
             return count($group);
@@ -94,7 +136,7 @@ class ReviewController extends Controller
 
         return response()->json(['data'=>
             [
-                'images' => $images,
+                'info' => $info,
                 'rating_filter' => $ratingFilter
             ]
         ]);

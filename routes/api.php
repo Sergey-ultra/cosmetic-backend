@@ -162,6 +162,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/comments', [CommentController::class, 'store']);
     Route::delete('/comments/{id}', [CommentController::class, 'destroy']);
 
+    Route::get('/videos/my', [SkuVideoController::class, 'my']);
+
+
     Route::get('/reviews/my', [ReviewController::class, 'my']);
     Route::post('/review/check-existing-review', [ReviewController::class, 'checkExistingReview']);
     Route::post('/reviews', [ReviewController::class, 'updateOrCreate']);

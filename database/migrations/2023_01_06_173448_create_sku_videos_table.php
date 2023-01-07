@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('description');
             $table->unsignedInteger('sku_id')->index();
             $table->unsignedInteger('user_id')->nullable()->index();
+            $table->string('status')->default('moderated');
             $table->timestamps();
         });
     }

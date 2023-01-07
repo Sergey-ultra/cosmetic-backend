@@ -38,7 +38,7 @@ class QuestionController extends Controller
             ->leftjoin('user_infos', 'users.id', '=', 'user_infos.user_id')
             ->where([
                 'questions.user_id' => Auth::id(),
-                ['questions.status', '!=', 'published']
+                ['questions.status', '!=', 'deleted']
             ])
         ;
 

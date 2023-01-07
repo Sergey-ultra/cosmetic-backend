@@ -3,7 +3,6 @@
 
 namespace App\Services\VideoSavingService;
 
-
 use Illuminate\Support\Facades\Storage;
 
 class VideoSavingService implements VideoSavingInterface
@@ -19,10 +18,11 @@ class VideoSavingService implements VideoSavingInterface
             $video = str_replace($replace, '', $stringData);
             $video = str_replace(' ', '+', $video);
 
-            $destinationPath = $folder . $fileName . '.' . $this->getExtension($stringData);
+            $videoDestinationPath = $folder . $fileName . '.' . $this->getExtension($stringData);
+            Storage::put($videoDestinationPath, base64_decode($video));
+            $videoFilePath = Storage::url($videoDestinationPath);
 
-            Storage::put($destinationPath, base64_decode($video));
-            return Storage::url($destinationPath);
+            return $videoFilePath;
         }
 
        return $stringData;
@@ -32,7 +32,7 @@ class VideoSavingService implements VideoSavingInterface
     {
         $type = mime_content_type($stringData);
         $extension = explode('/', $type)[1];
-        $extension =  str_replace('+xml', '', $extension);;
+        $extension =  str_replace('+xml', '', $extension);
 
         if (str_contains($extension, '-')) {
             $extension = explode('-', $extension)[1];
