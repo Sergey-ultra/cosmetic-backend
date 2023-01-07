@@ -17,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
 
@@ -74,24 +75,29 @@ class ReviewController extends Controller
 
         $videos = SkuVideo::where(['sku_id' => $id, 'status' => 'published'])->get();
 
+
         $info = $videos->reduce(
             function(array $common, SkuVideo $skuVideo): array {
+                $videoPath =  str_replace('/storage', '', $skuVideo->video);
+
+                $videoFileNameParts = explode('/', $videoPath);
+                $videoFile = $videoFileNameParts[count($videoFileNameParts) -1];
+                $videoFileName = explode('.', $videoFile, 2)[0];
+                $thumbnailPath =  "public/video/sku/thumbnail/$videoFileName.jpg";
+
                 try {
-                    $videoPath =  str_replace('/storage', '', $skuVideo->video);
                     $frameContents = FFMpeg::fromDisk('public')
                         ->open($videoPath)
                         ->getFrameFromSeconds(2)
                         ->export()
-                        ->getFrameContents();
-//                    dd(mime_content_type($frameContents));
-                    $frameContents = mb_convert_encoding($frameContents, 'UTF-8', 'UTF-8');
-
+                        ->toDisk('local')
+                        ->save($thumbnailPath);
 
                     if ($frameContents) {
                         $common[] = [
                             'type' => 'video',
-                            'url' => $skuVideo->video,
-                            'thumbnail' => $frameContents
+                            'video' => $skuVideo->video,
+                            'url' => Storage::url($thumbnailPath)
                         ];
                     }
                 } catch (\Throwable $e) {
@@ -102,6 +108,7 @@ class ReviewController extends Controller
             },
             []
         );
+
 
 
 
@@ -129,6 +136,7 @@ class ReviewController extends Controller
             },
             $info
         );
+
 
         $ratingFilter = $reviews->groupBy('rating')->map(function($group) {
             return count($group);
