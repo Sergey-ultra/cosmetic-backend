@@ -45,6 +45,7 @@ use App\Http\Controllers\Api\Admin\QuestionController as AdminQuestionController
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\Admin\TrackingController as AdminTrackingController;
 use App\Http\Controllers\Api\Admin\TagController as AdminTagController;
+use App\Http\Controllers\Api\Admin\SkuVideoController as AdminSkuVideoController;
 
 
 use App\Http\Controllers\Api\Admin\VisitStaticticsController;
@@ -273,6 +274,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/questions/set-status/{id}', [AdminQuestionController::class, 'setStatus']);
         Route::get('/questions', [AdminQuestionController::class, 'index']);
 
+        Route::post('/videos/set-status/{id}', [AdminSkuVideoController::class, 'setStatus']);
+        Route::get('/videos', [AdminSkuVideoController::class, 'index']);
 
 
         Route::post('/comments/set-status/{id}', [AdminCommentController::class, 'setStatus']);

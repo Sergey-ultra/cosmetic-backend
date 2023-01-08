@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class LinkParserController extends Controller
 {
-    public function parseLinks(Request $request, LinkCrawlerParser $linkParserService):JsonResponse
+    public function parseLinks(Request $request):JsonResponse
     {
         set_time_limit(7200);
 
@@ -19,25 +19,31 @@ class LinkParserController extends Controller
         $categoryId = (int) $request->categoryId;
         $isLoadToDb = (bool) ($request->isLoadToDb ?? false);
 
-        $linkOption = LinkOption::select('link_options.options', 'stores.link')
+        $linkOption = LinkOption::select(
+            'link_options.id',
+            'link_options.options',
+            'link_options.body',
+            'stores.link'
+        )
             ->join('stores', 'stores.id', '=', 'link_options.store_id')
             ->where(['store_id' => $storeId, 'category_id' => $categoryId])
             ->first();
 
         $option = json_decode($linkOption->options, true);
+        $body = json_decode($linkOption->body, true);
 
-
-       
-        $nextPage = $option['nextPage'] ?? NULL;
-        
-        $parsedLinks = $linkParserService->parseProductLinks(
-            $option['categoryUrl'],
-            $linkOption->link,
-            $option['productLink'],
+        $linkParserService = new LinkCrawlerParser(
+            $linkOption->id,
+            $body,
+            $option['nextPage'] ?? null,
             (bool) $option['relatedLink'],
-            $nextPage,
-            (bool) $option['relatedPageUrl']
+            $option['productLink'],
+            (bool) $option['relatedPageUrl'],
+            $linkOption->link
         );
+
+
+        $parsedLinks = $linkParserService->parseProductLinks($option['categoryUrl']);
 
         if (count($parsedLinks) === 0) {
             $result =  [

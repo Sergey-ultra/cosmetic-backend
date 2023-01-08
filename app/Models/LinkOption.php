@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class LinkOption extends Model
 {
-    protected $fillable = ['store_id', 'category_id', 'options'];
+    protected $fillable = ['store_id', 'category_id', 'options', 'main_page'];
 }

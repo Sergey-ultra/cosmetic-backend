@@ -33,7 +33,7 @@ export default [
     {
         path:'/admin/store',
         name:'store',
-        component:() => import('../views/store/stores.vue'),
+        component:() => import('../views/store/index.vue'),
         meta: { title:'Магазины' }
     },
     {
@@ -45,25 +45,25 @@ export default [
     {
         path:'/admin/countries',
         name:'countries',
-        component:() => import('../views/country/country.vue'),
+        component:() => import('../views/country/index.vue'),
         meta: { title:'Страны' }
     },
     {
         path:'/admin/ingredients',
         name:'ingredients',
-        component:() => import('../views/ingredient/ingredients.vue'),
+        component:() => import('../views/ingredient/index.vue'),
         meta: { title:'Ингредиенты' }
     },
     {
         path:'/admin/brands',
         name:'brands',
-        component:() => import('../views/brand/brands.vue'),
+        component:() => import('../views/brand/index.vue'),
         meta: { title: 'Бренды' }
     },
     {
         path:'/admin/categories',
         name:'categories',
-        component:() => import('../views/category/categories.vue'),
+        component:() => import('../views/category/index.vue'),
         meta: { title: 'Категории' }
     },
     {
@@ -75,7 +75,7 @@ export default [
     {
         path:'/admin/users',
         name:'users',
-        component:() => import('../views/users/users.vue'),
+        component:() => import('../views/users/index.vue'),
         meta: {title: 'Пользователи'}
     },
     {

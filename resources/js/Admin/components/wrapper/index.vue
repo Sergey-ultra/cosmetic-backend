@@ -108,6 +108,7 @@
                             {name: 'Комментарии', link: {name: 'comment'}},
                             {name: 'Вопросы', link: {name: 'question'}},
                             {name: 'Статьи', link: {name: 'article'}},
+                            {name: 'Видео', link: {name: 'video'}},
                             {name: 'Отзывы на статьи', link: {name: 'article-comment'}},
                             {name: 'Отслеживаемые', link: {name: 'trackings'}},
                         ]

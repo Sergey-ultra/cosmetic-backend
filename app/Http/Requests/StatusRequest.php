@@ -6,7 +6,7 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 
-class QuestionStatusRequest extends MiddleRequest
+class StatusRequest extends MiddleRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('sku_videos', function (Blueprint $table) {
             $table->id();
             $table->text('video');
+            $table->text('thumbnail');
             $table->string('description');
             $table->unsignedInteger('sku_id')->index();
             $table->unsignedInteger('user_id')->nullable()->index();

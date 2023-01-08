@@ -3,11 +3,13 @@
 
 namespace App\Services\VideoSavingService;
 
+
 use Illuminate\Support\Facades\Storage;
+use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
 class VideoSavingService implements VideoSavingInterface
 {
-    public function saveOneFile(string $stringData, string $folder, string $fileName): string
+    public function saveOneFile(string $stringData, string $folder, string $fileName): array
     {
 
         if (preg_match('/^data:video\/(.*);base64,/', $stringData) || preg_match('/;base64,/', $stringData)) {
@@ -22,10 +24,25 @@ class VideoSavingService implements VideoSavingInterface
             Storage::put($videoDestinationPath, base64_decode($video));
             $videoFilePath = Storage::url($videoDestinationPath);
 
-            return $videoFilePath;
+
+            try {
+                $thumbnailPath =   "$folder/thumbnail/$fileName.jpg";
+
+                $frameContents = FFMpeg::fromDisk('public')
+                    ->open(str_replace('/storage', '', $videoFilePath))
+                    ->getFrameFromSeconds(2)
+                    ->export()
+                    ->toDisk('local')
+                    ->save($thumbnailPath);
+
+            } catch (\Throwable $e) {
+                $thumbnailPath = null;
+            }
+
+            return [$videoFilePath, Storage::url($thumbnailPath)];
         }
 
-       return $stringData;
+       return [$stringData, null];
     }
 
     protected function getExtension(string $stringData): string

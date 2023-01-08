@@ -31,6 +31,12 @@ const constantRoutes = [
         meta: { title:'Статьи' }
     },
     {
+        path:'/admin/video',
+        name:'video',
+        component:() => import('../views/video/index.vue'),
+        meta: { title:'Видео' }
+    },
+    {
         path:'/admin/article-comment',
         name:'article-comment',
         component:() => import('../views/article-comment/index.vue'),

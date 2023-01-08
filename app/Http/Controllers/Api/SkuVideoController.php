@@ -73,7 +73,7 @@ class SkuVideoController extends Controller
         }
 
 
-        $videoFilePath = $videoSavingService->saveOneFile($request->file, self::VIDEO_FOLDER, $currentSku->code);
+        [$videoFilePath, $thumbnailPath] = $videoSavingService->saveOneFile($request->file, self::VIDEO_FOLDER, $currentSku->code);
 
 
         $skuVideo = SkuVideo::updateOrCreate(
@@ -83,6 +83,7 @@ class SkuVideoController extends Controller
             ],
             [
                 'video' => $videoFilePath,
+                'thumbnail' => $thumbnailPath,
                 'description' => $request->description
             ]
         );

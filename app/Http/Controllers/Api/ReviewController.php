@@ -17,8 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
+
 
 
 class ReviewController extends Controller
@@ -78,38 +77,16 @@ class ReviewController extends Controller
 
         $info = $videos->reduce(
             function(array $common, SkuVideo $skuVideo): array {
-                $videoPath =  str_replace('/storage', '', $skuVideo->video);
-
-                $videoFileNameParts = explode('/', $videoPath);
-                $videoFile = $videoFileNameParts[count($videoFileNameParts) -1];
-                $videoFileName = explode('.', $videoFile, 2)[0];
-                $thumbnailPath =  "public/video/sku/thumbnail/$videoFileName.jpg";
-
-                try {
-                    $frameContents = FFMpeg::fromDisk('public')
-                        ->open($videoPath)
-                        ->getFrameFromSeconds(2)
-                        ->export()
-                        ->toDisk('local')
-                        ->save($thumbnailPath);
-
-                    if ($frameContents) {
-                        $common[] = [
-                            'type' => 'video',
-                            'video' => $skuVideo->video,
-                            'url' => Storage::url($thumbnailPath)
-                        ];
-                    }
-                } catch (\Throwable $e) {
-                   throw $e;
-                }
+                $common[] = [
+                    'type' => 'video',
+                    'video' => $skuVideo->video,
+                    'url' => $skuVideo->thumbnail
+                ];
 
                 return $common;
             },
             []
         );
-
-
 
 
         $reviews = Review::select(

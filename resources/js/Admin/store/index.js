@@ -26,6 +26,7 @@ import question from './question'
 import supplier from './supplier'
 import tag from './tag'
 import articleComment from './article-comment'
+import video from './video'
 
 
 
@@ -58,7 +59,8 @@ export default createStore({
         question,
         supplier,
         tag,
-        articleComment
+        articleComment,
+        video
     }
 })
 
