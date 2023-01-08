@@ -32,6 +32,7 @@ class SkuVideoController extends Controller
             'skus.volume',
             'skus.images',
             'sku_videos.video',
+            'sku_videos.thumbnail',
             'sku_videos.status',
             'sku_videos.description',
             'sku_videos.created_at',

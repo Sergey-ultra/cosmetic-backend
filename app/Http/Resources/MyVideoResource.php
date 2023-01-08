@@ -23,6 +23,7 @@ class MyVideoResource extends JsonResource
             'volume' => $this->volume,
             'sku_image' => $this->image,
             'video' => $this->video,
+            'thumbnail' => $this->thumbnail,
             'description' => $this->description,
             'status' => $this->status,
             'created_at' => $this->created_at ? $this->created_at->toDateString() : null,

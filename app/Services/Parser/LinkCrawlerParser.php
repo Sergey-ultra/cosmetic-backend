@@ -36,6 +36,7 @@ class LinkCrawlerParser implements ILinkParser
         $result = [];
 
         if ($body = $this->getBody($categoryPageUrl)) {
+            $this->pageNumber++;
             $crawler = new Crawler();
             $crawler->addHtmlContent($body);
 
@@ -76,8 +77,9 @@ class LinkCrawlerParser implements ILinkParser
 
     protected function getBody(string $categoryPageUrl): ?string
     {
-        if (!$this->body[$this->pageNumber]) {
+        if (!isset($this->body[$this->pageNumber])) {
             $categoryPageUrl = $this->isRelatedPageUrl ? $this->storeUrl . $categoryPageUrl : $categoryPageUrl;
+
 
             $response = $this->httpClient->request($categoryPageUrl);
             $code = $response->getStatusCode();
@@ -85,11 +87,10 @@ class LinkCrawlerParser implements ILinkParser
 
             if (in_array($code, [200, 301])) {
                 $this->body[$this->pageNumber] = $response->getBody()->getContents();
-                LinkOption::where('id', $this->id)->update(['body' => json_encode($this->body)]);
+                LinkOption::where('id', $this->id)->update(['body' => $this->body]);
             }
         }
 
-        $this->pageNumber++;
         return $this->body[$this->pageNumber];
     }
 }

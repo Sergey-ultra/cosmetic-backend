@@ -15,9 +15,11 @@ class LinkParserController extends Controller
     {
         set_time_limit(7200);
 
-        $storeId = (int) $request->storeId;
-        $categoryId = (int) $request->categoryId;
-        $isLoadToDb = (bool) ($request->isLoadToDb ?? false);
+        $storeId = (int)$request->store_id;
+        $categoryId = (int)$request->category_id;
+        $isLoadToDb = (bool)($request->isLoadToDb ?? false);
+
+
 
         $linkOption = LinkOption::select(
             'link_options.id',
@@ -26,24 +28,23 @@ class LinkParserController extends Controller
             'stores.link'
         )
             ->join('stores', 'stores.id', '=', 'link_options.store_id')
-            ->where(['store_id' => $storeId, 'category_id' => $categoryId])
+            ->where(['link_options.store_id' => $storeId, 'link_options.category_id' => $categoryId])
             ->first();
 
-        $option = json_decode($linkOption->options, true);
-        $body = json_decode($linkOption->body, true);
+
 
         $linkParserService = new LinkCrawlerParser(
             $linkOption->id,
-            $body,
-            $option['nextPage'] ?? null,
-            (bool) $option['relatedLink'],
-            $option['productLink'],
-            (bool) $option['relatedPageUrl'],
+            $linkOption->body ?? [],
+            $linkOption->options['nextPage'] ?? null,
+            (bool) $linkOption->options['relatedLink'],
+            $linkOption->options['productLink'],
+            (bool) $linkOption->options['relatedPageUrl'],
             $linkOption->link
         );
 
 
-        $parsedLinks = $linkParserService->parseProductLinks($option['categoryUrl']);
+        $parsedLinks = $linkParserService->parseProductLinks($linkOption->options['categoryUrl']);
 
         if (count($parsedLinks) === 0) {
             $result =  [

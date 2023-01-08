@@ -15,7 +15,7 @@ class LinkOptionController extends Controller
         $categoryId =  (int) $request->category_id;
         $result = LinkOption::where(['store_id' => $storeId, 'category_id' => $categoryId])->first();
 
-        return response()->json(['data' => isset($result->options) ? json_decode($result->options) : null]);
+        return response()->json(['data' => $result?->options]);
     }
 
 

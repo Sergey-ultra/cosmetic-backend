@@ -28,7 +28,7 @@
     <form class="form__block" @input="setFormChangingToTrue">
         <div>
             <div class="form__element">
-                <div for="target__catalog">Относительный адрес Каталога</div>
+                <div for="target__catalog">Первая страница Каталога</div>
                 <input class="target__url" type="text" name="target__catalog"
                        v-model="options.categoryUrl"
                        :placeholder="categoryUrl"
