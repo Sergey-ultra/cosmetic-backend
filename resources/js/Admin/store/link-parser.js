@@ -3,21 +3,21 @@ import api from '../utils/api'
 export default {
     namespaced: true,
     state:{
-        isLoading: false,
+        isParsing: false,
         message: ''
     },
     mutations: {
-        setIsLoading: (state, payload) => state.isLoading = payload,
+        setIsParsing: (state, payload) => state.isParsing = payload,
         setMessage: (state, payload) => state.message = payload,
     },
     actions: {
         parseLinks: async({ commit }, obj) => {
-            commit('setIsLoading' , true)
+            commit('setIsParsing' , true)
             const { data } = await api.post("/parser/link/parse-links", obj)
             if (data) {
                 commit('setMessage', data.message)
             }
-            commit('setIsLoading' , false)
+            commit('setIsParsing' , false)
         },
     }
 }

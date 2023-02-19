@@ -74,6 +74,7 @@
                 @click="parse"
         >
             Спарсить ссылки
+            <loader :color="'#fff'" class="loader" v-if="isParsing"/>
         </button>
     </div>
 
@@ -82,10 +83,14 @@
 </template>
 
 <script>
+    import loader from "../../../components/loader.vue"
     import {mapActions, mapState} from "vuex";
 
     export default {
         name: "link-parser",
+        components: {
+            loader
+        },
         data() {
             return {
                 isLoadToDb: false,
@@ -105,7 +110,7 @@
             ...mapState('store',['allStores']),
             ...mapState('category',['allCategories']),
             ...mapState('linkOptions',['linkOptions']),
-            ...mapState('linkParser',['message']),
+            ...mapState('linkParser',['isParsing', 'message']),
         },
         async created() {
             this.loadAllStores()
@@ -209,5 +214,9 @@
     }
     .tagName {
         width:900px;
+    }
+    .loader {
+        position: absolute;
+        right: 0;
     }
 </style>

@@ -63,7 +63,8 @@ class LinkCrawlerParser implements ILinkParser
                     $nextPageElements = $nextPageElements->last();
                 }
 
-                $nextPageLink = $nextPageElements->getAttribute('href');
+
+                $nextPageLink = $nextPageElements->link()->getUri();
 
 
                 if ($nextPageLink) {
