@@ -8,5 +8,5 @@ namespace App\Services\CompressImageService;
 
 interface CompressImageInterface
 {
-    public function compress(string $filePath);
+    public function compress(string $filePath): array;
 }

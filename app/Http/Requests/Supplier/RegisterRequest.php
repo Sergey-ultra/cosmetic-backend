@@ -6,9 +6,9 @@ declare(strict_types=1);
 namespace App\Http\Requests\Supplier;
 
 
-use App\Http\Requests\MiddleRequest;
+use App\Http\Requests\JsonApiRequest;
 
-class RegisterRequest  extends MiddleRequest
+class RegisterRequest  extends JsonApiRequest
 {
 
     /**
@@ -16,7 +16,7 @@ class RegisterRequest  extends MiddleRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -26,7 +26,7 @@ class RegisterRequest  extends MiddleRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'name' => 'required|string|min:2|max:32',

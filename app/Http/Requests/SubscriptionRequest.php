@@ -3,14 +3,14 @@
 namespace App\Http\Requests;
 
 
-class SubscriptionRequest extends MiddleRequest
+class SubscriptionRequest extends JsonApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -20,7 +20,7 @@ class SubscriptionRequest extends MiddleRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'email' => 'required|string|email',

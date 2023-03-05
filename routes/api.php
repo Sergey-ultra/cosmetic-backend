@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\FavoritesController;
 use App\Http\Controllers\Api\FilterController;
-use App\Http\Controllers\Api\ImageController;
+use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\PriceHistoryController;
 use App\Http\Controllers\Api\RouteController;
 use App\Http\Controllers\Api\SearchController;
@@ -146,10 +146,12 @@ Route::get('/routes/articles', [RouteController::class, 'articles']);
 Route::get('/routes/categories', [RouteController::class, 'categories']);
 Route::get('/routes/brands', [RouteController::class, 'brands']);
 
-Route::post('/images', [ImageController::class, 'store']);
+
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::post('/files', [FileController::class, 'storeAsForm']);
 
     Route::get('/articles/my', [ArticleController::class, 'my']);
     Route::get('/articles/categories', [ArticleController::class, 'articleCategories']);
@@ -169,7 +171,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/reviews/my', [ReviewController::class, 'my']);
     Route::post('/review/check-existing-review', [ReviewController::class, 'checkExistingReview']);
     Route::post('/reviews', [ReviewController::class, 'updateOrCreate']);
-    Route::post('/reviews/add-video', [SkuVideoController::class, 'addOrUpdateVideo']);
+    Route::post('/reviews/add-video', [SkuVideoController::class, 'addOrUpdateVideoWithBase64Data']);
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 
     Route::get('/questions/my', [QuestionController::class, 'my']);
@@ -240,7 +242,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/sitemap', [SitemapController::class, 'create']);
 
 
-        //Route::delete('/images/{image}',[ImageController::class, 'destroy']);
+        //Route::delete('/images/{image}',[FileController::class, 'destroy']);
 
 
         Route::get('/articles/categories', [AdminArticleController::class, 'articleCategories']);

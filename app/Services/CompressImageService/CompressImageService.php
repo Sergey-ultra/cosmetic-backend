@@ -6,20 +6,28 @@ namespace App\Services\CompressImageService;
 
 
 use Imagick;
+use ImagickException;
 
 class CompressImageService implements CompressImageInterface
 {
-    public function compress(string $filePath, array $options = [['folder' => 'small', 'width' => 200, 'height' => 200]])
+    public function compress(string $filePath, array $options = [['folder' => 'small', 'width' => 200, 'height' => 200]]): array
     {
-        $im = new Imagick();
-        $im->pingImage($filePath);
-        $im->readImage($filePath);
 
-        foreach($options as $option) {
-            $im->resizeImage($option['width'], $option['height'], Imagick::FILTER_CATROM, 1, TRUE);
-            $im->setImageFormat("webp");
-            $im->setOption('webp:method', '6');
-            $im->writeImage($this->getDestinationPath($filePath, $option['folder']));
+        try {
+            $im = new Imagick();
+            $im->pingImage($filePath);
+            $im->readImage($filePath);
+
+            foreach ($options as $option) {
+                $im->resizeImage($option['width'], $option['height'], Imagick::FILTER_CATROM, 1, TRUE);
+                $im->setImageFormat("webp");
+                $im->setOption('webp:method', '6');
+                $im->writeImage($this->getDestinationPath($filePath, $option['folder']));
+            }
+
+            return ['status' => true];
+        } catch (ImagickException $e) {
+            return ['status' => false, 'message' => $e->getMessage()];
         }
 
 //

@@ -3,14 +3,14 @@
 namespace App\Http\Requests;
 
 
-class TrackingRequest extends MiddleRequest
+class TrackingRequest extends JsonApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -20,7 +20,7 @@ class TrackingRequest extends MiddleRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'sku_id' => 'required|numeric',

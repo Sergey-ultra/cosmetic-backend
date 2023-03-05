@@ -6,14 +6,14 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 
-class StatusRequest extends MiddleRequest
+class StatusRequest extends JsonApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -23,7 +23,7 @@ class StatusRequest extends MiddleRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'status' => 'required|in:rejected,deleted,moderated,published',

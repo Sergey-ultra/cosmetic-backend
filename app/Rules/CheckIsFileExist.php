@@ -23,10 +23,9 @@ class CheckIsFileExist implements Rule
      * @param  mixed  $value
      * @return bool
      */
-    public function passes($attribute, $value)
+    public function passes($attribute, $value): bool
     {
-        $handle = @fopen($value, 'r');
-        return $handle;
+        return @fopen($value, 'r');
     }
 
     /**
@@ -34,7 +33,7 @@ class CheckIsFileExist implements Rule
      *
      * @return string
      */
-    public function message()
+    public function message(): string
     {
         return 'Файл не существует.';
     }

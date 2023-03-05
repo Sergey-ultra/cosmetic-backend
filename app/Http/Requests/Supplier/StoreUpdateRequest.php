@@ -6,16 +6,16 @@ declare(strict_types=1);
 namespace App\Http\Requests\Supplier;
 
 
-use App\Http\Requests\MiddleRequest;
+use App\Http\Requests\JsonApiRequest;
 
-class StoreUpdateRequest extends MiddleRequest
+class StoreUpdateRequest extends JsonApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -25,7 +25,7 @@ class StoreUpdateRequest extends MiddleRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'id' => 'required|numeric',

@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
-
 namespace App\Http\Requests;
 
 
-class QuestionRequest extends JsonApiRequest
+
+class FileRequest extends JsonApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +24,11 @@ class QuestionRequest extends JsonApiRequest
     public function rules(): array
     {
         return [
-            'body' => 'required|string|min:5'
+            'files' => 'required|array',
+            'files.*' => 'file',
+            'entity' => 'string|in:sku,review',
+            'type' => 'string|in:image,video',
+            'file_name' => 'string'
         ];
     }
 }

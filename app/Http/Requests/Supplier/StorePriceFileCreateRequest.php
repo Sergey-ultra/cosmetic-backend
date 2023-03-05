@@ -1,14 +1,15 @@
 <?php
+
 declare(strict_types=1);
 
 
 namespace App\Http\Requests\Supplier;
 
 
-use App\Http\Requests\MiddleRequest;
+use App\Http\Requests\JsonApiRequest;
 use App\Rules\CheckIsFileExist;
 
-class StorePriceFileCreateRequest extends MiddleRequest
+class StorePriceFileCreateRequest extends JsonApiRequest
 {
 
     /**
@@ -16,7 +17,7 @@ class StorePriceFileCreateRequest extends MiddleRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -26,7 +27,7 @@ class StorePriceFileCreateRequest extends MiddleRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'price_url' => [

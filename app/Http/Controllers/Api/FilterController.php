@@ -7,12 +7,13 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Sku;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class FilterController extends Controller
 {
-   public function index(Request $request)
+   public function index(Request $request): JsonResponse
    {
        $categoryCode = $request->category_code;
        $brandCode = $request->brand_code;
@@ -28,10 +29,10 @@ class FilterController extends Controller
 
 
 
-       $productSubQuery = Product::select(['id', 'category_id', 'brand_id']);
+       $productSubQuery = Product::query()->select(['id', 'category_id', 'brand_id']);
 
        if ($categoryCode) {
-           $category = Category::where('code', $categoryCode)->first();
+           $category = Category::query()->where('code', $categoryCode)->first();
            if (!$category) {
                return response()->json(['error' => 'Not Found'], 404);
            }
@@ -39,7 +40,7 @@ class FilterController extends Controller
 
            $productSubQuery->where('category_id','=', $category->id);
        } else if ($brandCode) {
-           $brand = Brand::where('code', $brandCode)->first();
+           $brand = Brand::query()->where('code', $brandCode)->first();
            if (!$brand) {
                return response()->json(['error' => 'Not Found'], 404);
            }

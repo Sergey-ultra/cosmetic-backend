@@ -6,30 +6,38 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Sku;
 use App\Models\SkuUser;
-use App\Services\PriceHistoryService\PriceHistoryService;
+use App\Services\PriceHistoryService\PriceHistoryInterface;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class FavoritesController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
-        $ids = SkuUser::select('sku_id')->where('user_id', Auth::id())->get()->pluck('sku_id')->all();
+        $ids = SkuUser::query()
+            ->select('sku_id')
+            ->where('user_id', Auth::id())
+            ->get()
+            ->pluck('sku_id')
+            ->all()
+        ;
 
         return response()->json([ 'data' => $ids ]);
     }
 
-    public function showFavoriteSkus(PriceHistoryService $priceService)
+    public function showFavoriteSkus(PriceHistoryInterface $priceService): JsonResponse
     {
-        $skus = Sku::select(
-            'skus.id',
-            'skus.rating',
-            'skus.reviews_count',
-            'skus.volume',
-            'skus.images',
-            'products.name',
-            'products.code'
-        )
+        $skus = Sku::query()
+            ->select(
+                'skus.id',
+                'skus.rating',
+                'skus.reviews_count',
+                'skus.volume',
+                'skus.images',
+                'products.name',
+                'products.code'
+            )
             ->with('priceDynamics')
             ->join('sku_user', 'sku_user.sku_id', '=', 'skus.id')
             ->join('products', 'products.id', '=', 'skus.product_id')

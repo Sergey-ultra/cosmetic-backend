@@ -10,7 +10,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class MiddleRequest extends FormRequest
+class JsonApiRequest extends FormRequest
 {
     protected function failedValidation(Validator $validator)
     {

@@ -22,7 +22,7 @@ class ArticleController extends Controller
 {
     use DataProvider;
 
-    public function index(Request $request)
+    public function index(Request $request): ArticleWithTagsCollection
     {
         $perPage = (int)($request->per_page ?? 10);
 
@@ -34,7 +34,7 @@ class ArticleController extends Controller
         return new ArticleWithTagsCollection($result);
     }
 
-    public function last()
+    public function last(): ArticleCollection
     {
         $result = Article::withFullInfo()
             ->where('articles.status', 'published')

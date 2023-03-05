@@ -11,6 +11,8 @@ class MainController extends Controller
     public function main(Request $request)
     {
         //счетчик заходов на spa фронт
+        $name = (new Visit())->getConnectionName();
+//        dd(config('database'));
         Visit::hit($request);
 
 

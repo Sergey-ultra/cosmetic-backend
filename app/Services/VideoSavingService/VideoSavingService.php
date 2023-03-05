@@ -9,7 +9,12 @@ use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
 class VideoSavingService implements VideoSavingInterface
 {
-    public function saveOneFile(string $stringData, string $folder, string $fileName): array
+    public function saveOneAsFile(string $stringData, string $folder, string $fileName): array
+    {
+
+    }
+
+    public function saveOneAsBase64(string $stringData, string $folder, string $fileName): array
     {
 
         if (preg_match('/^data:video\/(.*);base64,/', $stringData) || preg_match('/;base64,/', $stringData)) {
@@ -24,25 +29,30 @@ class VideoSavingService implements VideoSavingInterface
             Storage::put($videoDestinationPath, base64_decode($video));
             $videoFilePath = Storage::url($videoDestinationPath);
 
-
-            try {
-                $thumbnailPath =   "$folder/thumbnail/$fileName.jpg";
-
-                $frameContents = FFMpeg::fromDisk('public')
-                    ->open(str_replace('/storage', '', $videoFilePath))
-                    ->getFrameFromSeconds(2)
-                    ->export()
-                    ->toDisk('local')
-                    ->save($thumbnailPath);
-
-            } catch (\Throwable $e) {
-                $thumbnailPath = null;
-            }
+            $thumbnailPath = $this->saveThumbnailByFilepath($videoFilePath, $folder, $fileName);
 
             return [$videoFilePath, Storage::url($thumbnailPath)];
         }
 
        return [$stringData, null];
+    }
+
+
+    public function saveThumbnailByFilepath(string $videoFilePath, string $folder, string $fileName): ?string
+    {
+        $thumbnailPath = "$folder/thumbnail/$fileName.jpg";
+        try {
+            FFMpeg::fromDisk('public')
+                ->open(str_replace('/storage', '', $videoFilePath))
+                ->getFrameFromSeconds(2)
+                ->export()
+                ->toDisk('local')
+                ->save($thumbnailPath);
+
+            return $thumbnailPath;
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     protected function getExtension(string $stringData): string

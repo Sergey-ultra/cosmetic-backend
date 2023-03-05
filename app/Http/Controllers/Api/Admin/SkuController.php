@@ -24,7 +24,7 @@ class SkuController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param Request $request
      * @return \App\Http\Resources\Admin\ProductCollection
      */
     public function index(Request $request): ProductCollection
@@ -83,9 +83,9 @@ class SkuController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \App\Services\ImageSavingService\ImageSavingService $imageSavingService
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @param ImageSavingService $imageSavingService
+     * @return JsonResponse
      */
     public function store(Request $request, ImageSavingService $imageSavingService): JsonResponse
     {
@@ -129,10 +129,10 @@ class SkuController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \App\Models\Sku $sku
-     * @param  \App\Services\ImageSavingService\ImageSavingService $imageSavingService
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @param Sku $sku
+     * @param ImageSavingService $imageSavingService
+     * @return JsonResponse
      */
     public function update(Request $request, Sku $sku, ImageSavingService $imageSavingService): JsonResponse
     {
