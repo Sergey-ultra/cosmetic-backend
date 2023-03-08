@@ -8,18 +8,15 @@ use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-
 
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request): JsonResponse
     {
-        if (User::where(['email' => $request->email, 'service' => NULL])->first()) {
+        if (User::query()->where(['email' => $request->email, 'service' => NULL])->first()) {
             return response()->json([
                 'status' => false,
                 'message' => 'На этот email занят.'
@@ -32,16 +29,20 @@ class AuthController extends Controller
             'password' => bcrypt($request->password)
         ]);
 
+        $response = [
+            'status' => true,
+            'isRequiredEmailVerification' => false,
+            'email' => $request->email,
+            'message' => 'Вы успешно зарегистрировались'
+        ];
+
         if($user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail()) {
             $user->sendEmailVerificationNotification();
-
-            return response()->json([
-                'status' => true,
-                'isRequiredEmailVerification' => true,
-                'email' => $request->email,
-                'message' => 'Необходимо подтверждение mail'
-            ]);
+            $response['isRequiredEmailVerification'] = true;
+            $response['message'] = 'Необходимо подтверждение mail';
         }
+
+        return response()->json($response);
     }
 
 
@@ -75,13 +76,12 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = $user->createToken('authToken')->plainTextToken;
         return response()->json([
             'status' => true,
             'message' => 'Пользователь успешно авторизирован',
             'isRequiredEmailVerification' => false,
             'name' => $user->name,
-            'token' => $token,
+            'token' => $user->getBearerToken(),
             'role' => $user->role->name,
             'avatar' => isset($user->info)
                 ? ($user->info->avatar ?? '/storage/icons/user_avatar.png')
@@ -91,7 +91,8 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $request->user()->token()->revoke();
+        //$request->user()->currentAccessToken()->delete();
         //auth()->user()->tokens()->delete();
         return response()->json([
             'status' => true,

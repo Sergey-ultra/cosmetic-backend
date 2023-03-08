@@ -42,13 +42,13 @@ return [
         ],
 
         'api' => [
-            'driver' => 'token',
+            'driver' => 'passport',
             'provider' => 'users',
             'hash' => false,
         ],
 
         'supplier' => [
-            'driver' => 'token',
+            'driver' => 'passport',
             'provider' => 'suppliers',
             'hash' => false,
         ]

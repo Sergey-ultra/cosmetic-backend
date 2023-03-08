@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\RatingController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SkuVideoController;
-use App\Http\Controllers\Api\SocialController;
+use App\Http\Controllers\Api\AuthSocialController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TrackingController;
 use App\Http\Controllers\Api\UserController;
@@ -76,21 +76,25 @@ use Illuminate\Support\Facades\Route;
 //
 //});
 
-//Route::post('/register', [AuthController::class, 'register']);
+
+
+Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail']);
-Route::get('/login/{service}', [SocialController::class, 'redirect']);
-Route::get('/login/{service}/callback', [SocialController::class, 'callback']);
+Route::get('/login/{service}', [AuthSocialController::class, 'redirect'])
+    ->whereIn('service', AuthSocialController::AVAILABLE_SERVICES);
+Route::get('/login/{service}/callback', [AuthSocialController::class, 'callback'])
+    ->whereIn('service', AuthSocialController::AVAILABLE_SERVICES);
 
 Route::group(['prefix' => '/admin'], function () {
     Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth:sanctum', 'role:admin']);
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth:api', 'role:admin']);
 });
 
 
 Route::post('/supplier/signin', [App\Http\Controllers\Api\Supplier\AuthController::class, 'login']);
 Route::post('/supplier/signup', [App\Http\Controllers\Api\Supplier\AuthController::class, 'register']);
-Route::post('/supplier/logout', [SupplierAuthController::class, 'logout'])->middleware(['auth:sanctum', 'role:supplier']);
+Route::post('/supplier/logout', [SupplierAuthController::class, 'logout'])->middleware(['auth:api', 'role:supplier']);
 
 
 
@@ -148,7 +152,7 @@ Route::get('/routes/brands', [RouteController::class, 'brands']);
 
 
 
-Route::group(['middleware' => ['auth:sanctum']], function () {
+Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::post('/files', [FileController::class, 'storeAsForm']);

@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace App\Services\ImageLoadingService;
 
-
 use App\Exceptions\ImageSavingException;
 use App\Jobs\CompressImageJob;
 use Illuminate\Support\Facades\Storage;
 
 class ImageLoadingService implements ImageLoadingInterface
 {
+    /**
+     * @param string $destinationFolder
+     * @param string $sourceUrl
+     * @param string $fileName
+     * @return array
+     * @throws ImageSavingException
+     */
     public  function loadingImage(string $destinationFolder, string $sourceUrl, string $fileName): array
     {
         try {
@@ -43,7 +49,12 @@ class ImageLoadingService implements ImageLoadingInterface
     }
 
 
-    protected function getFileName(string $sourceUrl, string $fileName = '')
+    /**
+     * @param string $sourceUrl
+     * @param string $fileName
+     * @return string
+     */
+    protected function getFileName(string $sourceUrl, string $fileName = ''): string
     {
         $imageUrlParts = explode('/', $sourceUrl);
         $imageName = $imageUrlParts[count($imageUrlParts) - 1];
