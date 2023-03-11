@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class LinkOption extends Model
 {
@@ -16,8 +16,8 @@ class LinkOption extends Model
         'options' => 'array',
     ];
 
-    public function pages(): BelongsTo
+    public function pages(): HasMany
     {
-        return $this->belongsTo(LinkPage::class,'link_option_id', 'id');
+        return $this->hasMany(LinkPage::class,  'link_option_id', 'id');
     }
 }

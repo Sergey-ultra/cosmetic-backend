@@ -7,6 +7,8 @@ use App\Configuration;
 use App\Services\CompressImageService\CompressImageInterface;
 use App\Services\CompressImageService\CompressImageService;
 use App\Services\Parser\ActualPriceParsingService;
+use App\Services\Parser\Contracts\ILinkParser;
+use App\Services\Parser\LinkCrawlerParser;
 use App\Services\Parser\PriceBulkInsertService;
 use App\Services\Parser\PriceCrawlerService;
 use App\Services\Parser\PriceParsingByCronService;
@@ -16,6 +18,8 @@ use App\Services\ProxyHttpClientService\ProxyHttpClientInterface;
 use App\Services\ProxyHttpClientService\ProxyHttpClientService;
 use App\Services\TreeService\TreeInterface;
 use App\Services\TreeService\TreeService;
+use App\Services\UrlService\IUrlService;
+use App\Services\UrlService\UrlService;
 use App\Services\VideoSavingService\VideoSavingInterface;
 use App\Services\VideoSavingService\VideoSavingService;
 use Illuminate\Support\ServiceProvider;
@@ -34,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(CompressImageInterface::class, CompressImageService::class);
         $this->app->singleton(VideoSavingInterface::class, VideoSavingService::class);
         $this->app->singleton(PriceHistoryInterface::class, PriceHistoryService::class);
+        $this->app->singleton(ILinkParser::class, LinkCrawlerParser::class);
+        $this->app->singleton(IUrlService::class, UrlService::class);
 
         $this->app->bind(
             PriceCrawlerService::class,

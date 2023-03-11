@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Api\Admin\Parser;
 use App\Http\Controllers\Controller;
 use App\Models\LinkOption;
 use App\Models\ParsingLink;
-use App\Services\Parser\LinkCrawlerParser;
+use App\Services\Parser\Contracts\ILinkParser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LinkParserController extends Controller
 {
-    public function parseLinks(Request $request):JsonResponse
+    public function parseLinks(Request $request, ILinkParser $linkParserService): JsonResponse
     {
         set_time_limit(7200);
 
@@ -32,20 +32,27 @@ class LinkParserController extends Controller
             ->where(['link_options.store_id' => $storeId, 'link_options.category_id' => $categoryId])
             ->first();
 
-        $bodyArray = $linkOption->pages ? $linkOption->pages->pluck('body')->all() : [];
 
-        $linkParserService = new LinkCrawlerParser(
+        $bodyArray = $linkOption->pages
+            ? $linkOption->pages
+                ->map(fn($item) => json_decode($item['body'] ,true))
+                ->all()
+            : [];
+
+//        $isRelatedProductLink =  (bool)($linkOption->options['relatedLink'] ?? false);
+//        $isRelatedPageUrl = (bool)($linkOption->options['relatedPageUrl'] ?? false);
+
+        $linkParserService->setParsingOptions(
             $linkOption->id,
             $bodyArray,
             $linkOption->options['nextPage'] ?? null,
-            (bool) $linkOption->options['relatedLink'],
             $linkOption->options['productLink'],
-            (bool) $linkOption->options['relatedPageUrl'],
             $linkOption->link
         );
 
 
         $parsedLinks = $linkParserService->parseProductLinks($linkOption->options['categoryUrl']);
+
 
         if (count($parsedLinks['links']) === 0) {
             $result =  [
@@ -67,10 +74,10 @@ class LinkParserController extends Controller
                             "category_id" => $categoryId
                         ];
                     },
-                    $parsedLinks
+                    $parsedLinks['links']
                 );
 
-                ParsingLink::insert($parsingLinks);
+                ParsingLink::query()->insert($parsingLinks);
 
                 $result['message'] = 'success';
             }

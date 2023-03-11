@@ -11,23 +11,35 @@ use App\Models\LinkPage;
 use App\Services\Parser\Contracts\ILinkParser;
 use App\Services\ProxyHttpClientService\ProxyHttpClientInterface;
 use App\Services\ProxyHttpClientService\ProxyHttpClientService;
+use App\Services\UrlService\IUrlService;
 use Symfony\Component\DomCrawler\Crawler;
 
 class LinkCrawlerParser implements ILinkParser
 {
-    protected ProxyHttpClientInterface $httpClient;
     protected int $pageNumber = 0;
+    protected int $linkOptionId;
+    protected array $body;
+    protected ?string $nextPage;
+    protected string $productLink;
+    protected string $storeUrl;
 
     public function __construct(
-        protected int $id,
-        protected array $body,
-        protected ?string $nextPage,
-        protected bool $relatedProductLink,
-        protected string $productLink,
-        protected bool $isRelatedPageUrl,
-        protected string $storeUrl
-    ) {
-        $this->httpClient = app(ProxyHttpClientService::class);
+        protected ProxyHttpClientService $httpClient,
+        protected IUrlService $urlService
+    ){}
+
+    public function setParsingOptions(
+        int     $linkOptionId,
+        array   $body,
+        ?string $nextPage,
+        string  $productLink,
+        string  $storeUrl
+    ): void {
+        $this->linkOptionId = $linkOptionId;
+        $this->body = $body;
+        $this->nextPage = $nextPage;
+        $this->productLink = $productLink;
+        $this->storeUrl = $storeUrl;
     }
 
 
@@ -52,11 +64,15 @@ class LinkCrawlerParser implements ILinkParser
 
             if (count($products)) {
                 foreach ($products as $product) {
-                    $link = $product->getAttribute('href');
-                    $link = $this->relatedProductLink ? $this->storeUrl . $link : $link;
+                    $productLink = $product->getAttribute('href');
 
-                    if ($link && !in_array($link, $productLinks)) {
-                        $productLinks['links'][] = $link;
+
+                    //$productLink = $this->isRelatedProductLink ? $this->storeUrl . $productLink : $productLink;
+
+                    $productLink = $this->urlService->relativeUrlToAbsolute($productLink, $this->storeUrl);
+
+                    if ($productLink && !in_array($productLink, $productLinks)) {
+                        $productLinks['links'][] = $productLink;
                     }
                 }
             }
@@ -89,9 +105,11 @@ class LinkCrawlerParser implements ILinkParser
     protected function getPageData(string $categoryPageUrl): array
     {
         if (!isset($this->body[$this->pageNumber])) {
-            if ($this->isRelatedPageUrl) {
-                $categoryPageUrl = $this->storeUrl . $categoryPageUrl;
-            }
+//            if ($this->isRelatedPageUrl) {
+//                $categoryPageUrl = $this->storeUrl . $categoryPageUrl;
+//            }
+
+            $categoryPageUrl = $this->urlService->relativeUrlToAbsolute($categoryPageUrl, $this->storeUrl);
 
             $response = $this->httpClient->request($categoryPageUrl);
             $code = $response->getStatusCode();
@@ -103,11 +121,9 @@ class LinkCrawlerParser implements ILinkParser
             if (in_array($code, [200, 301])) {
                 $body['content'] = $response->getBody()->getContents();
 
-                LinkPage::query()->create([
-                    'link_option_id' => $this->id,
-                    'page_number' => $this->pageNumber,
-                    'body' => $body
-                ]);
+                LinkPage::query()->updateOrCreate(
+                    ['link_option_id' => $this->linkOptionId, 'page_number' => $this->pageNumber],
+                    ['body' => json_encode($body)]);
             }
 
             $this->body[$this->pageNumber] = $body;
