@@ -17,7 +17,7 @@ class Configuration extends ParameterBag
             now()->addDay(),
             function () {
                 return array_reduce(
-                    ConfigurationOption::get()->toArray(),
+                    ConfigurationOption::query()->get()->toArray(),
                     function ($carry, $item) {
                         $carry[$item['key']] = $item['value'];
                         return $carry;
@@ -32,7 +32,7 @@ class Configuration extends ParameterBag
 
     public function set(string $key, $value)
     {
-        ConfigurationOption::updateOrCreate(['key' => $key], ['value' => $value]);
+        ConfigurationOption::query()->updateOrCreate(['key' => $key], ['value' => $value]);
 
         $this->parameters[$key] = $value;
     }

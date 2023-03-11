@@ -7,6 +7,7 @@ namespace App\Services\Parser;
 
 
 use App\Models\LinkOption;
+use App\Models\LinkPage;
 use App\Services\Parser\Contracts\ILinkParser;
 use App\Services\ProxyHttpClientService\ProxyHttpClientInterface;
 use App\Services\ProxyHttpClientService\ProxyHttpClientService;
@@ -33,9 +34,15 @@ class LinkCrawlerParser implements ILinkParser
 
     public function parseProductLinks(string $categoryPageUrl): array
     {
-        $result = [];
+        $pageData = $this->getPageData($categoryPageUrl);
 
-        if ($body = $this->getBody($categoryPageUrl)) {
+        $body = $pageData['content'];
+        $productLinks = [
+            'codes' => [$pageData['code']],
+            'links' => []
+        ];
+
+        if ($body) {
             $this->pageNumber++;
             $crawler = new Crawler();
             $crawler->addHtmlContent($body);
@@ -48,8 +55,8 @@ class LinkCrawlerParser implements ILinkParser
                     $link = $product->getAttribute('href');
                     $link = $this->relatedProductLink ? $this->storeUrl . $link : $link;
 
-                    if ($link && !in_array($link, $result)) {
-                        $result[] = $link;
+                    if ($link && !in_array($link, $productLinks)) {
+                        $productLinks['links'][] = $link;
                     }
                 }
             }
@@ -68,28 +75,42 @@ class LinkCrawlerParser implements ILinkParser
 
 
                 if ($nextPageLink) {
-                    $result = array_merge($result, $this->parseProductLinks($nextPageLink));
+                    $parsingProductLinks = $this->parseProductLinks($nextPageLink);
+                    $productLinks['links'] = array_merge($productLinks['links'], $parsingProductLinks['links']);
+                    $productLinks['codes'] = array_merge($productLinks['codes'], $parsingProductLinks['codes']);
                 }
             }
         }
 
-        return $result;
+
+        return $productLinks;
     }
 
-    protected function getBody(string $categoryPageUrl): ?string
+    protected function getPageData(string $categoryPageUrl): array
     {
         if (!isset($this->body[$this->pageNumber])) {
-            $categoryPageUrl = $this->isRelatedPageUrl ? $this->storeUrl . $categoryPageUrl : $categoryPageUrl;
-
+            if ($this->isRelatedPageUrl) {
+                $categoryPageUrl = $this->storeUrl . $categoryPageUrl;
+            }
 
             $response = $this->httpClient->request($categoryPageUrl);
             $code = $response->getStatusCode();
-
+            $body = [
+                'code' => $code,
+                'content' => null
+            ];
 
             if (in_array($code, [200, 301])) {
-                $this->body[$this->pageNumber] = $response->getBody()->getContents();
-                LinkOption::where('id', $this->id)->update(['body' => $this->body]);
+                $body['content'] = $response->getBody()->getContents();
+
+                LinkPage::query()->create([
+                    'link_option_id' => $this->id,
+                    'page_number' => $this->pageNumber,
+                    'body' => $body
+                ]);
             }
+
+            $this->body[$this->pageNumber] = $body;
         }
 
         return $this->body[$this->pageNumber];

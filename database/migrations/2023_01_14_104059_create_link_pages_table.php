@@ -15,7 +15,11 @@ return new class extends Migration
     {
         Schema::create('link_pages', function (Blueprint $table) {
             $table->id();
+            $table->unsignedInteger('link_option_id');
+            $table->tinyInteger('page_number');
+            $table->json('body')->nullable();
             $table->timestamps();
+            $table->index('link_option_id');
         });
     }
 

@@ -125,7 +125,7 @@ class ArticleController extends Controller
 
 
 
-        ArticleView::updateOrCreate([
+        ArticleView::query()->updateOrCreate([
             'article_id' => $article->id,
             'ip_address' => $request->ip()
         ],[]);

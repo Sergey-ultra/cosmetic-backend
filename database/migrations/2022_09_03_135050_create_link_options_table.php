@@ -18,7 +18,6 @@ class CreateLinkOptionsTable extends Migration
             $table->unsignedInteger('store_id');
             $table->unsignedInteger('category_id');
             $table->json('options');
-            $table->json('body')->nullable();
             $table->timestamps();
         });
     }

@@ -16,8 +16,8 @@ use Symfony\Component\DomCrawler\Crawler;
 class ProductCardCrawlerParser extends AbstractProductCardParser
 {
     const  DESTINATION_FOLDER = 'public/image/sku/';
-    protected $crawler;
-    protected $imageLoadingService;
+    protected Crawler $crawler;
+    protected ImageLoadingService $imageLoadingService;
 
 
     public function __construct(ParsingLinkWithOptionsDTO $currentLink)
@@ -44,8 +44,7 @@ class ProductCardCrawlerParser extends AbstractProductCardParser
                 try {
                     $current = $this->extractValue($option);
                 } catch (\Throwable $e) {
-                    throw new TextExtractException('опция '. $option[0] .
-                        ' '. $e->getMessage() .' '. $e->getFile() .' '.  $e->getLine());
+                    throw new TextExtractException("Опция {$option[0]} {$e->getMessage()} {$e->getFile()} {$e->getLine()}");
                 }
 
                 $property = $option[0];

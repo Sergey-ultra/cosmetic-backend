@@ -51,8 +51,6 @@ class UserController extends Controller
             'birthday_year' => $request['birthday_year']
         ]);
 
-
         return response()->json(['data' => ['status' => true]]);
     }
-
 }

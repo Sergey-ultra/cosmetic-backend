@@ -21,21 +21,22 @@ class LinkParserController extends Controller
 
 
 
-        $linkOption = LinkOption::select(
-            'link_options.id',
-            'link_options.options',
-            'link_options.body',
-            'stores.link'
-        )
+        $linkOption = LinkOption::query()
+            ->select(
+                'link_options.id',
+                'link_options.options',
+                'stores.link'
+            )
+            ->with('pages')
             ->join('stores', 'stores.id', '=', 'link_options.store_id')
             ->where(['link_options.store_id' => $storeId, 'link_options.category_id' => $categoryId])
             ->first();
 
-
+        $bodyArray = $linkOption->pages ? $linkOption->pages->pluck('body')->all() : [];
 
         $linkParserService = new LinkCrawlerParser(
             $linkOption->id,
-            $linkOption->body ?? [],
+            $bodyArray,
             $linkOption->options['nextPage'] ?? null,
             (bool) $linkOption->options['relatedLink'],
             $linkOption->options['productLink'],
@@ -46,7 +47,7 @@ class LinkParserController extends Controller
 
         $parsedLinks = $linkParserService->parseProductLinks($linkOption->options['categoryUrl']);
 
-        if (count($parsedLinks) === 0) {
+        if (count($parsedLinks['links']) === 0) {
             $result =  [
                 'message' => 'Нет спарсенных ссылок',
                 'res' => $parsedLinks
@@ -54,7 +55,7 @@ class LinkParserController extends Controller
 
         } else {
             //$result['links'] = $parsedLinks;
-            $result['links'] = $parsedLinks;
+            $result['links'] = $parsedLinks['links'];
 
             if ($isLoadToDb) {
                 $parsingLinks = array_map(
