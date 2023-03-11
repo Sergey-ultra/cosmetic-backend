@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\Parser;
 
-
-
-use App\Models\LinkOption;
 use App\Models\LinkPage;
 use App\Services\Parser\Contracts\ILinkParser;
 use App\Services\ProxyHttpClientService\ProxyHttpClientInterface;
-use App\Services\ProxyHttpClientService\ProxyHttpClientService;
 use App\Services\UrlService\IUrlService;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -24,7 +20,7 @@ class LinkCrawlerParser implements ILinkParser
     protected string $storeUrl;
 
     public function __construct(
-        protected ProxyHttpClientService $httpClient,
+        protected ProxyHttpClientInterface $httpClient,
         protected IUrlService $urlService
     ){}
 
@@ -79,6 +75,7 @@ class LinkCrawlerParser implements ILinkParser
 
 
 
+
             if ($this->nextPage) {
                 $nextPageElements = $crawler->filter($this->nextPage);
 
@@ -96,6 +93,8 @@ class LinkCrawlerParser implements ILinkParser
                     $productLinks['codes'] = array_merge($productLinks['codes'], $parsingProductLinks['codes']);
                 }
             }
+
+            $productLinks['links'] = array_unique($productLinks['links']);
         }
 
 
