@@ -14,4 +14,5 @@ interface ILinkParser
         string  $storeUrl
     ): void;
     public function parseProductLinks(string $categoryPageUrl): array;
+    public function getParsedBodies(): array;
 }

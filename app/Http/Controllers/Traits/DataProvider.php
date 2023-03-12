@@ -26,7 +26,7 @@ trait DataProvider
         return $query;
     }
 
-    protected function filterModel($query, bool $isJoin, array $filter)
+    protected function filterModel($query, bool $isJoin, array $filter): void
     {
         $isQueryBuilder = $isJoin && $query instanceof Builder;
 
@@ -51,7 +51,7 @@ trait DataProvider
         }
     }
 
-    protected function sortModel($query, string $sort)
+    protected function sortModel($query, string $sort): void
     {
         if ($sort[0] === '-') {
             $sort = substr($sort, 1);
@@ -61,7 +61,7 @@ trait DataProvider
         }
     }
 
-    protected function addCondition($query, string $column, string|array $param)
+    protected function addCondition($query, string $column, string|array $param): void
     {
 
         if (is_string($param)) {

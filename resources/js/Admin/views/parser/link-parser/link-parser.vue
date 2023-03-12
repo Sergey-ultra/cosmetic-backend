@@ -1,70 +1,66 @@
 <template>
-    <div class="form__element">
-        <div>Выберите магазин</div>
-        <select v-model="storeId">
-            <option value="null">Выберите магазин</option>
-            <option
-                    v-for="store in allStores"
-                    :key="store.id"
-                    :value="store.id"
-            >
-                {{ store.id }}    {{ store.name }}
-            </option>
-        </select>
-    </div>
-    <div class="form__element">
-        <div>Выберите категорию</div>
-        <select v-model="categoryId">
-            <option value="null">Выберите категорию</option>
-            <option
-                    v-for="category in allCategories"
-                    :key="category.id"
-                    :value="category.id"
-            >
-                {{ category.id }}    {{ category.name }}
-            </option>
-        </select>
-    </div>
-    <form class="form__block" @input="setFormChangingToTrue">
-        <div>
+    <form>
+        <div class="form__group">
             <div class="form__element">
-                <div for="target__catalog">Первая страница Каталога</div>
-                <input class="target__url" type="text" name="target__catalog"
-                       v-model="options.categoryUrl"
-                       :placeholder="categoryUrl"
-                >
+                <div>Выберите магазин</div>
+                <select v-model="storeId">
+                    <option value="null">Выберите магазин</option>
+                    <option
+                            v-for="store in allStores"
+                            :key="store.id"
+                            :value="store.id"
+                    >
+                        {{ store.id }}    {{ store.name }}
+                    </option>
+                </select>
             </div>
+        </div>
+
+        <div class="form__group">
             <div class="form__element">
-                <div>тег ссылки товарного предложения</div>
-                <input class="tagName" type="text" v-model="options.productLink">
-                <div>относительная ссылка</div>
-                <input  type="checkbox" v-model="options.relatedLink">
+                <div>Выберите категорию</div>
+                <select v-model="categoryId">
+                    <option value="null">Выберите категорию</option>
+                    <option
+                            v-for="category in allCategories"
+                            :key="category.id"
+                            :value="category.id"
+                    >
+                        {{ category.id }}    {{ category.name }}
+                    </option>
+                </select>
             </div>
-            <div class="form__element">
-                <div>тег кнопки следующей страницы</div>
-                <input class="tagName" type="text" v-model="options.nextPage">
-                <div>относительная ссылка</div>
-                <input  type="checkbox" v-model="options.relatedPageUrl">
-            </div>
-            <div class="form__element">
-                <button
-                        type="button"
-                        class="btn"
-                        :disabled="!(isFormChanging && storeId !== null)"
-                        @click="saveOptions"
-                >
-                    Сохранить настройки
-                </button>
-            </div>
+        </div>
+
+        <div class="form__group">
+            <button type="button" class="button button-settings" style="margin-left: auto;" @click="toggleIsShowLinkOptions">
+                <svg class="form__icon" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path><path d="m22.215 7.759-1.427-2.483a1.398 1.398 0 0 0-1.755-.591l-2.22.93-1.69-.97-.307-2.422A1.403 1.403 0 0 0 13.426 1h-2.853a1.403 1.403 0 0 0-1.39 1.224L8.88 4.622l-1.72.982-2.191-.92a1.4 1.4 0 0 0-1.756.593L1.787 7.756a1.403 1.403 0 0 0 .364 1.814l1.855 1.41.003 2.038-1.859 1.413a1.402 1.402 0 0 0-.365 1.81l1.427 2.482a1.398 1.398 0 0 0 1.754.592l2.22-.93 1.69.97.308 2.421A1.404 1.404 0 0 0 10.574 23h2.853a1.403 1.403 0 0 0 1.39-1.224l.304-2.398 1.72-.982 2.192.92a1.402 1.402 0 0 0 1.755-.593l1.425-2.479a1.401 1.401 0 0 0-.365-1.814l-1.854-1.41-.002-2.038L21.85 9.57a1.402 1.402 0 0 0 .365-1.81zm-4.226 2.233.007 4.023 2.222 1.687-.9 1.565-2.613-1.097-3.443 1.966L12.898 21h-1.796l-.367-2.886-3.412-1.956-2.641 1.109-.9-1.565 2.229-1.694-.007-4.02-2.222-1.69.9-1.565L7.294 7.83l3.444-1.966L11.102 3h1.796l.367 2.886 3.412 1.956 2.641-1.109.9 1.565-2.229 1.694z"></path></svg>
+                <span>{{ isShowLinkOptions ? 'Скрыть настройки' : 'Показать настройки'}}</span>
+            </button>
         </div>
     </form>
 
+    <link-options-form
+        v-if="isShowLinkOptions"
+        :storeId="storeId"
+        :categoryId="categoryId"
+    />
 
-    <div class="parser__settings">
-        <label>
-            Загрузить в базу данных
-            <input type="checkbox" v-model="isLoadToDb">
-        </label>
+
+
+    <div class="settings">
+        <div class="setting">
+            <label>
+                <input type="checkbox" v-model="isLoadToDb">
+                Загрузить в базу данных
+            </label>
+        </div>
+        <div class="setting">
+            <label>
+                <input type="checkbox" v-model="isOpenPreviewAfterParsingLocal">
+                Показывать результаты в modal
+            </label>
+        </div>
     </div>
     <div class="form__element">
         <button
@@ -78,18 +74,25 @@
         </button>
     </div>
 
-    {{ message }}
+    <preview-links-modal
+        v-if="isShowPreviewLocal"
+        v-model:isShowForm="isShowPreviewLocal"
+    />
 
 </template>
 
 <script>
     import loader from "../../../components/loader.vue"
-    import {mapActions, mapState} from "vuex";
+    import {mapActions, mapMutations, mapState} from "vuex";
+    import previewLinksModal from "../../../components/link-parsing/preview-links-modal.vue";
+    import linkOptionsForm from "../../../components/link-parsing/link-options-form.vue";
 
     export default {
         name: "link-parser",
         components: {
-            loader
+            loader,
+            previewLinksModal,
+            linkOptionsForm
         },
         data() {
             return {
@@ -97,6 +100,7 @@
                 storeId: null,
                 categoryId: null,
                 isFormChanging:false,
+                isShowLinkOptions: false,
                 options: {
                     categoryUrl: "",
                     productLink: "",
@@ -109,63 +113,43 @@
         computed: {
             ...mapState('store',['allStores']),
             ...mapState('category',['allCategories']),
-            ...mapState('linkOptions',['linkOptions']),
-            ...mapState('linkParser',['isParsing', 'message']),
+            ...mapState('linkParser',['isParsing', 'isShowPreview', 'isOpenPreviewAfterParsing']),
+            isShowPreviewLocal: {
+                get() {
+                    return this.isShowPreview;
+                },
+                set(value) {
+                    this.setIsShowPreview(value);
+                }
+            },
+            isOpenPreviewAfterParsingLocal: {
+                get() {
+                    return this.isOpenPreviewAfterParsing
+                },
+                set(value) {
+                    this.setIsOpenPreviewAfterParsing(value)
+                }
+            }
         },
         async created() {
             this.loadAllStores()
             this.loadAllCategories()
-        },
-        watch: {
-            storeId() {
-                this.loadOptions()
-            },
-            categoryId() {
-                this.loadOptions()
-            },
-            linkOptions(value) {
-                this.options = { ...value }
-            }
         },
         methods:{
             ...mapActions('store', ['loadAllStores']),
             ...mapActions('category', ['loadAllCategories']),
             ...mapActions('linkOptions', ['loadLinkOptions', 'saveLinkOptions']),
             ...mapActions('linkParser', ['parseLinks']),
-            setFormChangingToTrue() {
-                this.isFormChanging = true
-            },
-            async loadOptions() {
-                this.isFormChanging = false
-                if (this.storeId && this.storeId !== 'null' && this.categoryId && this.categoryId !== 'null') {
-                    this.loadLinkOptions({
-                        store_id: this.storeId,
-                        category_id: this.categoryId
-                    })
-                } else {
-                    this.options = {
-                        categoryUrl: "",
-                            productLink: "",
-                            relatedLink: true,
-                            nextPage:"",
-                            relatedPageUrl: true
-                    }
-                }
-            },
-            async saveOptions() {
-                this.isFormChanging = false
-                this.saveLinkOptions({
-                    store_id: this.storeId,
-                    category_id: this.categoryId,
-                    options: this.options
-                })
-            },
+            ...mapMutations('linkParser', ['setIsShowPreview', 'setIsOpenPreviewAfterParsing']),
             async parse() {
-                this.parseLinks({
+                await this.parseLinks({
                     category_id: this.categoryId,
                     store_id: this.storeId,
                     isLoadToDb: this.isLoadToDb,
                 })
+            },
+            toggleIsShowLinkOptions() {
+                this.isShowLinkOptions = !this.isShowLinkOptions
             }
         }
     }
@@ -193,30 +177,41 @@
             background-color: rgba(0,0,0,.12);
             color: rgba(0,0,0,.26);
         }
+        &-settings {
+            margin-top: 20px;
+            margin-left: auto;
+        }
     }
 
-    .form__block {
-        background-color: rgba(0, 0, 0, 0.08);
-        border-radius:5px;
-        border: 1px solid rgba(0,0,0,0.55);
-        display:flex;
-        align-items:flex-end;
-        margin:29px 0;
-        box-shadow: 0px 1px 4px rgba(0,0,0,0.15);
-        padding:20px;
-    }
-    .form__group {
-        display: flex;
-        justify-content: space-between;
-    }
-    .target__url {
-        width:900px;
-    }
-    .tagName {
-        width:900px;
+    .form {
+        &__group {
+            display: flex;
+            justify-content: space-between;
+        }
+        &__element {
+            margin: 15px 0;
+        }
+        &__block {
+            background-color: rgba(0, 0, 0, 0.08);
+            border-radius:5px;
+            border: 1px solid rgba(0,0,0,0.55);
+            align-items:flex-end;
+            margin:29px 0;
+            box-shadow: 0px 1px 4px rgba(0,0,0,0.15);
+            padding:20px;
+        }
+        &__icon {
+            fill: #fff;
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
     }
     .loader {
         position: absolute;
         right: 0;
+    }
+    .setting {
+        margin: 12px 0;
     }
 </style>

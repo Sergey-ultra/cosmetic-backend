@@ -158,7 +158,7 @@
                                 {name: 'Бренды', link: {name: 'brands'}},
                                 {name: 'Страны', link: {name: 'countries'}},
                                 {name: 'Товарные предложения', link: {name: 'skus'}},
-                                {name: 'Ингредиент', link: {name: 'ingredients'}},
+                                {name: 'Ингредиенты', link: {name: 'ingredients'}},
                                 {name: 'Пользователи', link: {name: 'users'}},
                                 {name: 'Test', link: {name: 'test'}},
                             ]

@@ -38,42 +38,41 @@ class LinkCrawlerParser implements ILinkParser
         $this->storeUrl = $storeUrl;
     }
 
+    /**
+     * @return array
+     */
+    public function getParsedBodies(): array
+    {
+        return $this->body;
+    }
 
 
+    /**
+     * @param string $categoryPageUrl
+     * @return array
+     */
     public function parseProductLinks(string $categoryPageUrl): array
     {
+        $productLinks = [];
+
         $pageData = $this->getPageData($categoryPageUrl);
-
-        $body = $pageData['content'];
-        $productLinks = [
-            'codes' => [$pageData['code']],
-            'links' => []
-        ];
-
-        if ($body) {
+        if ($body = $pageData['content']) {
             $this->pageNumber++;
-            $crawler = new Crawler();
-            $crawler->addHtmlContent($body);
 
+            $crawler = new Crawler($body, null, $this->storeUrl);
+//            $crawler->addHtmlContent();
             $products = $crawler->filter($this->productLink);
-
 
             if (count($products)) {
                 foreach ($products as $product) {
                     $productLink = $product->getAttribute('href');
-
-
-                    //$productLink = $this->isRelatedProductLink ? $this->storeUrl . $productLink : $productLink;
-
                     $productLink = $this->urlService->relativeUrlToAbsolute($productLink, $this->storeUrl);
 
                     if ($productLink && !in_array($productLink, $productLinks)) {
-                        $productLinks['links'][] = $productLink;
+                        $productLinks[] = $productLink;
                     }
                 }
             }
-
-
 
 
             if ($this->nextPage) {
@@ -81,33 +80,30 @@ class LinkCrawlerParser implements ILinkParser
 
                 if (count($nextPageElements)) {
                     $nextPageElements = $nextPageElements->last();
-                }
 
+                    $nextPageLink = $nextPageElements->link()->getUri();
 
-                $nextPageLink = $nextPageElements->link()->getUri();
-
-
-                if ($nextPageLink) {
-                    $parsingProductLinks = $this->parseProductLinks($nextPageLink);
-                    $productLinks['links'] = array_merge($productLinks['links'], $parsingProductLinks['links']);
-                    $productLinks['codes'] = array_merge($productLinks['codes'], $parsingProductLinks['codes']);
+                    if ($nextPageLink) {
+                        $parsingProductLinks = $this->parseProductLinks($nextPageLink);
+                        $productLinks= array_merge($productLinks, $parsingProductLinks);
+                    }
                 }
             }
 
-            $productLinks['links'] = array_unique($productLinks['links']);
+            $productLinks= array_unique($productLinks);
         }
 
 
         return $productLinks;
     }
 
+    /**
+     * @param string $categoryPageUrl
+     * @return array
+     */
     protected function getPageData(string $categoryPageUrl): array
     {
         if (!isset($this->body[$this->pageNumber])) {
-//            if ($this->isRelatedPageUrl) {
-//                $categoryPageUrl = $this->storeUrl . $categoryPageUrl;
-//            }
-
             $categoryPageUrl = $this->urlService->relativeUrlToAbsolute($categoryPageUrl, $this->storeUrl);
 
             $response = $this->httpClient->request($categoryPageUrl);

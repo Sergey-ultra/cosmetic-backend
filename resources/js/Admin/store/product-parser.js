@@ -38,7 +38,6 @@ export default {
                 if (state.isOpenPreviewAfterParsing) {
                     commit('setIsShowPreview', true)
                 }
-
             }
 
             commit('setIsParsingProduct', false)

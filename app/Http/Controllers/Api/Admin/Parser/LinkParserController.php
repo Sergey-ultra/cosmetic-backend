@@ -33,6 +33,11 @@ class LinkParserController extends Controller
             ->first();
 
 
+        if (!$linkOption) {
+            return response()->json(['data' => ['message' => 'нет настроек']]);
+        }
+
+
         $bodyArray = $linkOption->pages
             ? $linkOption->pages
                 ->map(fn($item) => json_decode($item['body'] ,true))
@@ -53,16 +58,15 @@ class LinkParserController extends Controller
 
         $parsedLinks = $linkParserService->parseProductLinks($linkOption->options['categoryUrl']);
 
+        $result['links'] = $parsedLinks;
 
-        if (count($parsedLinks['links']) === 0) {
-            $result =  [
-                'message' => 'Нет спарсенных ссылок',
-                'res' => $parsedLinks
-            ];
+        if (count($parsedLinks) === 0) {
+            $result['message'] = 'Нет спарсенных ссылок';
+            $result['bodies'] = $linkParserService->getParsedBodies();
 
         } else {
             //$result['links'] = $parsedLinks;
-            $result['links'] = $parsedLinks['links'];
+            $result['message'] = 'success';
 
             if ($isLoadToDb) {
                 $parsingLinks = array_map(
@@ -74,14 +78,14 @@ class LinkParserController extends Controller
                             "category_id" => $categoryId
                         ];
                     },
-                    $parsedLinks['links']
+                    $parsedLinks
                 );
 
-                ParsingLink::query()->insert($parsingLinks);
-
-                $result['message'] = 'success';
+                ParsingLink::query()->upsert($parsingLinks, []);
             }
         }
+
+
 
         return response()->json(['data' => $result]);
     }

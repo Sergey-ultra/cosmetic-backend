@@ -23,7 +23,6 @@
 
         <template v-slot:buttons>
             <button class="button" type="button" @click="$emit('update:isShowForm', false)">Отмена</button>
-
         </template>
     </modal>
 </template>
@@ -49,9 +48,6 @@
         },
         computed: {
             ...mapState('productParser', ['preview']),
-        },
-        methods: {
-
         }
     }
 </script>

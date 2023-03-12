@@ -32,8 +32,8 @@
 
 
         <product-options-form
-                v-if="isShowProductOptions"
-                :storeId="storeId"
+            v-if="isShowProductOptions"
+            :storeId="storeId"
         />
 
     </form>
