@@ -120,7 +120,7 @@
                     {title: 'link', value: 'link', width: '20%'},
                     {title: 'image', value: 'image', width: '15%', sort: false},
                     {title: 'links_count', value: 'links_count', width: '10%'},
-                    {title: 'Парситься', value: 'price_parsing_status', width: '10%'},
+                    {title: 'Парсятся цены?', value: 'price_parsing_status', width: '10%'},
                     {title: 'check_images_count', value: 'check_images_count', width: '10%'},
                     {title: 'Рейтинг', value: 'rating', width: '5%'},
                     {title: 'Действия', value: 'action', width: '10%'}

@@ -17,7 +17,7 @@ class ProductParserController extends Controller
         $linkIds = (array) $request->linkIds;
 
         //зачем мы передаем эти значения с фронта?
-        $brandId = (int) $request->brandId;
+        $brandId = $request->brandId ? (int) $request->brandId : null;
         $storeId = (int) $request->storeId;
 
         $result = $productParserService->parseProducts($isLoadToDb, $linkIds, $storeId, $brandId);

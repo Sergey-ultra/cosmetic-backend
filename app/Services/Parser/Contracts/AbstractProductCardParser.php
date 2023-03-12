@@ -173,7 +173,11 @@ abstract class AbstractProductCardParser
                 if ($current) {
 
                     $current = html_entity_decode($current);
-                    //dd($current);
+
+                    if (preg_match($ingredientPattern, $current, $ingredientsMatches)) {
+                        $current = $ingredientsMatches[0];
+                    }
+
                     $current = trim(preg_replace('#\r|\n|\t#', '', $current));
                     $current = trim(preg_replace('#Состав:#', '', $current));
                     $current = trim(preg_replace('#Активные ингредиенты.#', '', $current));

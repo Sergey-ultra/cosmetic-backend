@@ -25,6 +25,7 @@ class ProductInsertService extends ProductInsertReturnArrayService
             set_time_limit(7200);
             $brandPattern = '#[-+\s+]#';
 
+
             if (!isset($brandId)) {
                 [$brandIdsAndName, $countryIdsAndName] = $this->prepareExistingBrandsAndCountries($parsedInfo);
             }
@@ -117,7 +118,7 @@ class ProductInsertService extends ProductInsertReturnArrayService
 
                     if (!$isProductExist) {
 
-                        $insertedProduct = Product::create([
+                        $insertedProduct = Product::query()->create([
                             "brand_id" => $brandId,
                             "category_id" => $insertRow->category_id,
                             "name" => $insertRow->name,
@@ -157,7 +158,7 @@ class ProductInsertService extends ProductInsertReturnArrayService
                             'user_name' => 'Robot.Smart-Beautiful'
                         ]);
 
-                        PriceHistory::create([
+                        PriceHistory::query()->create([
                             "sku_id" => $skuId,
                             "store_id" => $storeId,
                             "link_id" => $insertRow->link_id,
@@ -231,13 +232,16 @@ class ProductInsertService extends ProductInsertReturnArrayService
 
         $countryIdsAndName = [];
         if (count($countryNameValues) > 0) {
-            $existingCountries = Country::select('id', 'name')
+            $existingCountries = Country::query()
+                ->select('id', 'name')
                 ->where(function ($query) use ($countryNameValues) {
                     foreach ($countryNameValues as $name) {
                         $query->orWhere('name', 'like', $name);
                     }
                 })
-                ->get();
+                ->get()
+                ->toArray()
+            ;
 
             $countryIdsAndName = Utils::findExisting($existingCountries, $countryNameValues, '%');
         }
@@ -250,7 +254,8 @@ class ProductInsertService extends ProductInsertReturnArrayService
                         $query->orWhere('name', 'like', $name);
                     }
                 })
-                ->get();
+                ->get()
+            ->toArray();
 
             $brandIdsAndName = Utils::findExisting($existingBrands, $brandNameValues, '%');
         }

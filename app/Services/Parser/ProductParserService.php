@@ -20,7 +20,7 @@ class ProductParserService
     public function __construct(private ProductInsertService $productInsertService)
     {}
 
-    public function parseProducts(bool $isLoadToDb, array $linkIds, int $storeId, int $brandId): array
+    public function parseProducts(bool $isLoadToDb, array $linkIds, int $storeId, ?int $brandId): array
     {
         $links = $this->getLinksWithOptionsByIds($linkIds);
 
@@ -46,9 +46,9 @@ class ProductParserService
             if (!is_null($currentParsedProduct)) {
                 $res['data'][] = $currentParsedProduct;
 
-                $imageCountCondition = !$currentLink['check_images_count'] || count($currentParsedProduct->images) > 0;
+                $imageCountCondition = !$currentLink->check_images_count || count($currentParsedProduct->images) > 0;
 
-                if ($imageCountCondition && (int) $currentParsedProduct->price > self::MIN_PRICE) {
+                if ($imageCountCondition && $currentParsedProduct->price > self::MIN_PRICE) {
                     $parsedInfo[] = $currentParsedProduct;
                 } else {
                     $abandonedProducts[] = $currentParsedProduct;
@@ -78,7 +78,7 @@ class ProductParserService
     }
 
 
-    protected function insertProductCardsToDb(array $parsedInfo, int $storeId, int $brandId): array
+    protected function insertProductCardsToDb(array $parsedInfo, int $storeId, ?int $brandId): array
     {
         try {
             $res['data'][] = $this->productInsertService->insertProductsInfo($parsedInfo, $storeId, $brandId);

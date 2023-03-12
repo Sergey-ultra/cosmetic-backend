@@ -24,24 +24,29 @@ class ImageLoadingService implements ImageLoadingInterface
 
             $destinationPath = $destinationFolder . $imageName;
 
-            $size = 'no_exist';
-            if (! (is_file($destinationPath) && file_exists($destinationPath)) ) {
+
+            $filePath = Storage::path($destinationPath);
+            $imageSavePath = Storage::url($destinationPath);
+
+            if (! (is_file($filePath) && file_exists($filePath)) ) {
                 $fileContent = file_get_contents($sourceUrl);
 
                 if ($fileContent) {
-                    Storage::put($destinationPath, $fileContent);
-                    //$size = file_put_contents($destinationPath, $fileContent);
-                    //Storage::path($destinationPath);
-                    $imageSavePath = Storage::url($destinationPath);
+                    $isSavingSuccess = Storage::put($destinationPath, $fileContent);
+                    if ($isSavingSuccess) {
 
-                    CompressImageJob::dispatch($imageSavePath);
+                        //$size = file_put_contents($destinationPath, $fileContent);
+
+                        CompressImageJob::dispatch($imageSavePath);
+                    }
                 }
             } else  {
                 //$size = exif_imagetype($filePath);
-                $size = @getimagesize($destinationPath);
             }
 
-            return  [$imageSavePath, $size];
+            $size = @getimagesize($filePath);
+
+            return  [$size, $imageSavePath];
 
         } catch (\Throwable $e) {
             throw new ImageSavingException($e->getMessage());
