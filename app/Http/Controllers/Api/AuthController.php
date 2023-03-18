@@ -36,7 +36,7 @@ class AuthController extends Controller
             'message' => 'Вы успешно зарегистрировались'
         ];
 
-        if($user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail()) {
+        if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
             $user->sendEmailVerificationNotification();
             $response['isRequiredEmailVerification'] = true;
             $response['message'] = 'Необходимо подтверждение mail';

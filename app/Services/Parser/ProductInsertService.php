@@ -41,7 +41,7 @@ class ProductInsertService extends ProductInsertReturnArrayService
             $brandCondition = isset($brandId) ? true : count($brandIdsAndName) > 0;
 
             if (count($productNameValues) > 0 && $brandCondition) {
-                $existingProducts = Product::select('id', 'name', 'brand_id')
+                $existingProducts = Product::query()->select('id', 'name', 'brand_id')
                     ->where(function ($query) use ($productNameValues) {
                         foreach ($productNameValues as $name) {
                             $query->orWhere('name', 'like', $name);
@@ -61,7 +61,7 @@ class ProductInsertService extends ProductInsertReturnArrayService
                     $existingProductIds = array_column($existingProducts, 'id');
 
 
-                    $existingSkus = Sku::select('id', 'volume', 'product_id')
+                    $existingSkus = Sku::query()->select('id', 'volume', 'product_id')
                         ->whereIn('product_id', $existingProductIds)
                         ->get();
 
@@ -94,13 +94,13 @@ class ProductInsertService extends ProductInsertReturnArrayService
                                 if (array_key_exists($countryName, $countryIdsAndName)) {
                                     $countryId = (int)$countryIdsAndName[$countryName];
                                 } else {
-                                    $insertedCountry = Country::create(["name" => $insertRow->country]);
+                                    $insertedCountry = Country::query()->create(["name" => $insertRow->country]);
                                     $countryId = (int)$insertedCountry->id;
                                     $countryIdsAndName[$countryName] = $countryId;
                                 }
                             }
 
-                            $insertedBrand = Brand::create([
+                            $insertedBrand = Brand::query()->create([
                                 "name" => $insertRow->brand,
                                 "code" => Text::makeCode($insertRow->brand),
                                 "country_id" => $countryId
@@ -166,9 +166,9 @@ class ProductInsertService extends ProductInsertReturnArrayService
                         ]);
                     }
 
-                    ParsingLink::where('id', $insertRow->link_id)->update(['parsed'=> 1]);
+                    ParsingLink::query()->where('id', $insertRow->link_id)->update(['parsed'=> 1]);
 
-                    Link::create([
+                    Link::query()->create([
                         'id' => $insertRow->link_id,
                         'link' => $insertRow->link,
                         'code' => Token::getToken(),

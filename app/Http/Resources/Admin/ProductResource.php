@@ -24,6 +24,7 @@ class ProductResource extends JsonResource
             'brand' => $this->brand,
             'name' => $this->name,
             'code' => $this->code,
+            'is_ingredients_exist' => $this->is_ingredients_exist,
             'volume' => $this->volume,
             'images' => $this->images ? json_decode($this->images, true) : null,
             'created_at' => substr($this->created_at, 0, 10)

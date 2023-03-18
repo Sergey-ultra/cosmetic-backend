@@ -31,6 +31,11 @@ class SkuController extends Controller
     {
         $perPage =  $request->per_page ?? 10;
 
+        $ingredientProductSubQuery = DB::table('ingredient_product')
+            ->select('product_id')
+            ->groupBy('product_id')
+        ;
+
         $query = DB::table('products')
             ->select([
                 'skus.id as id',
@@ -40,11 +45,15 @@ class SkuController extends Controller
                 'products.code as code',
                 'skus.volume as volume',
                 'skus.images as images',
-                'skus.created_at as created_at'
+                'skus.created_at as created_at',
+                DB::raw("IF(ip.product_id IS NULL, false, true) AS is_ingredients_exist")
             ])
             ->join('skus', 'skus.product_id', '=', 'products.id')
             ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoinSub($ingredientProductSubQuery, 'ip', function ($join) {
+                $join->on('ip.product_id', '=', 'products.id');
+            })
         ;
 
 

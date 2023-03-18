@@ -20,6 +20,10 @@
             </div>
         </template>
 
+        <template v-slot:is_ingredients_exist="product">
+            {{ product.item.is_ingredients_exist === 1 ? 'Да' : 'Нет' }}
+        </template>
+
         <template v-slot:action="product">
             <div class="action" @click="showForm(product.item.id)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -71,12 +75,13 @@
         data() {
             return {
                 headers: [
-                    {title: 'id', value: 'id', width: '5%'},
+                    {title: 'id', value: 'id', width: '2%'},
                     {title: 'Категория', value: 'category', width: '5%', filter: {type: 'select'}},
                     {title: 'Бренд', value: 'brand', width: '10%', filter: {type: 'input'}},
                     {title: 'Изображение', value: 'images', width: '15%', sort: false},
                     {title: 'Имя', value: 'name', width: '20%', filter: {type: 'input'}},
                     {title: 'Код', value: 'code', width: '25%', filter: {type: 'input'}},
+                    {title: 'Ингред.', value: 'is_ingredients_exist', width: '3%'},
                     {title: 'Объем', value: 'volume', width: '5%', filter: {type: 'input'}},
                     {title: 'Дата', value: 'created_at', width: '5%'},
                     {title: 'Действия', value: 'action', width: '10%'}

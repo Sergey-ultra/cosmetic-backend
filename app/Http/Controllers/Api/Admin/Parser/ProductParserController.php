@@ -22,6 +22,6 @@ class ProductParserController extends Controller
 
         $result = $productParserService->parseProducts($isLoadToDb, $linkIds, $storeId, $brandId);
 
-        return response()->json(['data' => $result]);
+        return response()->json($result);
     }
 }
