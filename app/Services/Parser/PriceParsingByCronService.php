@@ -25,7 +25,7 @@ class PriceParsingByCronService
        $res = 'start' . (new \DateTime())->format('Y-m-d H:i:s');
 
         try {
-            if ($this->configuration->getWeekStatus()) {
+            if ($this->configuration->getBoolean('week_status')) {
                 $linksWithSkuIdsAndStoreIds = $this->actualPriceParsingService->index(rand(10,17));
 
                 $linesCount = $linksWithSkuIdsAndStoreIds->count();
@@ -33,7 +33,7 @@ class PriceParsingByCronService
 
                 if ($linesCount === 0) {
                     $this->actualPriceParsingService->copyLinksToActualPriceParsingTable();
-                    $this->configuration->setWeekStatus(false);
+                    $this->configuration->setBoolean('week_status', false);
 
 
                 } else {

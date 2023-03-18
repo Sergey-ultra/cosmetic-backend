@@ -37,14 +37,10 @@ class Configuration extends ParameterBag
         $this->parameters[$key] = $value;
     }
 
-    public function getWeekStatus(): bool
-    {
-        return (bool)$this->get('week_status', false);
-    }
 
-    public function setWeekStatus(bool $value): void
+    public function setBoolean(string $key, bool $value): void
     {
         $value = $value ? 'true' : 'false';
-        $this->set('week_status', $value);
+        $this->set($key, $value);
     }
 }

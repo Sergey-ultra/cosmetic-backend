@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\SettingController;
 use App\Http\Controllers\Api\ArticleCommentController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthController;
@@ -244,6 +245,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 
         Route::get('/sitemap', [SitemapController::class, 'create']);
+        Route::get('/settings/get-is-required-email-verification', [SettingController::class, 'getIsRequiredEmailVerification']);
+        Route::post('/settings/set-is-required-email-verification', [SettingController::class, 'setIsRequiredEmailVerification']);
 
 
         //Route::delete('/images/{image}',[FileController::class, 'destroy']);

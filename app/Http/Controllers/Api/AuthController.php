@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Configuration;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
@@ -14,16 +15,16 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request): JsonResponse
+    public function register(RegisterRequest $request, Configuration $configuration): JsonResponse
     {
         if (User::query()->where(['email' => $request->email, 'service' => NULL])->first()) {
             return response()->json([
                 'status' => false,
-                'message' => 'На этот email занят.'
+                'message' => 'Этот email уже используется.'
             ]);
         };
 
-        $user = User::create([
+        $user = User::query()->create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password)
@@ -36,7 +37,9 @@ class AuthController extends Controller
             'message' => 'Вы успешно зарегистрировались'
         ];
 
-        if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
+        $isRequiredEmailVerification = $configuration->getBoolean('is_required_email_verification');
+
+        if ($isRequiredEmailVerification && $user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
             $user->sendEmailVerificationNotification();
             $response['isRequiredEmailVerification'] = true;
             $response['message'] = 'Необходимо подтверждение mail';
@@ -47,7 +50,7 @@ class AuthController extends Controller
 
 
 
-    public function login(LoginRequest $request): JsonResponse
+    public function login(LoginRequest $request, Configuration $configuration): JsonResponse
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
@@ -58,15 +61,15 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        if (!$user->hasVerifiedEmail()) {
+        $isRequiredEmailVerification = $configuration->getBoolean('is_required_email_verification');
+
+        if ($isRequiredEmailVerification && $user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
             return response()->json([
                 'status' => true,
-                'message' => 'Необходимо подтверждение mail',
+                'message' => 'Необходимо подтверждение email',
                 'isRequiredEmailVerification' => true,
                 'email' => $request->email
-            ]);
-
-            //abort(403, 'Email is not verified');
+            ], 403);
         }
 
         if ($request->has('asAdmin') && !$user->hasAnyRole(['admin', 'moderator'])) {
