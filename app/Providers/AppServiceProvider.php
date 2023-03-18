@@ -6,6 +6,8 @@ namespace App\Providers;
 use App\Configuration;
 use App\Services\CompressImageService\CompressImageInterface;
 use App\Services\CompressImageService\CompressImageService;
+use App\Services\ImageLoadingService\ImageLoadingInterface;
+use App\Services\ImageLoadingService\ImageLoadingService;
 use App\Services\Parser\ActualPriceParsingService;
 use App\Services\Parser\Contracts\ILinkParser;
 use App\Services\Parser\LinkCrawlerParser;
@@ -40,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(PriceHistoryInterface::class, PriceHistoryService::class);
         $this->app->singleton(ILinkParser::class, LinkCrawlerParser::class);
         $this->app->singleton(IUrlService::class, UrlService::class);
+        $this->app->singleton(ImageLoadingInterface::class, ImageLoadingService::class);
 
         $this->app->bind(
             PriceCrawlerService::class,

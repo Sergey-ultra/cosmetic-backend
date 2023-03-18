@@ -5,17 +5,17 @@
     >
         <template v-slot:header>Спарсенная инфа</template>
 
-        <div v-for="(product, productIndex) in preview" :key="productIndex">
-            <div v-for="(value, name, index) in product" :key="index">
-                <h4>{{ name }}</h4>
+        <div class="preview__wrapper" v-for="(product, productIndex) in preview" :key="productIndex">
+            <div class="preview__row" v-for="(value, name, index) in product" :key="index">
+                <div class="preview__item preview__title">{{ name }}</div>
 
-                <div class="flex" v-if="name === 'images'">
+                <div class="preview__item preview__content" v-if="['images','imageLinks'].includes(name)">
                     <img class="image" v-for="image in value" :key="image" :src="image"/>
                 </div>
-                <div v-else-if="name === 'ingredient'">
+                <div class="preview__item preview__content" v-else-if="name === 'ingredient'">
                     <div v-for="ingredient in value" :key="ingredient">{{ ingredient }}</div>
                 </div>
-                <div v-else>
+                <div class="preview__item preview__content" v-else>
                     <span>{{ value }}</span>
                 </div>
             </div>
@@ -68,11 +68,6 @@
             background: #ebeff4;
         }
     }
-    .flex {
-        align-items: center;
-        display: flex;
-        flex-wrap: wrap;
-    }
     .image {
         background-size: 32px 32px;
         border: 0;
@@ -85,6 +80,34 @@
         &:hover {
             transform: scale(1.2);
             transition: all .2s ease;
+        }
+    }
+    .preview {
+        &__wrapper {
+            border: 1px solid #999999;
+            border-radius: 4px;
+            margin:15px 0;
+        }
+        &__row {
+            display: flex;
+            padding: 5px 0;
+            &:not(:last-child) {
+                border-bottom: 1px solid #999999;
+            }
+        }
+        &__item {
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+        &__title {
+            width:10%;
+            font-weight: bold;
+            padding-right:15px;
+        }
+        &__content {
+            width:90%;
+            flex-wrap: wrap;
         }
     }
 </style>

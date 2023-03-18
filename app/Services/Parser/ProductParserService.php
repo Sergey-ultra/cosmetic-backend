@@ -27,6 +27,7 @@ class ProductParserService
         $parsedInfo = [];
         $abandonedProducts = [];
         $res = [];
+        $res['message'] = 'success';
 
 
         foreach ($links as $currentLink) {

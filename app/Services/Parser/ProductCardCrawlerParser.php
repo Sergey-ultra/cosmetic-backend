@@ -8,24 +8,28 @@ namespace App\Services\Parser;
 use App\Exceptions\ImageSavingException;
 use App\Exceptions\TextExtractException;
 use App\Exceptions\TextMethodException;
+use App\Services\ImageLoadingService\ImageLoadingInterface;
 use App\Services\Parser\Contracts\AbstractProductCardParser;
 use App\Services\Parser\DTO\ParsingLinkWithOptionsDTO;
 use App\Services\Parser\DTO\ProductCardDTO;
 use App\Services\ImageLoadingService\ImageLoadingService;
+use App\Services\UrlService\IUrlService;
 use Symfony\Component\DomCrawler\Crawler;
 
 class ProductCardCrawlerParser extends AbstractProductCardParser
 {
     const  DESTINATION_FOLDER = 'public/image/sku/';
     protected Crawler $crawler;
-    protected ImageLoadingService $imageLoadingService;
+    protected ImageLoadingInterface $imageLoadingService;
+    protected IUrlService $urlService;
 
 
     public function __construct(ParsingLinkWithOptionsDTO $currentLink)
     {
         parent::__construct($currentLink);
         $this->crawler = new Crawler();
-        $this->imageLoadingService = new ImageLoadingService();
+        $this->imageLoadingService = app(ImageLoadingInterface::class);
+        $this->urlService = app(IUrlService::class);
     }
 
     public function parseProductCard(): ?ProductCardDTO
@@ -84,7 +88,7 @@ class ProductCardCrawlerParser extends AbstractProductCardParser
         foreach ($imgLinks as $key => $imgLink) {
             $imgLink = $imgLink->getAttribute($this->currentLink->imgAttr);
 
-            $this->productCard->imageLinks[] = $imgLink;
+            $this->productCard->imageLinks[] = $this->urlService->relativeUrlToAbsolute($imgLink, $storeUrl);
 
             if ($imgLink) {
                 $fileName = $this->productCard->code . '-' . preg_replace('#\s+#', '', $this->productCard->volume) . '_' . ($key + 1);
