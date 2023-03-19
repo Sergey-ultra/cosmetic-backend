@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Configuration;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
@@ -12,12 +13,15 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
+use Symfony\Component\Mailer\Exception\TransportException;
 
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request, Configuration $configuration): JsonResponse
     {
-        if (User::query()->where(['email' => $request->email, 'service' => NULL])->first()) {
+        $email = $request->email;
+        if (User::query()->where(['email' => $email, 'service' => NULL])->first()) {
             return response()->json([
                 'status' => false,
                 'message' => 'Этот email уже используется.'
@@ -26,23 +30,29 @@ class AuthController extends Controller
 
         $user = User::query()->create([
             'name' => $request->name,
-            'email' => $request->email,
+            'email' => $email,
             'password' => bcrypt($request->password)
         ]);
 
         $response = [
             'status' => true,
             'isRequiredEmailVerification' => false,
-            'email' => $request->email,
+            'email' => $email,
             'message' => 'Вы успешно зарегистрировались'
         ];
 
         $isRequiredEmailVerification = $configuration->getBoolean('is_required_email_verification');
 
         if ($isRequiredEmailVerification && $user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
-            $user->sendEmailVerificationNotification();
+            try {
+                $user->sendEmailVerificationNotification();
+                $response['message'] = "На ваш email $email выслано подтверждение аккаунта";
+            } catch (TransportException $e) {
+                $response['message'] = 'Не удалось отправить email верификации. Попробуйте отправить еще раз';
+                $response['data'] = $e->getMessage();
+            }
+
             $response['isRequiredEmailVerification'] = true;
-            $response['message'] = 'Необходимо подтверждение mail';
         }
 
         return response()->json($response);
@@ -125,10 +135,33 @@ class AuthController extends Controller
     }
 
 
-    public function resendVerificationEmail(Request $request): JsonResponse
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        try {
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
+        } catch (TransportException $e) {
+            return response()->json([
+                'message' => "Не удалось отправить новый пароль на email",
+                'data' => $e->getMessage()
+            ]);
+        }
+        return response()->json([
+            'message' => "На почту выслан новый пароль",
+            'data' => $status
+        ]);
+    }
+
+    public function passwordReset()
     {
 
-        $user = User::where('email', $request->email)->first();
+    }
+
+
+    public function resendVerificationEmail(Request $request): JsonResponse
+    {
+        $user = User::query()->where('email', $request->email)->first();
 
         if (!$user) {
             abort('403', 'Email not found.');
@@ -138,7 +171,13 @@ class AuthController extends Controller
             abort('403', 'Verification email not sent. Already verified.');
         }
 
-        $user->sendEmailVerificationNotification();
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (TransportException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ]);
+        }
 
         return response()->json([
             'message' => "На почту выслано подтверждение",

@@ -82,6 +82,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::get('/login/{service}', [AuthSocialController::class, 'redirect'])
     ->whereIn('service', AuthSocialController::AVAILABLE_SERVICES);
 Route::get('/login/{service}/callback', [AuthSocialController::class, 'callback'])
