@@ -10,18 +10,26 @@
                 </select>
             </div>
 
-            <button type="button" class="button table__top-item" @click="setTableOptionsToDefault">Reload</button>
+            <buttonComponent
+                :size="'small'"
+                class="table__top-item"
+                :disabled="storeId === null || storeId === 'null'"
+                @click="setTableOptionsToDefault"
+            >
+                <svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 30 30" width="24px" height="24px">
+                    <path d="M 15 3 C 12.031398 3 9.3028202 4.0834384 7.2070312 5.875 A 1.0001 1.0001 0 1 0 8.5058594 7.3945312 C 10.25407 5.9000929 12.516602 5 15 5 C 20.19656 5 24.450989 8.9379267 24.951172 14 L 22 14 L 26 20 L 30 14 L 26.949219 14 C 26.437925 7.8516588 21.277839 3 15 3 z M 4 10 L 0 16 L 3.0507812 16 C 3.562075 22.148341 8.7221607 27 15 27 C 17.968602 27 20.69718 25.916562 22.792969 24.125 A 1.0001 1.0001 0 1 0 21.494141 22.605469 C 19.74593 24.099907 17.483398 25 15 25 C 9.80344 25 5.5490109 21.062074 5.0488281 16 L 8 16 L 4 10 z"/>
+                </svg>
+            </buttonComponent>
 
             <div class="table__buttons">
                 <slot name="buttons"></slot>
-                <button
-                        type="button"
-                        class="button"
-                        :disabled="!selectedLinkIds.length"
-                        @click="$emit('getItemsByLinkIds', selectedLinkIds)"
+                <buttonComponent
+                    :size="'small'"
+                    :disabled="!selectedLinkIds.length"
+                    @click="$emit('getItemsByLinkIds', selectedLinkIds)"
                 >
                     Спарсить {{ forPrice ? 'цены' : 'продукты'}} по выбранным ссылкам
-                </button>
+                </buttonComponent>
             </div>
 
         </div>
@@ -121,8 +129,12 @@
 
 <script>
     import {mapActions, mapMutations, mapState} from "vuex";
+    import buttonComponent from "../../components/button-component.vue"
     export default {
         name: "link-table",
+        components: {
+            buttonComponent
+        },
         data() {
             return {
                 optionsItemsPerPage:[5,10,20,30,50],
@@ -137,8 +149,8 @@
 
             }
         },
-        props:{
-            storeId:{
+        props: {
+            storeId: {
                default:null
             },
             isReloadLinks: {
@@ -258,23 +270,7 @@
         transition: all 0.3s ease;
         transform: rotate(-180deg);
     }
-    .button {
-        min-width: 28px;
-        padding: 0 12.4px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 4px;
-        color: #fff;
-        height: 28px;
-        background: rgb(24, 103, 192);
-        border: none;
-        &[disabled] {
-            background-color: rgba(0,0,0,.12);
-            color: rgba(0,0,0,.26);
-        }
 
-    }
     .table {
         background-color: #fff;
         border: 2px solid #999999;

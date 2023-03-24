@@ -26,7 +26,9 @@
 
                 <template v-slot:content>
                      <span>
-                          <button class="button" type="button" @click="copyHtml(bodyIndex)">Копировать</button>
+                          <buttonComponent :size="'small'" @click="copyHtml(bodyIndex)">
+                              Копировать
+                          </buttonComponent>
                     </span>
                     <div>{{ body.content }}</div>
                 </template>
@@ -34,7 +36,9 @@
         </div>
 
         <template v-slot:buttons>
-            <button class="button" type="button" @click="$emit('update:isShowForm', false)">Отмена</button>
+            <buttonComponent :size="'small'" @click="$emit('update:isShowForm', false)">
+                Отмена
+            </buttonComponent>
         </template>
     </modal>
 </template>
@@ -43,12 +47,14 @@
 import modal from "../modal/modal.vue"
 import {mapState} from "vuex";
 import expansionPanel from "../expansion-panel.vue";
+import buttonComponent from "../../components/button-component.vue"
 
 export default {
     name: "preview-links-modal",
     components: {
         modal,
-        expansionPanel
+        expansionPanel,
+        buttonComponent
     },
     props:{
         isShowForm: {
@@ -72,21 +78,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-button {
-    min-width: 28px;
-    padding: 0 12.4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 4px;
-    color: #fff;
-    height: 28px;
-    background: rgb(24, 103, 192) none repeat scroll 0% 0%;
-    border: 1px solid rgb(24, 103, 192);
-    &[disabled] {
-        background: #ebeff4;
-    }
-}
 .flex {
     align-items: center;
     display: flex;

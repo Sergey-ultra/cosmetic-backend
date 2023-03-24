@@ -31,23 +31,25 @@
         </div>
 
         <div class="form__element">
-                <button
-                    type="button"
-                    class="btn"
-                    :disabled="!(isFormChanging && storeId !== null)"
+                <buttonComponent
+                    :disabled="!(isFormChanging && (storeId !== null || storeId !== 'null'))"
                     @click="saveOptions"
                 >
                     Сохранить настройки
-                </button>
+                </buttonComponent>
             </div>
     </form>
 </template>
 
 <script>
 import {mapActions, mapState} from "vuex";
+import buttonComponent from "../../components/button-component.vue"
 
 export default {
     name: "link-options-form",
+    components: {
+        buttonComponent
+    },
     data() {
         return {
             isFormChanging:false,
@@ -120,61 +122,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-    button {
-        min-width: 28px;
-        padding: 0 20px;
-        display: flex;
-        justify-content: center;
-        position: relative;
-        align-items: center;
-        border-radius: 4px;
-        color: #fff;
-        height: 35px;
-        background: rgb(24, 103, 192) none repeat scroll 0% 0%;
-        border: 1px solid rgb(24, 103, 192);
-
-        &:hover::before {
-            opacity: .08;
-        }
-
-        &[disabled] {
-            border: none;
-            background-color: rgba(0, 0, 0, .12);
-            color: rgba(0, 0, 0, .26);
-        }
-
-        &-settings {
-            margin-top: 20px;
-            margin-left: auto;
-        }
-    }
-    .form {
-        &__group {
-            display: flex;
-            justify-content: space-between;
-        }
-        &__element {
-            margin: 15px 0;
-        }
-        &__block {
-            background-color: rgba(0, 0, 0, 0.08);
-            border-radius:5px;
-            border: 1px solid rgba(0,0,0,0.55);
-            align-items:flex-end;
-            margin:29px 0;
-            box-shadow: 0px 1px 4px rgba(0,0,0,0.15);
-            padding:20px;
-        }
-        &__icon {
-            fill: #fff;
-            margin-right: 10px;
-            width: 20px;
-            height: 20px;
-        }
-    }
-
+@import './resources/css/admin/form.scss';
     .target__url {
         width: 900px;
     }
-
 </style>

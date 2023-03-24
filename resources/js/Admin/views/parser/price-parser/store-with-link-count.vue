@@ -49,8 +49,6 @@
     }
 </script>
 
-<style scoped>
-    .form__element {
-        margin-top: 15px;
-    }
+<style lang="scss" scoped>
+   @import './resources/css/admin/form.scss';
 </style>

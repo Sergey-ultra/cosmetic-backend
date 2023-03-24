@@ -1,18 +1,21 @@
 <template>
-    <button type="button" @click="toggleIsRequiredEmailVerification" class="button button-settings">
+    <buttonComponent
+        @click="toggleIsRequiredEmailVerification"
+        :color="'yellow'"
+        class="button-settings"
+    >
         <span>{{ buttonText }}</span>
-        <loader :color="'#fff'" class="loader" v-if="isSetting"/>
-    </button>
+    </buttonComponent>
 </template>
 
 <script>
     import {mapActions, mapState} from "vuex";
-    import loader from "../../components/loader.vue"
+    import buttonComponent from "../../components/button-component.vue"
 
     export default {
         name: "settings",
         components:{
-            loader
+            buttonComponent
         },
         computed: {
             ...mapState('settings', ['isSetting', 'isRequiredEmailVerification']),
@@ -35,25 +38,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .button {
-        transition: all 0.12s ease-out;
-        background-color: #fc0;
-        -webkit-appearance: none;
-        border: 0;
-        border-radius: 4px;
-        position: relative;
-        line-height: 36px;
-        height: 36px;
-        padding: 0 16px;
+    .button-settings {
         margin-top: 16px;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        color: inherit;
-        text-align: center;
-    }
-    .loader {
-        position: absolute;
-        right: 0;
     }
 </style>
