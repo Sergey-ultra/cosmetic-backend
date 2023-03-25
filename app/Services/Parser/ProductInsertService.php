@@ -19,7 +19,6 @@ class ProductInsertService extends ProductInsertReturnArrayService
 {
     public function insertProductsInfo(array $parsedInfo, int $storeId, ?int $brandId = null): array
     {
-
         if (count($parsedInfo) > 0) {
             $timer1 = microtime(true);
             set_time_limit(7200);
@@ -145,7 +144,7 @@ class ProductInsertService extends ProductInsertReturnArrayService
 
                     if (!$this->isSkuExist($skuIdVolumesAndProductIds, $productId, $insertRow->volume)) {
 
-                        $insertedSku = Sku::create([
+                        $insertedSku = Sku::query()->create([
                             "volume" => $insertRow->volume,
                             "product_id" => $productId,
                             'rating' => 5,
@@ -197,7 +196,7 @@ class ProductInsertService extends ProductInsertReturnArrayService
                 'productNameValues' => $productNameValues,
                 'existingProducts' => $existingProducts,
                 'productIdsNamesAndBrandIds' => $productIdsNamesAndBrandIds,
-                'lasIsProductExist' => $isProductExist,
+                'isProductExist' => $isProductExist,
                 'skuIdVolumesAndProductIds' => $skuIdVolumesAndProductIds,
             ];
         }
