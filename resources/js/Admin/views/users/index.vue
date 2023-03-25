@@ -11,13 +11,11 @@
         @reloadTable="reloadUsers"
     >
         <template v-slot:add>
-            <btn @click="showForm(null)">
-                Добавить
-            </btn>
+            <buttonComponent :size="'small'" :color="'blue'" @click="showForm(null)">Добавить</buttonComponent>
         </template>
 
         <template v-slot:avatar="user">
-            <img v-if="user.item.avatar" class="avatar" :src="user.item.avatar" :alt="user.item.avatar">
+            <img v-if="user.item.avatar" class="image" :src="user.item.avatar" :alt="user.item.avatar">
         </template>
 
         <template v-slot:action="user">
@@ -56,15 +54,15 @@
 <script>
     import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
     import dataTable from '../../components/data-table.vue'
-    import btn from "../../components/btn.vue"
     import userForm from './user-form.vue'
     import deleteForm from '../../components/delete-form.vue'
+    import buttonComponent from "../../components/button-component.vue";
 
     export default {
         name: "users",
         components: {
             dataTable,
-            btn,
+            buttonComponent,
             userForm,
             deleteForm
         },
@@ -146,24 +144,5 @@
 </script>
 
 <style scoped lang="scss">
-    .action {
-        cursor: pointer;
-        &:not(:last-child) {
-            margin-right: 20px;
-        }
-    }
-    .avatar {
-        height: 32px;
-        width: 32px;
-        display: block;
-        margin: 0;
-        background-size: 32px 32px;
-        border: 0;
-        border-radius: 50%;
-        cursor:pointer;
-        &:hover {
-            transition: all 0.2s ease;
-            transform: scale(1.2);
-        }
-    }
+    @import './resources/css/admin/table.scss';
 </style>

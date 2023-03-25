@@ -12,9 +12,7 @@
     >
 
         <template v-slot:add>
-            <btn @click="showForm(null)">
-                Добавить
-            </btn>
+            <buttonComponent :size="'small'" :color="'blue'" @click="showForm(null)">Добавить</buttonComponent>
         </template>
 
         <template v-slot:product_name="review">
@@ -27,7 +25,7 @@
         </template>
 
         <template v-slot:images="review">
-            <div class="flex">
+            <div class="image__wrapper">
                 <img  v-for="image in review.item.images"  :key="image" class="image" :src="image" :alt="image">
             </div>
         </template>
@@ -100,17 +98,17 @@
 <script>
     import dataTable from '../../components/data-table.vue'
     import modal from '../../components/modal/modal.vue'
-    import btn from '../../components/btn.vue'
     import reviewForm from './review-form.vue'
     import dropMenu from '../../components/drop-menu.vue'
     import {mapActions, mapMutations, mapState} from "vuex";
+    import buttonComponent from "../../components/button-component.vue";
 
     export default {
         name: "review",
         components:{
             dataTable,
             modal,
-            btn,
+            buttonComponent,
             reviewForm,
             dropMenu
         },
@@ -187,65 +185,5 @@
 </script>
 
 <style scoped lang="scss">
-    .action {
-        cursor: pointer;
-        &:not(:last-child) {
-            margin-right: 20px;
-        }
-    }
-    .image {
-        height: 32px;
-        width: 32px;
-        display: block;
-        margin : 5px;
-        background-size: 32px 32px;
-        border: 0;
-        border-radius: 50%;
-        cursor: pointer;
-        &:hover {
-            transition: all 0.2s ease;
-            transform: scale(1.2);
-        }
-    }
-    .flex {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    .dropdown {
-        margin: -5px 5px;
-        &__inner {
-            font-size: 14px;
-            line-height: 16px;
-        }
-        &__value {
-            margin: 0;
-            border: none;
-            outline: none;
-            outline-offset: 2px;
-            background: transparent;
-            display: block;
-            width: 100%;
-            padding: 8px 12px;
-            color: #222;
-            cursor: pointer;
-            user-select: none;
-            text-align: left;
-        }
-        &__icon {
-            display: inline-block;
-            position: relative;
-            width: 32px;
-            height: 32px;
-            & svg {
-                fill: rgba(0,0,0,.4);
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%,-50%);
-                width: 20px;
-                height: 20px;
-            }
-        }
-    }
+    @import './resources/css/admin/table.scss';
 </style>

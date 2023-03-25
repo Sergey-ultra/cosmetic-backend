@@ -11,7 +11,7 @@
         @reloadTable="reloadBrands"
     >
         <template v-slot:add>
-           <btn @click="showForm(null)">Добавить</btn>
+            <buttonComponent :size="'small'" :color="'blue'" @click="showForm(null)">Добавить</buttonComponent>
         </template>
 
         <template v-slot:image="brand">
@@ -53,10 +53,10 @@
 <script>
     import dataTable from '../../components/data-table.vue'
     import modal from '../../components/modal/modal.vue'
-    import btn from '../../components/btn.vue'
     import brandForm from './brand-form.vue'
     import deleteForm from './../../components/delete-form.vue'
     import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
+    import buttonComponent from "../../components/button-component.vue";
 
     export default {
         name: "brands",
@@ -64,7 +64,7 @@
             dataTable,
             modal,
             brandForm,
-            btn,
+            buttonComponent,
             deleteForm
         },
         data: () => ({
@@ -145,24 +145,5 @@
 </script>
 
 <style scoped lang="scss">
-    .action {
-        cursor: pointer;
-        &:not(:last-child) {
-            margin-right: 20px;
-        }
-    }
-    .image {
-        height: 32px;
-        width: 32px;
-        display: block;
-        margin: 0;
-        background-size: 32px 32px;
-        border: 0;
-        border-radius: 50%;
-        cursor:pointer;
-        &:hover {
-            transition: all 0.2s ease;
-            transform: scale(1.2);
-        }
-    }
+   @import './resources/css/admin/table.scss';
 </style>

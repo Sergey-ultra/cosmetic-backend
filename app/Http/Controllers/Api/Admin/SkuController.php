@@ -9,6 +9,7 @@ use App\Http\Resources\Admin\ProductSingleResource;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\Sku;
+use App\Models\SkuStore;
 use App\Services\ImageSavingService\ImageSavingService;
 use App\Services\Parser\Text;
 use Illuminate\Http\JsonResponse;
@@ -36,7 +37,11 @@ class SkuController extends Controller
             ->groupBy('product_id')
         ;
 
-        $query = DB::table('products')
+        $currentPricesCountSubQuery = DB::table(SkuStore::TABLE)
+            ->select('sku_id', DB::raw('count(sku_id) AS link_count'))
+            ->groupBy('sku_id');
+
+        $query = Sku::query()
             ->select([
                 'skus.id as id',
                 'categories.name as category',
@@ -46,9 +51,14 @@ class SkuController extends Controller
                 'skus.volume as volume',
                 'skus.images as images',
                 'skus.created_at as created_at',
-                DB::raw("IF(ip.product_id IS NULL, false, true) AS is_ingredients_exist")
+                'currentPrices.link_count',
+                DB::raw("IF(ip.product_id IS NULL, false, true) AS is_ingredients_exist"),
+
             ])
-            ->join('skus', 'skus.product_id', '=', 'products.id')
+            ->leftJoinSub($currentPricesCountSubQuery, 'currentPrices', function($join) {
+                $join->on('currentPrices.sku_id', '=', 'skus.id');
+            })
+            ->join('products', 'skus.product_id', '=', 'products.id')
             ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->leftJoinSub($ingredientProductSubQuery, 'ip', function ($join) {

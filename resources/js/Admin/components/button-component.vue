@@ -1,8 +1,12 @@
 <template>
     <button
         type="button"
+        class="button"
         :disabled="disabled"
-        :class="classes"
+        :class="{
+            [`${color}`]: Boolean(color),
+            [`${size}`]: Boolean(size),
+        }"
     >
         <slot></slot>
         <loader :color="'#fff'" class="loader" v-if="isLoading"/>
@@ -27,33 +31,19 @@ export default {
         },
         size: {
             type: String,
-            default: 'normal'
         },
         color: {
             type: String,
-            default: 'blue'
         }
     },
     computed: {
-        classes() {
-            let array = [];
-            switch (this.size) {
-                case 'small':
-                    array.push('small')
-                break;
-            }
-            switch (this.color) {
-                case 'yellow':
-                    array.push('yellow')
-            }
-            return array
-        }
+
     }
 }
 </script>
 
 <style lang="scss" scoped>
-    button {
+    .button {
         transition: all 0.12s ease-out;
         min-width: 35px;
         height: 35px;
@@ -97,6 +87,9 @@ export default {
     .yellow {
         background-color: #fc0;
         color: #000000;
+    }
+    .blue {
+        background-color: rgb(0, 91, 255);
     }
 
     .loader {

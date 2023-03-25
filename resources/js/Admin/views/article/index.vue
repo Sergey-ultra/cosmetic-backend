@@ -12,9 +12,7 @@
     >
         <template v-slot:add>
             <router-link :to="{name: 'article-create'}">
-                <btn>
-                    Добавить
-                </btn>
+                <buttonComponent :size="'small'" :color="'blue'">Добавить</buttonComponent>
             </router-link>
         </template>
         <template v-slot:action="article">
@@ -71,15 +69,15 @@
 
 <script>
     import dataTable from '../../components/data-table.vue'
-    import btn from '../../components/btn.vue'
     import deleteForm from '../../components/delete-form.vue'
     import dropMenu from '../../components/drop-menu.vue'
     import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
+    import buttonComponent from "../../components/button-component.vue";
     export default {
         name: "article",
         components: {
             dataTable,
-            btn,
+            buttonComponent,
             deleteForm,
             dropMenu
         },
@@ -154,46 +152,5 @@
 </script>
 
 <style scoped lang="scss">
-    .action {
-        cursor: pointer;
-       &:not(:last-child){
-           margin-right:20px;
-       }
-    }
-    .dropdown {
-        margin: -5px 5px;
-        &__inner {
-            font-size: 14px;
-            line-height: 16px;
-        }
-        &__value {
-            margin: 0;
-            border: none;
-            outline: none;
-            outline-offset: 2px;
-            background: transparent;
-            display: block;
-            width: 100%;
-            padding: 8px 12px;
-            color: #222;
-            cursor: pointer;
-            user-select: none;
-            text-align: left;
-        }
-        &__icon {
-            display: inline-block;
-            position: relative;
-            width: 32px;
-            height: 32px;
-            & svg {
-                fill: rgba(0,0,0,.4);
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%,-50%);
-                width: 20px;
-                height: 20px;
-            }
-        }
-    }
+@import './resources/css/admin/table.scss';
 </style>

@@ -12,9 +12,7 @@
     >
 
         <template v-slot:add>
-            <btn @click="showForm(null)">
-                Добавить
-            </btn>
+            <buttonComponent :size="'small'" :color="'blue'" @click="showForm(null)">Добавить</buttonComponent>
         </template>
         <template v-slot:action="ingredient">
             <div class="action" @click="showForm(ingredient.item.id)">
@@ -52,17 +50,17 @@
 <script>
     import dataTable from '../../components/data-table.vue'
     import modal from '../../components/modal/modal.vue'
-    import btn from '../../components/btn.vue'
     import ingredientForm from './ingredient-form.vue'
     import deleteForm from '../../components/delete-form.vue'
     import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
+    import buttonComponent from "../../components/button-component.vue";
 
     export default {
         name: "ingredients",
         components: {
             dataTable,
             modal,
-            btn,
+            buttonComponent,
             ingredientForm,
             deleteForm,
         },
@@ -144,10 +142,5 @@
 </script>
 
 <style scoped lang="scss">
-    .action {
-        cursor: pointer;
-        &:not(:last-child) {
-            margin-right: 20px;
-        }
-    }
+   @import './resources/css/admin/table.scss';
 </style>

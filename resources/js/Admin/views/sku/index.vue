@@ -11,11 +11,18 @@
         @reloadTable="reloadSkus"
     >
         <template v-slot:add>
-            <btn @click="!creationDisabled ? showForm() : ''" :disabled="creationDisabled">Добавить</btn>
+            <buttonComponent
+                :size="'small'"
+                :color="'blue'"
+                :disabled="creationDisabled"
+                @click="!creationDisabled ? showForm() : ''"
+            >
+                Добавить
+            </buttonComponent>
         </template>
 
         <template v-slot:images="product">
-            <div class="flex">
+            <div class="image__wrapper">
                 <img  v-for="image in product.item.images"  :key="image" class="image" :src="image" :alt="image">
             </div>
         </template>
@@ -59,16 +66,16 @@
 
 <script>
     import dataTable from '../../components/data-table.vue'
-    import btn from "../../components/btn.vue"
     import skuForm from './sku-form.vue'
     import deleteForm from '../../components/delete-form.vue'
     import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
+    import buttonComponent from "../../components/button-component.vue";
 
     export default {
         name: "skus",
         components: {
             dataTable,
-            btn,
+            buttonComponent,
             skuForm,
             deleteForm
         },
@@ -77,10 +84,10 @@
                 headers: [
                     {title: 'id', value: 'id', width: '2%'},
                     {title: 'Категория', value: 'category', width: '5%', filter: {type: 'select'}},
-                    {title: 'Бренд', value: 'brand', width: '10%', filter: {type: 'input'}},
-                    {title: 'Изображение', value: 'images', width: '15%', sort: false},
-                    {title: 'Имя', value: 'name', width: '20%', filter: {type: 'input'}},
-                    {title: 'Код', value: 'code', width: '25%', filter: {type: 'input'}},
+                    {title: 'Бренд', value: 'brand', width: '7%', filter: {type: 'input'}},
+                    {title: 'Изображение', value: 'images', width: '20%', sort: false},
+                    {title: 'Имя', value: 'name', width: '35%', filter: {type: 'input'}},
+                    {title: 'Кол-во цен', value: 'link_count', width: '8%'},
                     {title: 'Ингред.', value: 'is_ingredients_exist', width: '3%'},
                     {title: 'Объем', value: 'volume', width: '5%', filter: {type: 'input'}},
                     {title: 'Дата', value: 'created_at', width: '5%'},
@@ -155,33 +162,9 @@
 </script>
 
 <style scoped lang="scss">
+    @import './resources/css/admin/table.scss';
     a {
         color:#fff;
         text-decoration: none;
-    }
-    .action {
-        cursor: pointer;
-        &:not(:last-child) {
-            margin-right: 20px;
-        }
-    }
-    .image {
-        height: 32px;
-        width: 32px;
-        display: block;
-        margin : 5px;
-        background-size: 32px 32px;
-        border: 0;
-        border-radius: 50%;
-        cursor: pointer;
-        &:hover {
-            transition: all 0.2s ease;
-            transform: scale(1.2);
-        }
-    }
-    .flex {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
     }
 </style>

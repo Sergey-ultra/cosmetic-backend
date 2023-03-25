@@ -10,7 +10,7 @@
             @reloadTable="reloadStores"
     >
         <template v-slot:add>
-            <btn @click="showForm(null)">Добавить</btn>
+            <buttonComponent :size="'small'" :color="'blue'" @click="showForm(null)">Добавить</buttonComponent>
         </template>
 
         <template v-slot:image="store">
@@ -98,14 +98,14 @@
 <script>
     import dataTable from '../../components/data-table.vue'
     import dropMenu from '../../components/drop-menu.vue'
-    import btn from "../../components/btn.vue";
     import storeForm from "./store-form.vue";
     import deleteForm from '../../components/delete-form.vue'
     import {mapActions, mapMutations, mapState} from "vuex";
+    import buttonComponent from "../../components/button-component.vue";
 
     export default {
         components:{
-            btn,
+            buttonComponent,
             dataTable,
             storeForm,
             deleteForm,
@@ -187,59 +187,5 @@
 </script>
 
 <style lang="scss" scoped>
-    .action {
-        cursor: pointer;
-        &:not(:last-child) {
-            margin-right: 20px;
-        }
-    }
-    .image {
-        height: 25px;
-        width: 100px;
-        display: block;
-        margin : 5px;
-        background-size: 32px 32px;
-        border: 0;
-        cursor: pointer;
-        &:hover {
-            transition: all 0.2s ease;
-            transform: scale(1.2);
-        }
-    }
-    .dropdown {
-        margin: -5px 5px;
-        &__inner {
-            font-size: 14px;
-            line-height: 16px;
-        }
-        &__value {
-            margin: 0;
-            border: none;
-            outline: none;
-            outline-offset: 2px;
-            background: transparent;
-            display: block;
-            width: 100%;
-            padding: 8px 12px;
-            color: #222;
-            cursor: pointer;
-            user-select: none;
-            text-align: left;
-        }
-        &__icon {
-            display: inline-block;
-            position: relative;
-            width: 32px;
-            height: 32px;
-            & svg {
-                fill: rgba(0,0,0,.4);
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%,-50%);
-                width: 20px;
-                height: 20px;
-            }
-        }
-    }
+    @import './resources/css/admin/table.scss';
 </style>
