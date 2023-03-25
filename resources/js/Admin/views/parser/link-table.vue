@@ -72,9 +72,11 @@
                 <div class="table__item table__item-select">
                     <input type="checkbox" :value="link.id" v-model="selectedLinkIds">
                 </div>
-                <div class="table__item table__item-id">{{ link.id }}</div>
+                <div class="table__item table__item-id" @click="toggleSelectedLink(link.id)">{{ link.id }}</div>
                 <div class="table__item table__item-link">
-                   <span>{{ link.link }}</span>
+                   <span @click="toggleSelectedLink(link.id)">{{ link.link }}</span>
+                </div>
+                <div class="table__item table__item-external">
                     <a :href="link.link" target="_blank">
                         <svg
                             height="16px"
@@ -238,6 +240,14 @@
         methods: {
             ...mapActions('parsingLink', ['loadLinksWithPagination']),
             ...mapMutations('parsingLink', ['setLinksWithPaginationToDefault','setTableOptions', 'setTableOptionsToDefault']),
+            toggleSelectedLink(id) {
+                const index =  this.selectedLinkIds.indexOf(id);
+                if (index === -1) {
+                    this.selectedLinkIds.push(id)
+                } else {
+                    this.selectedLinkIds.splice(index, 1);
+                }
+            },
             setSortBy(value) {
                 if (this.options.sortBy === value) {
                     if (this.options.sortDesc === false) {
@@ -310,11 +320,13 @@
             margin-left: auto;
         }
         &__row {
-            padding: 5px 0;
             border-bottom: 1px solid #999999;
-            min-height:30px;
+            min-height:35px;
             display: flex;
             align-items:center;
+            &:hover {
+                background: #eee;
+            }
             &-header {
                 background-color: #ebeff4;
             }
@@ -324,7 +336,7 @@
         }
         &__item {
             display: flex;
-            padding: 0 10px;
+            padding: 5px 10px;
             cursor:pointer;
             &-header {
                 font-weight: 600;
@@ -337,6 +349,11 @@
                 width: 75%;
                 display:flex;
                 justify-content: space-between;
+            }
+            &-external {
+                padding: 0;
+                height: 100%;
+                width: 30px;
             }
             &-date {
                 width: 17%;
