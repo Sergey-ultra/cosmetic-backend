@@ -132,10 +132,7 @@
                 if (value && !this.allBrands.length) {
                     this.loadAllBrands()
                 }
-            },
-        },
-        created() {
-
+            }
         },
         methods: {
             ...mapActions('brand', ['loadAllBrands']),

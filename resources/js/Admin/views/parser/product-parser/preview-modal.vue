@@ -1,7 +1,7 @@
 <template>
     <modal
             :width="80"
-            v-model:isShowForm="isShowForm"
+            v-model:isShowForm="isShowFormLocal"
     >
         <template v-slot:header>Спарсенная инфа</template>
 
@@ -22,7 +22,7 @@
         </div>
 
         <template v-slot:buttons>
-            <button class="button" type="button" @click="$emit('update:isShowForm', false)">Отмена</button>
+            <buttonComponent :size="'small'" :color="'blue'" @click="$emit('update:isShowForm', false)">Отмена</buttonComponent>
         </template>
     </modal>
 </template>
@@ -30,15 +30,13 @@
 <script>
     import modal from "../../../components/modal/modal.vue"
     import {mapState} from "vuex";
+    import buttonComponent from "../../../components/button-component.vue";
 
     export default {
         name: "preview-modal",
         components: {
-            modal
-        },
-        data() {
-            return {
-            }
+            modal,
+            buttonComponent
         },
         props:{
             isShowForm:{
@@ -48,26 +46,19 @@
         },
         computed: {
             ...mapState('productParser', ['preview']),
+            isShowFormLocal: {
+                get() {
+                    return this.isShowForm;
+                },
+                set(value) {
+                    this.$emit('update:isShowForm', value)
+                }
+            }
         }
     }
 </script>
 
 <style scoped lang="scss">
-    button {
-        min-width: 28px;
-        padding: 0 12.4px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 4px;
-        color: #fff;
-        height: 28px;
-        background: rgb(24, 103, 192) none repeat scroll 0% 0%;
-        border: 1px solid rgb(24, 103, 192);
-        &[disabled] {
-            background: #ebeff4;
-        }
-    }
     .image {
         background-size: 32px 32px;
         border: 0;

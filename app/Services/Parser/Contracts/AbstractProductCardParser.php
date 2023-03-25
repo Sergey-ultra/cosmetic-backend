@@ -78,7 +78,7 @@ abstract class AbstractProductCardParser
     abstract protected function extractValue(array $option): ?string;
 
 
-    protected function clearValues(string $current, string $name, string $tag)
+    protected function clearValues(string $current, string $name, string $tag): string|int|array
     {
         $volumePattern = '#(\d+\s+(х|x|\*)(\s+|\d+,)|\d+(\*\d+,|\*|х))\d+\s+([Мм][Лл]|[GgГг]|[Гг][Рр])|(\d+|\d+\s+)(капс|[Шш]т по \d+,d+\s+[Мм][Лл]|[Mm][Ll]|[GgГг](р?)|[Мм][Лл]|[Шш]т|капсул|capsules|(ампул|амп) по\s+\d+\s+[Мм][Лл])#u';
         $pricePattern = '#[^\d+]#';
@@ -169,14 +169,16 @@ abstract class AbstractProductCardParser
             case "ingredient":
                 if ((!$current || !$tag) && $this->ingredients) {
                     $current = $this->ingredients;
+                } else if (preg_match($ingredientPattern, $current, $ingredientsMatches)) {
+                    $current = $ingredientsMatches[0];
+                } else {
+                    return [];
                 }
                 if ($current) {
 
                     $current = html_entity_decode($current);
 
-                    if (preg_match($ingredientPattern, $current, $ingredientsMatches)) {
-                        $current = $ingredientsMatches[0];
-                    }
+
 
                     $current = trim(preg_replace('#\r|\n|\t#', '', $current));
                     $current = trim(preg_replace('#Состав:#', '', $current));

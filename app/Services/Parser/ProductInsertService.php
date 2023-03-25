@@ -138,6 +138,8 @@ class ProductInsertService extends ProductInsertReturnArrayService
                         if (isset($insertRow->ingredient)) {
                             $this->insertIngredients($insertRow->ingredient, $productId);
                         }
+                    } else {
+                        //add ingredients
                     }
 
 
@@ -152,7 +154,7 @@ class ProductInsertService extends ProductInsertReturnArrayService
 
                         $skuId = $insertedSku->id;
 
-                        SkuRating::create([
+                        SkuRating::query()->create([
                             'sku_id' => $skuId,
                             'rating' => 5,
                             'user_name' => 'Robot.Smart-Beautiful'

@@ -100,29 +100,43 @@
             </div>
         </div>
 
-        <div class="pagination">
+        <div class="pagination" v-if="totalCount">
             <div class="pagination__item">
                 {{ paginationCountText }}
             </div>
-            <div @click="minusPage" class=" pagination__item pagination__item-button">
+            <buttonComponent
+                :size="'small'"
+                :color="'grey'"
+                :outline="true"
+                :disabled="options.page === 1"
+                @click="minusPage"
+                class="pagination__item"
+            >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                      class="bi bi-chevron-left" viewBox="0 0 16 16">
                     <path fill-rule="evenodd"
                           d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
                 </svg>
-            </div>
+            </buttonComponent>
             <select v-model="options.page" class="pagination__item">
                 <option v-for="(page, index) in pages" :key="index">
                     {{ page }}
                 </option>
             </select>
-            <div @click="plusPage" class="pagination__item pagination__item-button">
+            <buttonComponent
+                :size="'small'"
+                :color="'grey'"
+                :outline="true"
+                :disabled="options.page === lastPage"
+                @click="plusPage"
+                class="pagination__item"
+            >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                      class="bi bi-chevron-right" viewBox="0 0 16 16">
                     <path fill-rule="evenodd"
                           d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
                 </svg>
-            </div>
+            </buttonComponent>
         </div>
     </div>
 </template>
@@ -164,7 +178,7 @@
         },
         computed: {
             ...mapState('parsingLink', ['links', 'totalCount', 'tableOptions']),
-            options:{
+            options: {
                 get() {
                     return this.tableOptions
                 },
@@ -340,15 +354,6 @@
 
         &__item {
             margin-right:10px;
-            &-button {
-                border: 1px solid #d5dae0;
-                border-radius: 2px;
-                width: 32px;
-                height: 100%;
-                display:flex;
-                justify-content: center;
-                align-items:center;
-            }
         }
     }
 

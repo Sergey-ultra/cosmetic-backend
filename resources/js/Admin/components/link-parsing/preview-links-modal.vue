@@ -1,7 +1,7 @@
 <template>
     <modal
         :width="80"
-        v-model:isShowForm="isShowForm"
+        v-model:isShowForm="isShowFormLocal"
     >
         <template v-slot:header>Спарсенная инфа</template>
 
@@ -56,7 +56,7 @@ export default {
         expansionPanel,
         buttonComponent
     },
-    props:{
+    props: {
         isShowForm: {
             type: Boolean,
             default: false
@@ -64,6 +64,14 @@ export default {
     },
     computed: {
         ...mapState('linkParser',['preview']),
+        isShowFormLocal: {
+            get() {
+                return this.isShowForm;
+            },
+            set(value) {
+                this.$emit('update:isShowForm', value)
+            }
+        }
     },
     methods: {
         copyHtml(index) {

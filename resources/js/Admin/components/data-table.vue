@@ -131,7 +131,14 @@
         <div class="pagination">
             <div class="pagination__item">{{ paginationCountText }}</div>
 
-            <buttonComponent :size="'small'" :color="'grey'" :outline="true" @click="minus" class="pagination__item">
+            <buttonComponent
+                :size="'small'"
+                :color="'grey'"
+                :outline="true"
+                :disabled="page === 1"
+                @click="minus"
+                class="pagination__item"
+            >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                      class="bi bi-chevron-left" viewBox="0 0 16 16">
                     <path fill-rule="evenodd"
@@ -143,7 +150,14 @@
                     {{ page }}
                 </option>
             </select>
-            <buttonComponent :size="'small'" :color="'grey'" :outline="true" @click="plus" class="pagination__item">
+            <buttonComponent
+                :size="'small'"
+                :color="'grey'"
+                :outline="true"
+                :disabled="page === lastPage"
+                @click="plus"
+                class="pagination__item"
+            >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                      class="bi bi-chevron-right" viewBox="0 0 16 16">
                     <path fill-rule="evenodd"
@@ -198,7 +212,6 @@
                     return this.options.page
                 },
                 set(value) {
-                    console.log(value)
                    this.$emit('update:options', { ...this.options, page: value })
                 }
             },
