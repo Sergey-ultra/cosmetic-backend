@@ -29,9 +29,9 @@ export default {
 
             if (res.status && !res.isRequiredEmailVerification && ['admin', 'moderator'].includes(res.role.toLowerCase())) {
                 dispatch('notification/setSuccess', res.message, { root: true })
-                const { message, user_name, token, avatar, role } = res
-                localStorage.setItem('userData', JSON.stringify({ userName: user_name,  token, avatar, role }))
-                commit('SET_USER', { userName: user_name, avatar, role })
+                const { message, name, token, avatar, role } = res
+                localStorage.setItem('userData', JSON.stringify({ userName: name,  token, avatar, role }))
+                commit('SET_USER', { userName: name, avatar, role })
 
             } else {
                 dispatch('notification/setError', res.message, { root: true })

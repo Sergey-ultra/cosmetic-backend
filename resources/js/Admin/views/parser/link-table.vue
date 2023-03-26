@@ -102,7 +102,7 @@
                 <div v-if="link.is_body_exist" class="table__item table__item-is_body_exist">{{ link.is_body_exist}}</div>
                 <div v-if="link.is_body_exist" class="table__item table__item-action">
                     <buttonComponent
-                        @click="deleteBodyFromParsingLink(link.id)"
+                        @click="deleteBodyFromParsingLinkLocal(link.id)"
                         :color="'red'"
                         :icon="true"
                         :outline="true"
@@ -268,6 +268,10 @@
         methods: {
             ...mapActions('parsingLink', ['loadLinksWithPagination', 'deleteBodyFromParsingLink']),
             ...mapMutations('parsingLink', ['setLinksWithPaginationToDefault','setTableOptions', 'setTableOptionsToDefault']),
+            async deleteBodyFromParsingLinkLocal(id) {
+                await this.deleteBodyFromParsingLink(id);
+                await this.loadLinks()
+            },
             toggleSelectedLink(id) {
                 const index =  this.selectedLinkIds.indexOf(id);
                 if (index === -1) {

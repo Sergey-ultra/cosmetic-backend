@@ -120,10 +120,10 @@
             ...mapState('auth', ['userName', 'userRole', 'userAvatar']),
         },
         created() {
-            if (this.userRole.toLowerCase() === 'admin') {
-                adminRoutes.forEach(el => this.$router.addRoute(el))
-               // this.$router.addRoute(adminRoutes);
-            }
+            // if (this.userRole.toLowerCase() === 'admin') {
+            //     adminRoutes.forEach(el => this.$router.addRoute(el))
+            //    // this.$router.addRoute(adminRoutes);
+            // }
 
             this.initMenu()
         },
