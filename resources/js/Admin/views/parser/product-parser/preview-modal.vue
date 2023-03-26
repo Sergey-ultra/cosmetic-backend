@@ -9,13 +9,17 @@
             <div class="preview__row" v-for="(value, name, index) in product" :key="index">
                 <div class="preview__item preview__title">{{ name }}</div>
 
-                <div class="preview__item preview__content" v-if="['images','imageLinks'].includes(name)">
+                <div v-if="['images','imageLinks'].includes(name)" class="preview__item preview__content" >
                     <img class="image" v-for="image in value" :key="image" :src="image"/>
                 </div>
-                <div class="preview__item preview__content" v-else-if="name === 'ingredient'">
+                <div
+                    v-else-if="name === 'ingredient'"
+                    class="preview__item preview__content"
+                    :class="{'preview__content-ingredients': name === 'ingredient'}"
+                >
                     <div v-for="ingredient in value" :key="ingredient">{{ ingredient }}</div>
                 </div>
-                <div class="preview__item preview__content" v-else>
+                <div v-else class="preview__item preview__content">
                     <span>{{ value }}</span>
                 </div>
             </div>
@@ -99,6 +103,10 @@
         &__content {
             width:90%;
             flex-wrap: wrap;
+            &-ingredients {
+                align-items: stretch;
+                flex-direction: column;
+            }
         }
     }
 </style>
