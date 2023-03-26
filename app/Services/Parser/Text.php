@@ -21,6 +21,8 @@ class Text
         $name = preg_replace('#\+\s+|\"|\-\s+#u', '', $name);
         //убрать запятые
         $name = preg_replace('#\,#u', '', $name);
+        //убрать двоеточие
+        $name = preg_replace('#:#u', '', $name);
         $name = preg_replace('#\s+|\'|\`#u', ' ', $name);
         return self::changeLangToEnglish($name);
 
