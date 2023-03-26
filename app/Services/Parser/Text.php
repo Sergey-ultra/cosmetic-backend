@@ -17,13 +17,20 @@ class Text
             $name =   $brand . '-' . $name;
         }
 
-        //return $string = iconv("utf-8", "us-ascii//TRANSLIT", $string);
-        $name = preg_replace('#\+\s+|\"|\-\s+#u', '', $name);
+
         //убрать запятые
         $name = preg_replace('#\,#u', '', $name);
         //убрать двоеточие
         $name = preg_replace('#:#u', '', $name);
+        //убрать знак (.)
+        $name = preg_replace('#\(\.\)#u', '', $name);
+
+
+        //return $string = iconv("utf-8", "us-ascii//TRANSLIT", $string);
+
         $name = preg_replace('#\s+|\'|\`#u', ' ', $name);
+        $name = preg_replace('#\+\s+|\"|\-\s+#u', '', $name);
+        $name = preg_replace('#\-$#u', '', $name);
         return self::changeLangToEnglish($name);
 
 
