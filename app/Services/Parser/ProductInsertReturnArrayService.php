@@ -286,20 +286,24 @@ class ProductInsertReturnArrayService
 
     public function insertIngredientByName(string $ingredientName): int
     {
-        $code = Text::makeIngredientCode(trim($ingredientName));
+        $ingredientName = trim($ingredientName);
+        $code = Text::makeIngredientCode($ingredientName);
 
-        $currentIngredient = Ingredient::where(["code" => $code])->first();
+        $currentIngredient = Ingredient::query()
+            ->where("code",$code)
+            ->orWhere("name", $ingredientName)
+            ->first();
 
         if (!$currentIngredient) {
             $lang = Utils::knownLanguage($ingredientName);
             try {
                 if ($lang === 'en') {
-                    $currentIngredient = Ingredient::create([
+                    $currentIngredient = Ingredient::query()->create([
                         "name" => $ingredientName,
                         "code" => $code
                     ]);
                 } elseif ($lang === 'rus') {
-                    $currentIngredient = Ingredient::create([
+                    $currentIngredient = Ingredient::query()->create([
                         "name_rus" => $ingredientName,
                         "code" => $code
                     ]);
