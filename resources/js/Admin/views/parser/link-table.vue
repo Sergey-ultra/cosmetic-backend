@@ -69,12 +69,12 @@
                     v-for="link in links"
                     :key="link.id"
             >
-                <div class="table__item table__item-select">
+                <label class="table__item table__item-select">
                     <input type="checkbox" :value="link.id" v-model="selectedLinkIds">
-                </div>
+                </label>
                 <div class="table__item table__item-id" @click="toggleSelectedLink(link.id)">{{ link.id }}</div>
-                <div class="table__item table__item-link">
-                   <span @click="toggleSelectedLink(link.id)">{{ link.link }}</span>
+                <div class="table__item table__item-link" @click="toggleSelectedLink(link.id)">
+                   <span>{{ link.link }}</span>
                 </div>
                 <div class="table__item table__item-external">
                     <a :href="link.link" target="_blank">
@@ -99,6 +99,22 @@
                     </a>
                 </div>
                 <div class="table__item table__item-date">{{ link.date}}</div>
+                <div v-if="link.is_body_exist" class="table__item table__item-is_body_exist">{{ link.is_body_exist}}</div>
+                <div v-if="link.is_body_exist" class="table__item table__item-action">
+                    <buttonComponent
+                        @click="deleteBodyFromParsingLink(link.id)"
+                        :color="'red'"
+                        :icon="true"
+                        :outline="true"
+                        :round="true"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-trash-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                        </svg>
+                    </buttonComponent>
+                </div>
             </div>
         </div>
 
@@ -154,12 +170,6 @@
         data() {
             return {
                 optionsItemsPerPage:[5,10,20,30,50],
-                headers: [
-                    {title: 'id', value: 'id', width: '4%'},
-                    {title: 'Ссылка', value: 'link', width: '75%'},
-                    {title: 'Дата', value: 'date', width: '17%'},
-                ],
-
                 selectedLinkIds:[],
                 isSelectAllLinks:false,
 
@@ -180,6 +190,24 @@
         },
         computed: {
             ...mapState('parsingLink', ['links', 'totalCount', 'tableOptions']),
+            headers() {
+                if  (!this.forPrice) {
+                    return [
+                        {title: 'id', value: 'id', width: '4%'},
+                        {title: 'Ссылка', value: 'link', width: '73%'},
+                        {title: 'Ext', value: 'link', width: '4%'},
+                        {title: 'Дата', value: 'date', width: '5%'},
+                        {title: 'Есть Body?', value: 'is_body_exist', width: '5%'},
+                        {title: 'Действия', value: 'action', width: '5%'},
+                    ];
+                }
+                return [
+                    {title: 'id', value: 'id', width: '4%'},
+                    {title: 'Ссылка', value: 'link', width: '73%'},
+                    {title: 'Ext', value: 'link', width: '4%'},
+                    {title: 'Дата', value: 'date', width: '5%'},
+                ];
+            },
             options: {
                 get() {
                     return this.tableOptions
@@ -238,7 +266,7 @@
             this.setLinksWithPaginationToDefault()
         },
         methods: {
-            ...mapActions('parsingLink', ['loadLinksWithPagination']),
+            ...mapActions('parsingLink', ['loadLinksWithPagination', 'deleteBodyFromParsingLink']),
             ...mapMutations('parsingLink', ['setLinksWithPaginationToDefault','setTableOptions', 'setTableOptionsToDefault']),
             toggleSelectedLink(id) {
                 const index =  this.selectedLinkIds.indexOf(id);
@@ -323,7 +351,6 @@
             border-bottom: 1px solid #999999;
             min-height:35px;
             display: flex;
-            align-items:center;
             &:hover {
                 background: #eee;
             }
@@ -342,21 +369,27 @@
                 font-weight: 600;
             }
             &-select,
-            &-id{
+            &-id {
                 width: 4%;
             }
             &-link {
-                width: 75%;
+                width: 73%;
                 display:flex;
                 justify-content: space-between;
             }
             &-external {
-                padding: 0;
-                height: 100%;
-                width: 30px;
+                width: 4%;
+            }
+            &-is_body_exist {
+                justify-content: center;
+                width: 5%;
             }
             &-date {
-                width: 17%;
+                width: 5%;
+            }
+            &-action {
+                justify-content: center;
+                width: 5%;
             }
         }
     }

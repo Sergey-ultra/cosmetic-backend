@@ -13,11 +13,13 @@ use App\Models\PriceHistory;
 use App\Models\Product;
 use App\Models\Sku;
 use App\Models\SkuRating;
+use App\Models\SkuStore;
 use Illuminate\Support\Facades\DB;
 
 class ProductInsertService extends ProductInsertReturnArrayService
 {
-    public function insertProductsInfo(array $parsedInfo, int $storeId, ?int $brandId = null): array
+
+    public function insertProductsInfo(array $parsedInfo, int $storeId, bool $isInsertIngredients = true, ?int $brandId = null): array
     {
         if (count($parsedInfo) > 0) {
             $timer1 = microtime(true);
@@ -30,9 +32,9 @@ class ProductInsertService extends ProductInsertReturnArrayService
             }
 
 
-            $productIdsNamesAndBrandIds = [];
+
             $existingProducts = [];
-            $skuIdVolumesAndProductIds = [];
+
 
 
             $productNameValues = $this->preparedProductNameValues($parsedInfo);
@@ -40,7 +42,8 @@ class ProductInsertService extends ProductInsertReturnArrayService
             $brandCondition = isset($brandId) ? true : count($brandIdsAndName) > 0;
 
             if (count($productNameValues) > 0 && $brandCondition) {
-                $existingProducts = Product::query()->select('id', 'name', 'brand_id')
+                $existingProducts = Product::with('ingredientIds')
+                    ->select('id', 'name', 'brand_id')
                     ->where(function ($query) use ($productNameValues) {
                         foreach ($productNameValues as $name) {
                             $query->orWhere('name', 'like', $name);
@@ -52,9 +55,9 @@ class ProductInsertService extends ProductInsertReturnArrayService
                 } else {
                     $existingProducts->where('brand_id', $brandId);
                 }
-                $existingProducts = $existingProducts->get()->toArray();
 
-                $productIdsNamesAndBrandIds = Utils::findExistingProducts($existingProducts, $productNameValues, '%');
+                $existingProducts = $existingProducts->get()->toArray();
+                $this->productIdsNamesAndBrandIds = Utils::findExistingProducts($existingProducts, $productNameValues, '%');
 
                 if (count($existingProducts) > 0) {
                     $existingProductIds = array_column($existingProducts, 'id');
@@ -65,7 +68,7 @@ class ProductInsertService extends ProductInsertReturnArrayService
                         ->get();
 
                     foreach ($existingSkus as $sku) {
-                        $skuIdVolumesAndProductIds[$sku['product_id']][] = [
+                        $this->skuIdVolumesAndProductIds[$sku['product_id']][] = [
                             'id' => $sku['id'],
                             'volume' => $sku['volume']
                         ];
@@ -112,7 +115,7 @@ class ProductInsertService extends ProductInsertReturnArrayService
 
                     //ищем,существует такой продукт или вставляем его в таблицу
 
-                    [$isProductExist, $productId] = $this->isProductExist($productIdsNamesAndBrandIds, $brandId, $insertRow->name);
+                    [$isProductExist, $productId, $ingredientsCount] = $this->isProductExist($brandId, $insertRow->name);
 
 
                     if (!$isProductExist) {
@@ -133,17 +136,17 @@ class ProductInsertService extends ProductInsertReturnArrayService
 
 
                         $productId = (int) $insertedProduct->id;
+                    }
 
-                        if (isset($insertRow->ingredient)) {
-                            $this->insertIngredients($insertRow->ingredient, $productId);
-                        }
-                    } else {
-                        //add ingredients
+                    if ($isInsertIngredients && $ingredientsCount === 0 && isset($insertRow->ingredient)) {
+                        $this->insertIngredients($insertRow->ingredient, $productId);
                     }
 
 
-                    if (!$this->isSkuExist($skuIdVolumesAndProductIds, $productId, $insertRow->volume)) {
+                    [$isSkuExist, $skuId] = $this->isSkuExist($productId, $insertRow->volume);
 
+
+                    if (!$isSkuExist) {
                         $insertedSku = Sku::query()->create([
                             "volume" => $insertRow->volume,
                             "product_id" => $productId,
@@ -158,14 +161,23 @@ class ProductInsertService extends ProductInsertReturnArrayService
                             'rating' => 5,
                             'user_name' => 'Robot.Smart-Beautiful'
                         ]);
-
-                        PriceHistory::query()->create([
-                            "sku_id" => $skuId,
-                            "store_id" => $storeId,
-                            "link_id" => $insertRow->link_id,
-                            "price" =>  $insertRow->price
-                        ]);
                     }
+// пока не нужно писать в таблицу актуальных цен
+
+//                    SkuStore::query()->updateOrCreate(
+//                        ['sku_id' => $skuId, 'store_id' => $storeId, 'link_id' => $insertRow->link_id],
+//                        [
+//                            'price' => $insertRow->price,
+//                            'fails_count' => DB::raw('IF(price IS NULL, fails_count + 1, fails_count)')
+//                        ]
+//                    );
+
+                    PriceHistory::query()->create([
+                        "sku_id" => $skuId,
+                        "store_id" => $storeId,
+                        "link_id" => $insertRow->link_id,
+                        "price" => $insertRow->price
+                    ]);
 
                     ParsingLink::query()->where('id', $insertRow->link_id)->update(['parsed'=> 1]);
 
@@ -195,9 +207,9 @@ class ProductInsertService extends ProductInsertReturnArrayService
                 'brandIdsAndName' => isset($brandIdsAndName) ?? [],
                 'productNameValues' => $productNameValues,
                 'existingProducts' => $existingProducts,
-                'productIdsNamesAndBrandIds' => $productIdsNamesAndBrandIds,
+                'productIdsNamesAndBrandIds' => $this->productIdsNamesAndBrandIds,
                 'isProductExist' => $isProductExist,
-                'skuIdVolumesAndProductIds' => $skuIdVolumesAndProductIds,
+                'skuIdVolumesAndProductIds' => $this->skuIdVolumesAndProductIds,
             ];
         }
 

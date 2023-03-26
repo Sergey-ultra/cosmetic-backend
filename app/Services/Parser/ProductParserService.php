@@ -20,7 +20,13 @@ class ProductParserService
     public function __construct(private ProductInsertService $productInsertService)
     {}
 
-    public function parseProducts(bool $isLoadToDb, array $linkIds, int $storeId, ?int $brandId): array
+    public function parseProducts(
+        bool $isLoadToDb,
+        array $linkIds,
+        int $storeId,
+        bool $isInsertIngredients = true,
+        ?int $brandId = null
+    ): array
     {
         $links = $this->getLinksWithOptionsByIds($linkIds);
 
@@ -65,7 +71,7 @@ class ProductParserService
                 $res['message'] = 'success';
 
                 if (count($parsedInfo) > 0) {
-                    $res = array_merge($res, $this->insertProductCardsToDb($parsedInfo, $storeId, $brandId));
+                    $res = array_merge($res, $this->insertProductCardsToDb($parsedInfo, $storeId, $isInsertIngredients, $brandId));
                 }
 
                 if (count($abandonedProducts) > 0) {
@@ -79,10 +85,10 @@ class ProductParserService
     }
 
 
-    protected function insertProductCardsToDb(array $parsedInfo, int $storeId, ?int $brandId): array
+    protected function insertProductCardsToDb(array $parsedInfo, int $storeId, bool $isInsertIngredients, ?int $brandId): array
     {
         try {
-            $res['data'][] = $this->productInsertService->insertProductsInfo($parsedInfo, $storeId, $brandId);
+            $res['data'][] = $this->productInsertService->insertProductsInfo($parsedInfo, $storeId, $isInsertIngredients, $brandId);
         } catch (ProductInsertException $e) {
             $res['message'] = 'Ошибка при вставки карточки товара в таблицы ' . $e->getMessage();
         }

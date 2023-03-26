@@ -22,7 +22,13 @@ class ParsingLinkController extends Controller
         $forPrice = (bool) ($request->forPrice ?? false);
         $storeId = (int) $request->store_id;
 
-        $query = ParsingLink::select('id', 'link', DB::raw('DATE(created_at) as date'))
+        $columns = ['id', 'link', DB::raw('DATE(created_at) as date')];
+
+        if (!$forPrice) {
+            $columns[] = DB::raw("IF(body IS NULL, false, true) AS is_body_exist");
+        }
+
+        $query = ParsingLink::query()->select($columns)
             ->where('store_id', $storeId)
             ->where('parsed', $forPrice ? 1 : 0);
 
@@ -55,5 +61,10 @@ class ParsingLinkController extends Controller
             ->get();
 
         return response()->json(['data' => $result]);
+    }
+
+    public function deleteBodyFromParsingLink(int $id): void
+    {
+        ParsingLink::query()->where('id', $id)->update(['body' => null]);
     }
 }

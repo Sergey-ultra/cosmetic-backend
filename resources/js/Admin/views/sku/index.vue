@@ -96,12 +96,12 @@
         data() {
             return {
                 headers: [
-                    {title: 'id', value: 'id', width: '2%'},
+                    {title: 'id', value: 'id', width: '5%'},
                     {title: 'Категория', value: 'category', width: '5%', filter: {type: 'select'}},
                     {title: 'Бренд', value: 'brand', width: '7%', filter: {type: 'input'}},
                     {title: 'Изображение', value: 'images', width: '20%', sort: false},
                     {title: 'Имя', value: 'name', width: '35%', filter: {type: 'input'}},
-                    {title: 'Кол-во цен', value: 'link_count', width: '8%'},
+                    {title: 'Кол-во цен', value: 'link_count', width: '5%'},
                     {title: 'Ингред.', value: 'is_ingredients_exist', width: '3%'},
                     {title: 'Объем', value: 'volume', width: '5%', filter: {type: 'input'}},
                     {title: 'Дата', value: 'created_at', width: '5%'},

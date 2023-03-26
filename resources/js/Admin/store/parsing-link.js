@@ -73,5 +73,9 @@ export default {
                 commit('setStoresWithLinksCount', data)
             }
         },
+        deleteBodyFromParsingLink: async ({ dispatch }, id) => {
+            await api.delete(`/parser/parsed-links/delete-body-from-parsing-link/${id}`);
+            dispatch('notification/setSuccess', 'Тело данной ссылки успешно удалено', { root: true })
+        }
     }
 }

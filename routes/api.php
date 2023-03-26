@@ -212,15 +212,13 @@ Route::group(['middleware' => ['auth:api']], function () {
             Route::get('/save-ingredient', [ParserControllerProxy::class, 'saveIngredient']);
             Route::get('/save-ingredient-product', [ParserControllerProxy::class, 'saveIngredientProduct']);
 
-            Route::get('/parsed-links', [ParsingLinkController::class, 'index']);
-            Route::get(
-                '/parsed-links/stores-with-unparsed-links-count',
-                [ParsingLinkController::class, 'storesWithUnparsedLinksCount']
-            );
-            Route::get(
-                '/parsed-links/stores-with-links-count',
-                [ParsingLinkController::class, 'storesWithLinksCount']
-            );
+            Route::group(['prefix' => '/parsed-links'], function() {
+                Route::get('/', [ParsingLinkController::class, 'index']);
+                Route::get('/stores-with-unparsed-links-count', [ParsingLinkController::class, 'storesWithUnparsedLinksCount']);
+                Route::get('/stores-with-links-count', [ParsingLinkController::class, 'storesWithLinksCount']);
+                Route::delete('/delete-body-from-parsing-link/{id}', [ParsingLinkController::class, 'deleteBodyFromParsingLink']);
+            });
+
 
             Route::get('/product-option', [ProductOptionController::class, 'index']);
             Route::post('/product-option', [ProductOptionController::class, 'updateOrCreate']);

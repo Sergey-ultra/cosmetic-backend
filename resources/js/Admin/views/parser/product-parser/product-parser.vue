@@ -52,6 +52,10 @@
 
         >
             <template v-slot:buttons>
+                <label v-if="isLoadToDb">
+                    Загрузить ингредиенты?
+                    <input type="checkbox" v-model="isInsertIngredients">
+                </label>
                 <label>
                     Загрузить в базу данных
                     <input type="checkbox" v-model="isLoadToDb">
@@ -96,7 +100,8 @@
                 brandId:null,
                 storeId: null,
                 isLoadToDb: false,
-                isShowProductOptions: false
+                isShowProductOptions: false,
+                isInsertIngredients: true,
             }
         },
         computed: {
@@ -143,7 +148,8 @@
                     linkIds: ids,
                     brandId: this.brandId,
                     storeId: this.storeId,
-                    isLoadToDb: this.isLoadToDb
+                    isLoadToDb: this.isLoadToDb,
+                    isInsertIngredients: this.isInsertIngredients
                 })
 
                 if (this.isLoadToDb) {

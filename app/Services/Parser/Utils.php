@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Parser;
 
 
+use App\Services\Parser\DTO\ExistingProductDTO;
+
 class Utils
 {
     public static function splitProductName (string $name): string
@@ -56,7 +58,7 @@ class Utils
     public static function findExistingProducts(array $existingProducts, array $nameValues, string $explodeChar): array
     {
         $idsAndName = [];
-        foreach ($existingProducts as  $product) {
+        foreach ($existingProducts as $product) {
             $currentName = '';
 
             foreach ($nameValues as $key => $name) {
@@ -78,10 +80,12 @@ class Utils
             }
 
             if ($currentName) {
-                $idsAndName[$currentName][] = [
-                    'id' => $product['id'],
-                    'brand_id' => $product['brand_id']
-                ];
+                $dto = new ExistingProductDTO();
+                $dto->id = $product['id'];
+                $dto->brandId = $product['brand_id'];
+                $dto->ingredientsCount = count($product['ingredient_ids']);
+
+                $idsAndName[$currentName][] = $dto;
             }
         }
 
