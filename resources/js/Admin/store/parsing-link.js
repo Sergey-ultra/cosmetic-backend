@@ -33,6 +33,10 @@ export default {
         },
         setAvailableStoresWithUnparsedLinks: (state, payload) => state.availableStoresWithUnparsedLinks = [...payload],
         setStoresWithLinksCount: (state, payload) => state.storesWithLinksCount = [...payload],
+        updateCountBeforeEnd: (state, payload) => {
+            const index = state.availableStoresWithUnparsedLinks.findIndex(el => el.id === payload.storeId);
+            state.availableStoresWithUnparsedLinks[index].countBeforeEnd = payload.count
+        }
     },
     actions: {
         loadLinksWithPagination: async ({ commit, state }, obj) => {

@@ -257,6 +257,9 @@
                 } else {
                     this.selectedLinkIds = []
                 }
+            },
+            totalCount(value) {
+                this.updateCountBeforeEnd({ storeId: this.storeId, count: value })
             }
         },
         created() {
@@ -267,10 +270,11 @@
         },
         methods: {
             ...mapActions('parsingLink', ['loadLinksWithPagination', 'deleteBodyFromParsingLink']),
-            ...mapMutations('parsingLink', ['setLinksWithPaginationToDefault','setTableOptions', 'setTableOptionsToDefault']),
+            ...mapMutations('parsingLink', ['setLinksWithPaginationToDefault','setTableOptions',
+                'setTableOptionsToDefault', 'updateCountBeforeEnd']),
             async deleteBodyFromParsingLinkLocal(id) {
                 await this.deleteBodyFromParsingLink(id);
-                await this.loadLinks()
+                await this.loadLinks();
             },
             toggleSelectedLink(id) {
                 const index =  this.selectedLinkIds.indexOf(id);
