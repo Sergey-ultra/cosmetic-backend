@@ -78,6 +78,15 @@ use Illuminate\Support\Facades\Route;
 //});
 
 
+Route::get('/test', function() {
+    $repare = Sku::query()->where('id','>', 3099)->get();
+    foreach($repare as $sku) {
+        $sku->images = json_decode($sku->images);
+
+        $sku->update();
+    }
+    echo 'success';
+});
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
