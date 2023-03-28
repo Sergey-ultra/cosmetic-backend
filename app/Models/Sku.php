@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @params $images картинки
+ */
 class Sku extends Model
 {
     protected $fillable = ['product_id', 'images', 'volume', 'rating', 'reviews_count'];

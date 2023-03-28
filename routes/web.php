@@ -24,6 +24,8 @@ Route::get('/clear-cache', function() {
     return 'DONE'; //Return anything
 });
 
+Route::get('/test', [MainController::class, 'test']);
+
 
 
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'emailVerify'])

@@ -13,26 +13,33 @@ use ReflectionClass;
 
 trait DataProvider
 {
-    protected function prepareModel(Request $request, EloquentBuilder|Builder $query, bool $isJoin = false)
+    protected EloquentBuilder|Builder $query;
+    protected function prepareModel(
+        Request $request,
+        EloquentBuilder|Builder $query,
+        bool $isJoin = false
+    ): EloquentBuilder|Builder
     {
-        if ($request->filter) {
-            $this->filterModel($query, $isJoin, $request->filter);
+        $this->query = $query;
+
+        if ($request->input('filter')) {
+            $this->filterModel($isJoin, $request->input('filter'));
         }
 
-        if (is_string($request->sort) && $request->sort !== '') {
-            $this->sortModel($query, $request->sort);
+        if (is_string($request->input('sort')) && $request->input('sort') !== '') {
+            $this->sortModel($request->input('sort'));
         }
 
-        return $query;
+        return $this->query;
     }
 
-    protected function filterModel($query, bool $isJoin, array $filter): void
+    protected function filterModel(bool $isJoin, array $filter): void
     {
-        $isQueryBuilder = $isJoin && $query instanceof Builder;
+        $isQueryBuilder = $isJoin && $this->query instanceof Builder;
 
         if ($isQueryBuilder) {
             $columns = [];
-            foreach ($query->columns as $column) {
+            foreach ($this->query->columns as $column) {
 
                 $parts = explode(' ', $column);
                 if (count($parts) > 1) {
@@ -47,27 +54,27 @@ trait DataProvider
 
         foreach ($filter as $filterKey => $param) {
             $col = $isQueryBuilder ? $columns[$filterKey] : $filterKey;
-            $this->addCondition($query, $col, $param);
+            $this->addCondition($col, $param);
         }
     }
 
-    protected function sortModel($query, string $sort): void
+    protected function sortModel(string $sort): void
     {
         if ($sort[0] === '-') {
             $sort = substr($sort, 1);
-            $query->orderByDesc($sort);
+            $this->query->orderByDesc($sort);
         } else {
-            $query->orderBy($sort);
+            $this->query->orderBy($sort);
         }
     }
 
-    protected function addCondition($query, string $column, string|array $param): void
+    protected function addCondition(string $column, string|array $param): void
     {
 
         if (is_string($param)) {
-            $query->where($column, $param);
+            $this->query->where($column, $param);
         } else if(is_array($param)) {
-            $query->where(function ($query) use ($column, $param) {
+            $this->query->where(function ($query) use ($column, $param) {
                 foreach ($param as $key => $value) {
                     if (is_string($value)) {
                         if ($key === 'like') {

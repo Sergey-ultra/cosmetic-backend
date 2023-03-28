@@ -42,7 +42,7 @@ class ParsingLinkController extends Controller
 
     public function storesWithUnparsedLinksCount(): JsonResponse
     {
-        $result = Store::select(DB::raw("stores.id, stores.name, count(parsing_links.id) as countBeforeEnd"))
+        $result = Store::query()->select(DB::raw("stores.id, stores.name, count(parsing_links.id) as countBeforeEnd"))
             ->join('parsing_links', 'stores.id', '=', 'parsing_links.store_id')
             ->where('parsing_links.parsed', 0)
             ->groupBy('stores.id', 'stores.name')
@@ -54,7 +54,7 @@ class ParsingLinkController extends Controller
 
     public function storesWithLinksCount(): JsonResponse
     {
-        $result = Store::select(DB::raw("stores.id, stores.name, count(parsing_links.id) as count"))
+        $result = Store::query()->select(DB::raw("stores.id, stores.name, count(parsing_links.id) as count"))
             ->join('parsing_links', 'stores.id', '=', 'parsing_links.store_id')
             ->where('parsing_links.parsed', 1)
             ->groupBy('stores.id', 'stores.name')

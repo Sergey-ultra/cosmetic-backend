@@ -151,7 +151,8 @@ class ProductInsertService extends ProductInsertReturnArrayService
                             "volume" => $insertRow->volume,
                             "product_id" => $productId,
                             'rating' => 5,
-                            "images" => json_encode($insertRow->images)
+                            //"images" => json_encode($insertRow->images),
+                            "images" => $insertRow->images
                         ]);
 
                         $skuId = $insertedSku->id;
