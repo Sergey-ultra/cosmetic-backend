@@ -139,14 +139,14 @@ class ProductParserService
 
 
         return array_map(
-            function($item): ParsingLinkWithOptionsDTO {
+            static function($item): ParsingLinkWithOptionsDTO {
                 $link = new ParsingLinkWithOptionsDTO();
                 $link->id = (int)$item->id;
                 $link->link =  $item->link;
                 $link->store_id = (int)$item->store_id;
                 $link->category_id = (int)$item->category_id;
                 $link->body = $item->body;
-                $link->check_images_count =  (bool)$item->check_images_count;
+                $link->check_images_count = (bool)$item->check_images_count;
 
                 $options = json_decode($item->options, true);
                 $link->options = $options['fileFields'];

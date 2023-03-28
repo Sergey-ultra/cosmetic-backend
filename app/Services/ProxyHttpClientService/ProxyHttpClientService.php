@@ -90,9 +90,8 @@ class ProxyHttpClientService implements ProxyHttpClientInterface
         return Cache::remember(
             'proxy_servers',
             now()->addDay(),
-            function (): array {
-                $list = $this->proxyServersService->getList();
-                return $list ?? [];
+            static function (): array {
+                return $this->proxyServersService->getList() ?? [];
             }
         );
     }

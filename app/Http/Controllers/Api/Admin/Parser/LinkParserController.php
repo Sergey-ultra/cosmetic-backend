@@ -69,8 +69,25 @@ class LinkParserController extends Controller
             $result['message'] = 'success';
 
             if ($isLoadToDb) {
-                $parsingLinks = array_map(
-                    function ($link) use ($storeId, $categoryId) {
+                $existingParsingLinks = ParsingLink::query()
+                    ->select('link')
+                    ->whereIn('link', $parsedLinks)
+                    ->get()
+                    ->pluck('link')
+                    ->all();
+
+
+                if (count($existingParsingLinks)) {
+                    $parsedLinks = array_filter(
+                        $parsedLinks,
+                        static function ($item) use ($existingParsingLinks) {
+                            return !in_array($item, $existingParsingLinks, true);
+                        }
+                    );
+                }
+
+                $preparedParsedLinks = array_map(
+                    static function ($link) use ($storeId, $categoryId) {
                         return [
                             "link" => $link,
                             "parsed" => 0,
@@ -81,7 +98,7 @@ class LinkParserController extends Controller
                     $parsedLinks
                 );
 
-                ParsingLink::query()->upsert($parsingLinks, []);
+                ParsingLink::query()->upsert($preparedParsedLinks, []);
             }
         }
 
