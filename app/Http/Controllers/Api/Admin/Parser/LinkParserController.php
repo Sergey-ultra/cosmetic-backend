@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\Admin\Parser;
 
 use App\Http\Controllers\Controller;
 use App\Models\LinkOption;
-use App\Models\ParsingLink;
 use App\Services\Parser\Contracts\ILinkParser;
+use App\Services\Parser\LinkInsertService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -69,40 +69,9 @@ class LinkParserController extends Controller
             $result['message'] = 'success';
 
             if ($isLoadToDb) {
-                $existingParsingLinks = ParsingLink::query()
-                    ->select('link')
-                    ->whereIn('link', $parsedLinks)
-                    ->get()
-                    ->pluck('link')
-                    ->all();
-
-
-                if (count($existingParsingLinks)) {
-                    $parsedLinks = array_filter(
-                        $parsedLinks,
-                        static function ($item) use ($existingParsingLinks) {
-                            return !in_array($item, $existingParsingLinks, true);
-                        }
-                    );
-                }
-
-                $preparedParsedLinks = array_map(
-                    static function ($link) use ($storeId, $categoryId) {
-                        return [
-                            "link" => $link,
-                            "parsed" => 0,
-                            "store_id" => $storeId,
-                            "category_id" => $categoryId
-                        ];
-                    },
-                    $parsedLinks
-                );
-
-                ParsingLink::query()->upsert($preparedParsedLinks, []);
+                (new LinkInsertService())->insert($parsedLinks, $storeId, $categoryId);
             }
         }
-
-
 
         return response()->json(['data' => $result]);
     }
