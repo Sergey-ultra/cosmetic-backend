@@ -61,6 +61,7 @@ use App\Http\Controllers\Api\Admin\Parser\PriceParserController;
 use App\Http\Controllers\Api\Admin\Parser\ProductOptionController;
 use App\Http\Controllers\Api\Admin\Parser\ProductParserController;
 use App\Http\Controllers\Api\Admin\Parser\Old\ParserControllerProxy;
+use App\Models\Sku;
 use Illuminate\Support\Facades\Route;
 
 /*
