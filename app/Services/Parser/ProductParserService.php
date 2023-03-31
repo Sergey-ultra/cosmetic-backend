@@ -8,6 +8,7 @@ namespace App\Services\Parser;
 use App\Exceptions\ProductInsertException;
 use App\Exceptions\TextExtractException;
 use App\Services\Parser\DTO\ParsingLinkWithOptionsDTO;
+use App\Services\Parser\DTO\ProductCardDTO;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -100,8 +101,8 @@ class ProductParserService
     protected function insertAbandonedProductsToDb(array $abandonedProducts): array
     {
         $linkIds = array_map(
-            function ($product) {
-                return $product['link_id'];
+            function (ProductCardDTO $product): int {
+                return $product->link_id;
             },
             $abandonedProducts
         );
