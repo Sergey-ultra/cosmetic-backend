@@ -18,15 +18,13 @@
     import {mapActions, mapState} from "vuex";
 
     export default {
-        name: "store-with-link-count",
-        data() {
-            return {
-
-            }
-        },
         props:{
             storeId: {
                 default: null
+            },
+            forPrice: {
+                type: Boolean,
+                default: false
             }
         },
         computed: {
@@ -41,7 +39,7 @@
             }
         },
         created() {
-            this.loadStoresWithLinksCount()
+            this.loadStoresWithLinksCount(this.forPrice);
         },
         methods: {
             ...mapActions('parsingLink', ['loadStoresWithLinksCount'])
@@ -50,5 +48,8 @@
 </script>
 
 <style lang="scss" scoped>
-   @import './resources/css/admin/form.scss';
+   @import '../../../../../css/admin/form';
+   .option__not-empty {
+       background: #84f4bd;
+   }
 </style>

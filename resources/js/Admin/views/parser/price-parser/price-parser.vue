@@ -1,7 +1,10 @@
 <template>
     <div class="price">
         <div>
-            <store-with-link-count v-model:storeId="storeId"/>
+            <store-with-link-count
+                v-model:storeId="storeId"
+                :forPrice="true"
+            />
 
             <h4>Настройка тегов парсинга</h4>
             <form class="form" @input="setFormChangingToTrue">
@@ -24,14 +27,10 @@
                 </div>
             </form>
         </div>
-        <buttonComponent
-            class="button__price"
-            :isLoading="isLoading"
-            :disabled="isLoading"
-            @click="parsePricesFromActualPriceParsingTable"
-        >
-            Спарсить цены всех магазинов
-        </buttonComponent>
+
+        <manualPriceParser></manualPriceParser>
+
+
     </div>
     <div class="table">
         <link-table
@@ -44,10 +43,11 @@
     </div>
 </template>
 <script>
-    import storeWithLinkCount from "./store-with-link-count.vue"
-    import linkTable from "../link-table.vue"
+    import storeWithLinkCount from "../src/store-with-link-count.vue"
+    import linkTable from "../src/link-table.vue"
     import buttonComponent from "../../../components/button-component.vue"
-    import {mapActions, mapState} from "vuex";
+    import {mapActions, mapMutations, mapState} from "vuex";
+    import manualPriceParser from "../src/manual-price-parser.vue";
 
     export default {
         name: "price-parser",
@@ -55,6 +55,7 @@
             storeWithLinkCount,
             buttonComponent,
             linkTable,
+            manualPriceParser
         },
         data() {
             return {
@@ -66,22 +67,25 @@
         },
         computed:{
             ...mapState('priceOptions', ['priceTag']),
-            ...mapState('priceParser', ['isLoading', 'isLoadingPrice']),
+            ...mapState('priceParser', ['isLoadingPrice']),
         },
         watch:{
             async storeId(value) {
                 this.isFormChanging = false
                 if (! ['null', undefined, ''].includes(value)) {
-                    this.loadPriceOptions(value)
+                    await this.loadPriceOptions(value);
+                } else {
+                    this.setPriceOptions('');
                 }
             },
             priceTag(value) {
-                this.editedPriceTag = value
+                this.editedPriceTag = value;
             },
         },
         methods:{
             ...mapActions('priceOptions', ['loadPriceOptions', 'savePriceOptions']),
-            ...mapActions('priceParser', ['parsePriceByLinkIds', 'parsePricesFromActualPriceParsingTable']),
+            ...mapMutations('priceOptions', ['setPriceOptions']),
+            ...mapActions('priceParser', ['parsePriceByLinkIds']),
             setFormChangingToTrue() {
                 this.isFormChanging = true
             },
@@ -119,8 +123,5 @@
     }
     .web__tag {
         width:500px;
-    }
-    .button__price {
-        height: 35px;
     }
 </style>

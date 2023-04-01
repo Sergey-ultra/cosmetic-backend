@@ -58,7 +58,7 @@ class AppServiceProvider extends ServiceProvider
                     $app->make(ActualPriceParsingService::class),
                     $app->make(Configuration::class),
                     $app->make(PriceBulkInsertService::class),
-                    app(PriceCrawlerService::class)
+                    $app->make(PriceCrawlerService::class)
                 );
             }
         );

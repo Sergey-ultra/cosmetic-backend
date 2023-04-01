@@ -1,7 +1,7 @@
 <template>
     <form name="parser" ref="parser">
         <div class="form__group">
-            <store-with-unparsed-links
+            <store-with-link-count
                     v-model:storeId="storeId"
             />
             <div class="form__element">
@@ -80,15 +80,15 @@
 <script>
     import {mapActions, mapMutations, mapState} from "vuex";
     import productOptionsForm from "./product-options-form.vue"
-    import storeWithUnparsedLinks from "./store-with-unparsed-links.vue"
-    import linkTable from "../link-table.vue"
+    import linkTable from "../src/link-table.vue"
     import previewModal from "./preview-modal.vue"
     import buttonComponent from "../../../components/button-component.vue"
+    import storeWithLinkCount from "../src/store-with-link-count.vue";
 
     export default {
         name: "product-parser",
         components: {
-            storeWithUnparsedLinks,
+            storeWithLinkCount,
             linkTable,
             previewModal,
             productOptionsForm,

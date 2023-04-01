@@ -161,7 +161,7 @@
 
 <script>
     import {mapActions, mapMutations, mapState} from "vuex";
-    import buttonComponent from "../../components/button-component.vue"
+    import buttonComponent from "../../../components/button-component.vue"
     export default {
         name: "link-table",
         components: {
@@ -258,12 +258,11 @@
                     this.selectedLinkIds = []
                 }
             },
-            totalCount(value) {
-                this.updateCountBeforeEnd({ storeId: this.storeId, count: value })
+            totalCount(value, oldValue) {
+                if (oldValue !== 0 && value !== oldValue) {
+                    this.updateCountBeforeEnd({ storeId: this.storeId, count: value })
+                }
             }
-        },
-        created() {
-
         },
         unmounted() {
             this.setLinksWithPaginationToDefault()
@@ -302,7 +301,7 @@
                 if (this.forPrice) {
                     params.forPrice = true
                 }
-               this.loadLinksWithPagination(params)
+                this.loadLinksWithPagination(params);
             },
             plusPage() {
                 if (this.options.page < this.lastPage) {

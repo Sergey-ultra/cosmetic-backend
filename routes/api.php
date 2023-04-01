@@ -215,7 +215,6 @@ Route::group(['middleware' => ['auth:api']], function () {
 
             Route::group(['prefix' => '/parsed-links'], function() {
                 Route::get('/', [ParsingLinkController::class, 'index']);
-                Route::get('/stores-with-unparsed-links-count', [ParsingLinkController::class, 'storesWithUnparsedLinksCount']);
                 Route::get('/stores-with-links-count', [ParsingLinkController::class, 'storesWithLinksCount']);
                 Route::delete('/delete-body-from-parsing-link/{id}', [ParsingLinkController::class, 'deleteBodyFromParsingLink']);
             });
@@ -233,6 +232,11 @@ Route::group(['middleware' => ['auth:api']], function () {
 
             Route::post('/product/parse-product-by-link-ids', [ProductParserController::class, 'parseProductByLinkIds']);
 
+            Route::get('/price/max-link-count-per-store', [PriceParserController::class, 'maxLinkCountPerStore']);
+            Route::get('/price/get-min-hour-count', [PriceParserController::class, 'getMinHourCount']);
+            Route::get('/price/get-max-hour-count', [PriceParserController::class, 'getMaxHourCount']);
+            Route::post('/price/set-min-hour-count', [PriceParserController::class, 'setMinHourCount']);
+            Route::post('/price/set-max-hour-count', [PriceParserController::class, 'setMaxHourCount']);
             Route::post('/price/parse-prices-by-link-ids', [PriceParserController::class, 'parsePricesByLinkIds']);
             Route::post(
                 '/price/parse-prices-from-actual-price-parsing-table',
