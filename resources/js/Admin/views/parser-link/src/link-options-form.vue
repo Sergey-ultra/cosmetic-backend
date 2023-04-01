@@ -43,7 +43,7 @@
 
 <script>
 import {mapActions, mapState} from "vuex";
-import buttonComponent from "../../components/button-component.vue"
+import buttonComponent from "../../../components/button-component.vue"
 
 export default {
     name: "link-options-form",
@@ -122,7 +122,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import './resources/css/admin/form.scss';
+@import '../../../../../css/admin/form';
     .target__url {
         width: 900px;
     }

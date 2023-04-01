@@ -60,21 +60,21 @@ const constantRoutes = [
         component: () => import('../views/test/test.vue')
     },
     {
-        path:'/admin/link-parser',
+        path:'/admin/parser-link',
         name:'link-parser',
-        component:() => import('../views/parser/link-parser/link-parser.vue'),
+        component:() => import('../views/parser-link/index.vue'),
         meta: { title:'Парсинг ссылок на товарные предложения' }
     },
     {
-        path:'/admin/product-parser',
+        path:'/admin/parser-product',
         name:'product-parser',
-        component:() => import('../views/parser/product-parser/product-parser.vue'),
+        component:() => import('../views/parser-product/index.vue'),
         meta: { title:'Парсинг товарных предложений' }
     },
     {
-        path:'/admin/price-parser',
+        path:'/admin/parser-price',
         name:'price-parser',
-        component:() => import('../views/parser/price-parser/price-parser.vue'),
+        component:() => import('../views/parser-price/index.vue'),
         meta: { title:'Парсинг цен' }
     },
     {

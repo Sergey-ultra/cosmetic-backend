@@ -27,10 +27,6 @@
                 </div>
             </form>
         </div>
-
-        <manualPriceParser></manualPriceParser>
-
-
     </div>
     <div class="table">
         <link-table
@@ -43,19 +39,17 @@
     </div>
 </template>
 <script>
-    import storeWithLinkCount from "../src/store-with-link-count.vue"
-    import linkTable from "../src/link-table.vue"
+    import storeWithLinkCount from "../../../components/parsing/store-with-link-count.vue"
+    import linkTable from "../../../components/parsing/link-table.vue"
     import buttonComponent from "../../../components/button-component.vue"
     import {mapActions, mapMutations, mapState} from "vuex";
-    import manualPriceParser from "../src/manual-price-parser.vue";
 
     export default {
         name: "price-parser",
         components:{
             storeWithLinkCount,
             buttonComponent,
-            linkTable,
-            manualPriceParser
+            linkTable
         },
         data() {
             return {
@@ -103,7 +97,7 @@
 </script>
 
 <style lang="scss" scoped>
-   @import './resources/css/admin/form.scss';
+   @import '../../../../../css/admin/form';
     .price {
         display: flex;
         justify-content: space-between;

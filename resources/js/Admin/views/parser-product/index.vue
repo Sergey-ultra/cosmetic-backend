@@ -46,9 +46,9 @@
 
     <div class="table-block">
         <link-table
-                :storeId="storeId"
-                @getItemsByLinkIds="parseByLinkIds"
-                v-model:isReloadLinks="isReloadLinksLocal"
+            :storeId="storeId"
+            @getItemsByLinkIds="parseByLinkIds"
+            v-model:isReloadLinks="isReloadLinksLocal"
 
         >
             <template v-slot:buttons>
@@ -79,11 +79,11 @@
 
 <script>
     import {mapActions, mapMutations, mapState} from "vuex";
-    import productOptionsForm from "./product-options-form.vue"
-    import linkTable from "../src/link-table.vue"
-    import previewModal from "./preview-modal.vue"
-    import buttonComponent from "../../../components/button-component.vue"
-    import storeWithLinkCount from "../src/store-with-link-count.vue";
+    import productOptionsForm from "./src/product-options-form.vue"
+    import linkTable from "../../components/parsing/link-table.vue"
+    import previewModal from "./src/preview-modal.vue"
+    import buttonComponent from "../../components/button-component.vue"
+    import storeWithLinkCount from "../../components/parsing/store-with-link-count.vue";
 
     export default {
         name: "product-parser",
@@ -164,7 +164,7 @@
 </script>
 
 <style scoped lang="scss">
-@import './resources/css/admin/form.scss';
+@import '../../../../css/admin/form';
     select option {
         display: flex;
         justify-content: space-between;

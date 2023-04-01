@@ -44,10 +44,10 @@
 </template>
 
 <script>
-import modal from "../modal/modal.vue"
+import modal from "../../../components/modal/modal.vue"
 import {mapState} from "vuex";
-import expansionPanel from "../expansion-panel.vue";
-import buttonComponent from "../../components/button-component.vue"
+import expansionPanel from "../../../components/expansion-panel.vue";
+import buttonComponent from "../../../components/button-component.vue"
 
 export default {
     name: "preview-links-modal",

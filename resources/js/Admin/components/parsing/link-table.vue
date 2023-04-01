@@ -161,7 +161,7 @@
 
 <script>
     import {mapActions, mapMutations, mapState} from "vuex";
-    import buttonComponent from "../../../components/button-component.vue"
+    import buttonComponent from "../button-component.vue"
     export default {
         name: "link-table",
         components: {

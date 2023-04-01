@@ -1,21 +1,21 @@
 
 export default [
     // {
-    //     path:'/admin/link-parser',
-    //     name:'link-parser',
-    //     component:() => import('../views/parser/link-parser/link-parser.vue'),
+    //     path:'/admin/parser-link',
+    //     name:'parser-link',
+    //     component:() => import('../views/parser/parser-link/parser-link.vue'),
     //     meta: { title:'Парсинг ссылок на товарные предложения' }
     // },
     // {
-    //     path:'/admin/product-parser',
-    //     name:'product-parser',
-    //     component:() => import('../views/parser/product-parser/product-parser.vue'),
+    //     path:'/admin/parser-product',
+    //     name:'parser-product',
+    //     component:() => import('../views/parser/parser-product/parser-product.vue'),
     //     meta: { title:'Парсинг товарных предложений' }
     // },
     // {
-    //     path:'/admin/price-parser',
-    //     name:'price-parser',
-    //     component:() => import('../views/parser/price-parser/price-parser.vue'),
+    //     path:'/admin/parser-price',
+    //     name:'parser-price',
+    //     component:() => import('../views/parser/parser-price/parser-price.vue'),
     //     meta: { title:'Парсинг цен' }
     // },
     // {

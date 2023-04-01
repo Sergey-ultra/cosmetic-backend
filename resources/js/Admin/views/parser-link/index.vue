@@ -85,9 +85,9 @@
 
 <script>
     import {mapActions, mapMutations, mapState} from "vuex";
-    import previewLinksModal from "../../../components/link-parsing/preview-links-modal.vue";
-    import linkOptionsForm from "../../../components/link-parsing/link-options-form.vue";
-    import buttonComponent from "../../../components/button-component.vue"
+    import previewLinksModal from "./src/preview-links-modal.vue";
+    import linkOptionsForm from "./src/link-options-form.vue";
+    import buttonComponent from "../../components/button-component.vue"
 
     export default {
         name: "link-parser",
@@ -158,7 +158,7 @@
 </script>
 
 <style lang="scss" scoped>
-@import './resources/css/admin/form.scss';
+@import '../../../../css/admin/form';
     .button-settings {
         margin-top: 20px;
         margin-left: auto;

@@ -48,7 +48,7 @@
 </script>
 
 <style lang="scss" scoped>
-   @import '../../../../../css/admin/form';
+   @import '../../../../css/admin/form';
    .option__not-empty {
        background: #84f4bd;
    }
