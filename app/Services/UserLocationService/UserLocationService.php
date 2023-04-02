@@ -10,7 +10,7 @@ class UserLocationService
 
     public function getLocationByIp(string $ip): array
     {
-        $response = $this->httpClient->request('GET', "https://ip-api.com/json/$ip");
+        $response = $this->httpClient->request('GET', "http://ip-api.com/json/$ip");
         return json_decode($response->getBody()->getContents(), true);
     }
 }
