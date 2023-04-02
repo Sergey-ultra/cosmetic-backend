@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserUpdateRequest;
+use App\Models\Country;
 use App\Models\SkuRating;
 use App\Services\UserLocationService\UserLocationService;
 use Illuminate\Http\JsonResponse;
@@ -58,7 +59,16 @@ class UserController extends Controller
     public function getMyLocation(Request $request, UserLocationService $userLocationService): JsonResponse
     {
         $userIp = $request->ip();
-        $result = $userLocationService->getLocationByIp($userIp);
+        $location = $userLocationService->getLocationByIp($userIp);
+        $result = [];
+
+        if ($location['country']) {
+            $result = Country::query()
+                ->select('id', 'name', 'name_en')
+                ->where('name_en', '=', $location['country'])
+                ->get();
+        }
+
 
         return response()->json($result);
     }
