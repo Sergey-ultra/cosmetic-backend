@@ -66,7 +66,7 @@ class UserController extends Controller
             $result = Country::query()
                 ->select('id', 'name', 'name_en')
                 ->where('name_en', '=', $location['country'])
-                ->get();
+                ->first();
         }
 
 
