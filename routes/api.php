@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\FavoritesController;
 use App\Http\Controllers\Api\FilterController;
 use App\Http\Controllers\Api\FileController;
+use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\PriceHistoryController;
 use App\Http\Controllers\Api\RouteController;
 use App\Http\Controllers\Api\SearchController;
@@ -106,7 +107,8 @@ Route::post('/supplier/register', [AuthController::class, 'register']);
 Route::post('/supplier/login', [AuthController::class, 'login']);
 Route::post('/subscription', [SubscriptionController::class, 'store']);
 
-Route::get('/location', [UserController::class, 'getMyLocation']);
+Route::get('/my-location', [UserController::class, 'getMyLocation']);
+Route::get('/location-list', [LocationController::class, 'index']);
 
 
 Route::get('/articles', [ArticleController::class, 'index']);
