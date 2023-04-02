@@ -106,6 +106,8 @@ Route::post('/supplier/register', [AuthController::class, 'register']);
 Route::post('/supplier/login', [AuthController::class, 'login']);
 Route::post('/subscription', [SubscriptionController::class, 'store']);
 
+Route::get('/location', [UserController::class, 'getMyLocation']);
+
 
 Route::get('/articles', [ArticleController::class, 'index']);
 Route::get('/articles/last', [ArticleController::class, 'last']);

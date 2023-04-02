@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\SkuRating;
+use App\Services\UserLocationService\UserLocationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,5 +53,13 @@ class UserController extends Controller
         ]);
 
         return response()->json(['data' => ['status' => true]]);
+    }
+
+    public function getMyLocation(Request $request, UserLocationService $userLocationService): JsonResponse
+    {
+        $userIp = $request->ip();
+        $result = $userLocationService->getLocationByIp($userIp);
+
+        return response()->json($result);
     }
 }
