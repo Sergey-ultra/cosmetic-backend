@@ -37,7 +37,8 @@ class ImageLoadingService implements ImageLoadingInterface
 
                         //$size = file_put_contents($destinationPath, $fileContent);
 
-                        CompressImageJob::dispatch($imageSavePath);
+                        //CompressImageJob::dispatch($imageSavePath);
+                        CompressImageJob::dispatch($filePath);
                     }
                 }
             } else  {
