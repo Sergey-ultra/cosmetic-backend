@@ -78,7 +78,6 @@ class ProductParserService
                 if (count($abandonedProducts) > 0) {
                     $res = array_merge($res, $this->insertAbandonedProductsToDb($abandonedProducts));
                 }
-
             }
         }
 

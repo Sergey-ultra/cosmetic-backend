@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin\Parser;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductParsingRequest;
+use App\Jobs\CompressImageJob;
 use App\Services\Parser\ProductCardCrawlerParser;
 use App\Services\Parser\ProductParserService;
 use Illuminate\Http\JsonResponse;
@@ -36,6 +37,15 @@ class ProductParserController extends Controller
         $smallFileList = scandir(Storage::path(ProductCardCrawlerParser::DESTINATION_FOLDER . '/small'));
 
         $diff = array_diff($fileList, $smallFileList);
+
+        foreach ($diff as $filename) {
+            $destinationPath = ProductCardCrawlerParser::DESTINATION_FOLDER . $filename;
+            $filePath = Storage::path($destinationPath);
+
+            if (! (is_file($filePath) && file_exists($filePath)) ) {
+                CompressImageJob::dispatch($filePath);
+            }
+        }
 
         return response()->json(['data' => [count($fileList), count($smallFileList), $diff]]);
     }
