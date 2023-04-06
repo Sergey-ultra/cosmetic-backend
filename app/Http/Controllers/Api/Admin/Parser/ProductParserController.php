@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api\Admin\Parser;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductParsingRequest;
+use App\Services\Parser\ProductCardCrawlerParser;
 use App\Services\Parser\ProductParserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductParserController extends Controller
 {
@@ -26,5 +28,15 @@ class ProductParserController extends Controller
         $result = $productParserService->parseProducts($isLoadToDb, $linkIds, $storeId, $isInsertIngredients, $brandId);
 
         return response()->json(['data' => $result]);
+    }
+
+    public function compressAllUncompressedImages(): JsonResponse
+    {
+        $fileList = scandir(Storage::path(ProductCardCrawlerParser::DESTINATION_FOLDER));
+        $smallFileList = scandir(Storage::path(ProductCardCrawlerParser::DESTINATION_FOLDER . '/small'));
+
+        $diff = array_diff($fileList, $smallFileList);
+
+        return response()->json(['data' => [count($fileList), count($smallFileList), $diff]]);
     }
 }

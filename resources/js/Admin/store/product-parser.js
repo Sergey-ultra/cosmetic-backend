@@ -41,6 +41,9 @@ export default {
             }
 
             commit('setIsParsingProduct', false)
-        }
+        },
+        compressAllUncompressedImages: async({ commit }) => {
+            const res = await api.get("/parser/product/compress-all-uncompressed-images")
+        },
     }
 }

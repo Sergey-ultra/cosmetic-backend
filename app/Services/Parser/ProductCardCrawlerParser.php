@@ -18,7 +18,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class ProductCardCrawlerParser extends AbstractProductCardParser
 {
-    const  DESTINATION_FOLDER = 'public/image/sku/';
+    public const DESTINATION_FOLDER = 'public/image/sku/';
     protected Crawler $crawler;
     protected ImageLoadingInterface $imageLoadingService;
     protected IUrlService $urlService;
@@ -61,7 +61,7 @@ class ProductCardCrawlerParser extends AbstractProductCardParser
             }
 
             if (!isset($this->productCard->volume)) {
-                $this->productCard->volume =  $this->volume;
+                $this->productCard->volume = $this->volume;
             }
 
             $this->productCard->code = Text::makeProductCode($this->brandClearValue, $this->nameClearValue);

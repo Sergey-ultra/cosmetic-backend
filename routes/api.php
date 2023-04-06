@@ -235,6 +235,7 @@ Route::group(['middleware' => ['auth:api']], function () {
             Route::post('/link-option', [LinkOptionController::class, 'updateOrCreate']);
 
             Route::post('/product/parse-product-by-link-ids', [ProductParserController::class, 'parseProductByLinkIds']);
+            Route::get('/product/compress-all-uncompressed-images', [ProductParserController::class, 'compressAllUncompressedImages']);
 
             Route::get('/price/max-link-count-per-store', [PriceParserController::class, 'maxLinkCountPerStore']);
             Route::get('/price/get-min-hour-count', [PriceParserController::class, 'getMinHourCount']);
