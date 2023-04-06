@@ -38,7 +38,7 @@ class ProductParserController extends Controller
         $fileList = scandir(Storage::path(ProductCardCrawlerParser::DESTINATION_FOLDER));
         $smallFileList = scandir(Storage::path(ProductCardCrawlerParser::DESTINATION_FOLDER . '/small'));
 
-        $diff = array_diff($fileList, $smallFileList);
+        $diff = array_value(array_diff($fileList, $smallFileList));
 
         foreach ($diff as $key => $filename) {
             if ($key > 20) {
