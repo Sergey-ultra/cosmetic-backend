@@ -42,9 +42,8 @@ class ProductParserController extends Controller
             $destinationPath = ProductCardCrawlerParser::DESTINATION_FOLDER . $filename;
             $filePath = Storage::path($destinationPath);
 
-            if (! (is_file($filePath) && file_exists($filePath)) ) {
-                CompressImageJob::dispatch($filePath);
-            }
+            CompressImageJob::dispatch($filePath);
+
         }
 
         return response()->json(['data' => [count($fileList), count($smallFileList), $diff]]);
