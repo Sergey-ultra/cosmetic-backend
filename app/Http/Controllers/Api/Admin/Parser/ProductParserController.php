@@ -33,6 +33,8 @@ class ProductParserController extends Controller
 
     public function compressAllUncompressedImages(): JsonResponse
     {
+        set_time_limit(7200);
+
         $fileList = scandir(Storage::path(ProductCardCrawlerParser::DESTINATION_FOLDER));
         $smallFileList = scandir(Storage::path(ProductCardCrawlerParser::DESTINATION_FOLDER . '/small'));
 
