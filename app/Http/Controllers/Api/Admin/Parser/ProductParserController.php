@@ -28,7 +28,11 @@ class ProductParserController extends Controller
 
         $result = $productParserService->parseProducts($isLoadToDb, $linkIds, $storeId, $isInsertIngredients, $brandId);
 
-        return response()->json(['data' => $result]);
+        $size = memory_get_usage(true);
+        $unit = ['b','kb','mb','gb','tb','pb'];
+        $size = round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+
+        return response()->json(['data' => $result, 'size' => $size]);
     }
 
     public function compressAllUncompressedImages(): JsonResponse
