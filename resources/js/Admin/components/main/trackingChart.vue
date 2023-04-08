@@ -6,35 +6,20 @@
     import * as am4core from "@amcharts/amcharts4/core";
     import * as am4charts from "@amcharts/amcharts4/charts";
     import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+    import {mapActions, mapState} from "vuex";
 
     am4core.useTheme(am4themes_animated);
 
     export default {
-        name: "trackingChart",
-        props: {
-            chartData: {
-                type:Array,
-                default: () => [{
-                    count: 0,
-                    date: 0,
-                }]
-            }
-        },
         data() {
             return {
                 chart: '',
             }
         },
-        beforeDestroy() {
-            if (this.chart) {
-                console.log('time')
-                this.chart.dispose();
-            }
-        },
         computed: {
+            ...mapState('dynamics', ['trackingDynamics']),
             preparedData() {
-
-                return this.chartData.map(el => {
+                return this.trackingDynamics.map(el => {
                     return {
                         date: el.date,
                         name: "name" + el.date,
@@ -54,10 +39,20 @@
                 //this.chart.invalidateData()
             }
         },
+        beforeDestroy() {
+            if (this.chart) {
+                console.log('time')
+                this.chart.dispose();
+            }
+        },
+        created() {
+            this.loadTrackingDynamics();
+        },
         mounted() {
             this.renderChart()
         },
         methods: {
+            ...mapActions('dynamics', ['loadTrackingDynamics']),
             renderChart() {
                 let trackingChart = am4core.create(this.$refs.chartdiv, am4charts.XYChart);
 

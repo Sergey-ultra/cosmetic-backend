@@ -17,12 +17,19 @@
 
             <dropdown class="header__item header__item-profile">
                 <template v-slot:activator="{ on }">
-                    <span>{{ userName }}</span>
+                    <span class="header__user">{{ userName }}</span>
                     <div class="avatar" @click="on">
                         <img class="avatar__img" :src="userAvatar" :alt="userAvatar">
                     </div>
                 </template>
 
+                <div class="dropdown__el">
+                    <svg class="dropdown__icon" viewBox="0 0 24 24">
+                        <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path>
+                        <path d="m22.215 7.759-1.427-2.483a1.398 1.398 0 0 0-1.755-.591l-2.22.93-1.69-.97-.307-2.422A1.403 1.403 0 0 0 13.426 1h-2.853a1.403 1.403 0 0 0-1.39 1.224L8.88 4.622l-1.72.982-2.191-.92a1.4 1.4 0 0 0-1.756.593L1.787 7.756a1.403 1.403 0 0 0 .364 1.814l1.855 1.41.003 2.038-1.859 1.413a1.402 1.402 0 0 0-.365 1.81l1.427 2.482a1.398 1.398 0 0 0 1.754.592l2.22-.93 1.69.97.308 2.421A1.404 1.404 0 0 0 10.574 23h2.853a1.403 1.403 0 0 0 1.39-1.224l.304-2.398 1.72-.982 2.192.92a1.402 1.402 0 0 0 1.755-.593l1.425-2.479a1.401 1.401 0 0 0-.365-1.814l-1.854-1.41-.002-2.038L21.85 9.57a1.402 1.402 0 0 0 .365-1.81zm-4.226 2.233.007 4.023 2.222 1.687-.9 1.565-2.613-1.097-3.443 1.966L12.898 21h-1.796l-.367-2.886-3.412-1.956-2.641 1.109-.9-1.565 2.229-1.694-.007-4.02-2.222-1.69.9-1.565L7.294 7.83l3.444-1.966L11.102 3h1.796l.367 2.886 3.412 1.956 2.641-1.109.9 1.565-2.229 1.694z"></path>
+                    </svg>
+                    <span>Настройки</span>
+                </div>
 
                 <div class="dropdown__el" @click="logout">
                     <svg class="dropdown__icon" viewBox="0 0 24 24">
@@ -96,7 +103,7 @@
                 isCompactMenu: false,
                 routes: [
                     {
-                        name: 'Сводка',
+                        name: 'Дашборд',
                         link: {name: 'main'},
                         icon: '<svg class="menu__icon" viewBox="0 0 24 24" fill="currentColor"><path  d="M19 21H5V3h9.172l2.414 2.414L19 7.828V21zM3 3a2 2 0 0 1 2-2h9.172a2 2 0 0 1 1.414.586L18 4l2.414 2.414A2 2 0 0 1 21 7.828V21a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3zm5 14a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8zm-1-2a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H8a1 1 0 0 1-1-1zm7-7a3 3 0 0 0-3-3v3h3zm-1 1h-2a1 1 0 1 1-1-1V6a3 3 0 1 0 3 3z"></path></svg>'
                     },
@@ -229,6 +236,11 @@
             display:flex;
             align-items:center;
         }
+        &__user {
+            color: #26325c;
+            font-size:18px;
+            font-weight: 700;
+        }
         &__item {
             &:not(:last-child) {
                 margin-right: 15px;
@@ -241,9 +253,6 @@
                 display: flex;
                 align-items:center;
                 margin-left: auto;
-                & > :not(:last-child) {
-                    margin-right: 15px;
-                }
             }
             &-burger {
                 color: #212121;

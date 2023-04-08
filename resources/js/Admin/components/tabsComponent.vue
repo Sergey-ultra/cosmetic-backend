@@ -56,34 +56,33 @@ export default {
 
 <style scoped lang="scss">
 .tabs {
-    margin: 0;
+    margin: 32px 0;
     padding: 0;
     width: 100%;
     display:flex;
     overflow-x:auto;
     overflow-y:hidden;
+    border-bottom: 1px solid #e8ebef;
     &__item {
-        border-radius: 4px;
+        color: #83899f;
         display: flex;
         align-items: center;
         text-align: center;
-        background-color: #e8e8e8;
         font-weight: 700;
         justify-content: center;
         padding: 6px 10px;
-        font-size: 14px;
-        line-height: 18px;
+        font-size: 16px;
+        line-height: 20px;
         white-space: nowrap;
+        border-bottom: 1px solid rgba(0,0,0,0);
         cursor: pointer;
 
-        &:not(:first-child){
-            margin-left: 12px;
+        .tabs__item + .tabs__item {
+            margin-left: 24px;
         }
         & span {
             text-transform: capitalize;
             letter-spacing: .25px;
-            font-size: 14px;
-            line-height: 16px;
             display: block;
             font-weight: 700;
             text-decoration: none;
@@ -91,9 +90,9 @@ export default {
         }
 
         &.active {
-            background-color: #666;
-            color: #fff;
-            font-size: 16px;
+            color: #26325c;
+            font-size: 18px;
+            border-color: #454cee;
         }
     }
 }
