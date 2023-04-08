@@ -31,11 +31,10 @@ export default {
         },
         setStoresWithLinksCount: (state, payload) => state.storesWithLinksCount = [...payload],
         updateCountBeforeEnd: (state, payload) => {
-            const editedStores = state.storesWithLinksCount;
+            const index = state.storesWithLinksCount.findIndex(el => el.id === payload.storeId);
 
-            const index = editedStores.findIndex(el => el.id === payload.storeId);
             if (index !== -1) {
-                editedStores[index].countBeforeEnd = payload.count
+                state.storesWithLinksCount[index].count = payload.count
             }
         }
     },
