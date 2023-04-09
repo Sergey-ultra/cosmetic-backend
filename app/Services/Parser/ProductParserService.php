@@ -14,9 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class ProductParserService
 {
-
-    const MIN_PRICE = 200;
-
+    const MIN_PRICE = 100;
 
     public function __construct(private ProductInsertService $productInsertService)
     {}

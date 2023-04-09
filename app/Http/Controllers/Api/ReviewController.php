@@ -7,11 +7,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
 use App\Http\Requests\ReviewRequest;
 use App\Http\Resources\MyReviewsCollection;
+use App\Http\Resources\MyReviewsResource;
 use App\Http\Resources\ReviewCollection;
 use App\Models\Review;
 use App\Models\Sku;
 use App\Models\SkuRating;
 use App\Models\SkuVideo;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -30,9 +32,40 @@ class ReviewController extends Controller
      */
     public function my(Request $request): ResourceCollection
     {
-        $perPage = (int) ($request->per_page ?? 10);
+        $perPage = (int)($request->per_page ?? 10);
+        $query = $this
+            ->getReviewQuery()
+            ->leftJoin('reviews', function($join) {
+                $join->on('reviews.sku_rating_id', '=', 'sku_ratings.id')
+                    ->where('reviews.status', '!=', 'deleted');
+            })
+            ->where([
+            'sku_ratings.user_id' => Auth::id(),
+            'sku_ratings.status' => 'published'
+        ]);
 
-        $query = SkuRating::select([
+        $result = $this->prepareModel($request, $query)->paginate($perPage);
+
+        return new MyReviewsCollection($result);
+    }
+
+    public function last(): MyReviewsCollection
+    {
+        $result = $this->getReviewQuery()
+            ->join('reviews', function($join) {
+                $join->on('reviews.sku_rating_id', '=', 'sku_ratings.id')
+                    ->where('reviews.status', '!=', 'deleted');
+            })
+            ->orderBy('sku_ratings.created_at', 'DESC')
+            ->limit(10)
+            ->get();
+
+        return new MyReviewsCollection($result);
+    }
+
+    private function getReviewQuery(): Builder
+    {
+        return SkuRating::query()->select([
             'sku_ratings.id AS sku_rating_id',
             'sku_ratings.rating',
             'products.name AS sku_name',
@@ -54,19 +87,7 @@ class ReviewController extends Controller
             ->join('skus', 'skus.id', '=', 'sku_ratings.sku_id')
             ->join('products', 'skus.product_id', '=', 'products.id')
             ->join('users', 'users.id', '=', 'sku_ratings.user_id')
-            ->leftjoin('user_infos', 'users.id', '=', 'user_infos.user_id')
-            ->leftJoin('reviews', function($join) {
-                $join->on('reviews.sku_rating_id', '=', 'sku_ratings.id')
-                ->where('reviews.status', '!=', 'deleted');
-            })
-            ->where([
-                'sku_ratings.user_id' => Auth::id(),
-                'sku_ratings.status' => 'published'
-            ])
-           ;
-        $result = $this->prepareModel($request, $query)->paginate($perPage);
-
-        return new MyReviewsCollection($result);
+            ->leftjoin('user_infos', 'users.id', '=', 'user_infos.user_id');
     }
 
     public function additionalInfoBySkuId(int $id): JsonResponse

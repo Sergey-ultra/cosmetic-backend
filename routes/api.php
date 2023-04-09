@@ -141,6 +141,7 @@ Route::get('/suggest', [SearchController::class, 'index']);
 
 Route::get('/skus/viewed', [SkuController::class, 'viewed']);
 
+Route::get('/reviews/last', [ReviewController::class, 'last']);
 Route::get('/reviews/by-sku-id/{id}', [ReviewController::class, 'bySkuId']);
 Route::get('/reviews/additional-info-by-sku-id/{id}', [ReviewController::class, 'additionalInfoBySkuId']);
 
