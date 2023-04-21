@@ -54,6 +54,9 @@ return [
         'redirect' => env('INSTAGRAM_REDIRECT_URI')
     ],
 
-
+    'mailjet' => [
+        'key' => env('MAILJET_APIKEY'),
+        'secret' => env('MAILJET_APISECRET'),
+    ]
 
 ];
