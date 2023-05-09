@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ArticleComment extends Model
 {
@@ -14,7 +15,7 @@ class ArticleComment extends Model
         'created_at'  => 'date:Y-m-d',
     ];
 
-    public function article()
+    public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class);
     }

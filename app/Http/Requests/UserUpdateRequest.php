@@ -26,9 +26,9 @@ class UserUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'string',
-            'sex' => 'in:male,female',
-            'birthday_year' => 'numeric',
+            'name' => 'string|min:5',
+            'sex' => 'in:0,1|nullable',
+            'birthday_year' => 'nullable|numeric',
         ];
     }
 }

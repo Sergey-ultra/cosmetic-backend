@@ -8,10 +8,10 @@ services:
     restart: unless-stopped
     tty: true
     environment:
-      - VIRTUAL_PORT=80
+      - VIRTUAL_PORT=8000
       - VIRTUAL_HOST=smart-beautiful.local
     ports:
-      - "80:80"
+      - "8000:80"
     links:
       - app
     volumes:
@@ -19,8 +19,7 @@ services:
       - ./docker/nginx/conf.d/app.conf:/etc/nginx/conf.d/default.conf:rw
       - ./docker/logs/nginx:/var/logs/nginx:rw
     networks:
-      cosmetic:
-        ipv4_address: "172.15.0.10"
+      - cosmetic
 
 
 
@@ -42,8 +41,8 @@ services:
       - ./:/var/www
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
-      cosmetic:
-        ipv4_address: "172.15.0.11"
+      - cosmetic
+
 
   #MySQL Service
   db:
@@ -52,7 +51,7 @@ services:
       restart: unless-stopped
       tty: true
       ports:
-          - "3306:3306"
+          - "3307:3306"
       environment:
           MYSQL_ROOT_PASSWORD:
           MYSQL_ALLOW_EMPTY_PASSWORD: 1
@@ -63,8 +62,10 @@ services:
       volumes:
          - ./docker/mysql:/docker-entrypoint-initdb.d
       networks:
-         cosmetic:
-            ipv4_address: "172.15.0.12"
+         - cosmetic
+
+# docker exec -i db mysql -uroot -proot "$local_db_name" < "$db_file"
+
 
 #  #Postgres Service
 #  postgres:
@@ -88,21 +89,17 @@ services:
   redis:
     image: redis:alpine
     ports:
-      - "6379:6379"
+      - "6380:6379"
     container_name: ${APP_NAME}_redis
     networks:
-       cosmetic:
-         ipv4_address: "172.15.0.13"
+       - cosmetic
 
 
 #Docker Networks
 
 
 networks:
-   cosmetic:
-       ipam:
-         driver: default
-         config:
-          - subnet: "172.15.0.0/24"
+  cosmetic:
+    driver: bridge
 
 

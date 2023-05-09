@@ -258,8 +258,11 @@ class SkuController extends Controller
             )
                 ->with([
                     'skus',
-                    'ingredients' => function ($q) {
-                        $q->orderBy('order', 'asc');
+                    'ingredients' => function ($query) {
+                        $query
+                            ->with('activeIds')
+                            ->orderBy('order', 'asc')
+                        ;
                     }
                 ])
                 ->join('skus', 'skus.product_id', '=', 'products.id')

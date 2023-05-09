@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\Country;
 use App\Models\SkuRating;
+use App\Models\UserInfo;
 use App\Services\UserLocationService\UserLocationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,10 +14,12 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+
     public function me(Request $request): JsonResponse
     {
         $user = Auth::user();
         $info = $user->info;
+
         $result = [
             'email' => $user->email,
             'role' => $user->role->name,
@@ -44,13 +47,14 @@ class UserController extends Controller
     public function updateMe(UserUpdateRequest $request): JsonResponse
     {
         $user = Auth::user();
-        $user->name = $request['name'];
-
+        $user->name = $request->input('name');
         $user->save();
 
         $user->info()->update([
-            'sex' => $request['sex'],
-            'birthday_year' => $request['birthday_year']
+            'sex' => $request->input('sex')
+                ? $request->input('sex')
+                : null,
+            'birthday_year' => $request->input('birthday_year')
         ]);
 
         return response()->json(['data' => ['status' => true]]);
@@ -62,7 +66,7 @@ class UserController extends Controller
         $location = $userLocationService->getLocationByIp($userIp);
         $result = [];
 
-        if ($location['country']) {
+        if (isset($location['country'])) {
             $result = Country::query()
                 ->select('id', 'name', 'name_en')
                 ->where('name_en', '=', $location['country'])

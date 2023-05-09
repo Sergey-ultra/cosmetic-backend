@@ -26,8 +26,6 @@
 
             <input @change="setImage($event)" type="file"  accept="image/*">
         </div>
-
-
     </div>
 </template>
 
@@ -37,11 +35,6 @@
         name: "one-image-upload",
         components: {
             toolTip
-        },
-        data() {
-            return {
-                previewImage: ''
-            }
         },
         props: {
             image: String,

@@ -9,6 +9,10 @@ class Comment extends Model
     protected $fillable = ['comment', 'review_id', 'user_id', 'user_name', 'reply_id', 'status'];
 
 
+    /**
+     * @param $reviewId
+     * @return void
+     */
     public function nestedComments($reviewId)
     {
         $comments = self::select(
