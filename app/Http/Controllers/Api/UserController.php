@@ -50,10 +50,9 @@ class UserController extends Controller
         $user->name = $request->input('name');
         $user->save();
 
-        $user->info()->update([
-            'sex' => $request->input('sex')
-                ? $request->input('sex')
-                : null,
+
+        $user->info()->updateOrCreate([], [
+            'sex' => $request->input('sex') ?? null,
             'birthday_year' => $request->input('birthday_year')
         ]);
 
