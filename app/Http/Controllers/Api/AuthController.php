@@ -137,6 +137,32 @@ class AuthController extends Controller
         ]);
     }
 
+    public function notificationBot(): JsonResponse
+    {
+        $hash = '';
+        $botUrl = 'https://t.me/' . $hash;
+        try {
+            $qrCode = QrCode::size(200)
+                ->backgroundColor(255, 255, 0)
+                ->color(0, 0, 255)
+                ->margin(1)
+                ->generate($botUrl);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'qr_code' => $qrCode,
+                'bot_url' => $botUrl
+            ]
+        ]);
+    }
+
     public function emailVerify(Request $request): RedirectResponse|View|array|null
     {
         $user = User::find($request->id);
