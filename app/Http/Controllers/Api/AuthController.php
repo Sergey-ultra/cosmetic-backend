@@ -4,16 +4,20 @@ namespace App\Http\Controllers\Api;
 
 use App\Configuration;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\View\View;
 use Symfony\Component\Mailer\Exception\TransportException;
 
 class AuthController extends Controller
@@ -113,9 +117,27 @@ class AuthController extends Controller
         ]);
     }
 
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    {
+        $user = Auth::user();
+        if (!Hash::check($request->input('password'), $user->password)){
+            return response()->json([
+                'status' => false,
+                'message' => 'Неверный пароль'
+            ]);
+        }
 
+        $user->update([
+            'password' => bcrypt($request->input('new_password'))
+        ]);
 
-    public function emailVerify(Request $request)
+        return response()->json([
+            'status' => true,
+            'message' => 'Пароль успешно изменен',
+        ]);
+    }
+
+    public function emailVerify(Request $request): RedirectResponse|View|array|null
     {
         $user = User::find($request->id);
 
@@ -135,7 +157,7 @@ class AuthController extends Controller
     }
 
 
-    public function forgotPassword(ForgotPasswordRequest $request)
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
         try {
             $status = Password::sendResetLink(
