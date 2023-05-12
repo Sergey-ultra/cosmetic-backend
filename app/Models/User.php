@@ -73,6 +73,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(UserInfo::class);
     }
 
+    public function telegramInfo(): HasOne
+    {
+        return $this->hasOne(UserTelegramInfo::class);
+    }
+
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);

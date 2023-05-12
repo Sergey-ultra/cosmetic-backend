@@ -62,7 +62,15 @@ class UserController extends Controller
 
     public function startNotificationBot(): JsonResponse
     {
-        $hash = Str::uuid();
+        $user = Auth::user();
+        if (!$user->telegramInfo) {
+            $hash = Str::uuid();
+            $user->telegramInfo()->updateOrCreate([],['hash' => $hash]);
+        } else {
+            $hash = $user->telegramInfo->hash;
+        }
+
+
         $qrCode = '';
         $botUrl = config('telegrambot.user_notification_url') . '?start=' . $hash;
         try {
