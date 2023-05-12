@@ -66,13 +66,19 @@ class TelegramController extends Controller
         }
     }
 
-    public function unsubscribe(TelegramUserNotificationApiService $telegramUserNotificationApiService)
+    public function unsubscribe(Request $request, TelegramUserNotificationApiService $telegramUserNotificationApiService): JsonResponse|null
     {
-        $user = Auth::user();
-        if (isset($user->telegramInfo->telegram_user_id)) {
-            $unsubscribeCode = mt_rand(1111, 9999);
-            $user->telegramInfo->update(['unsubscribe_code' => $unsubscribeCode]);
-            $telegramUserNotificationApiService->sendMessage($user->telegramInfo->telegram_user_id, $unsubscribeCode);
+        if ($request->input('hash') && $request->input('code')) {
+            $currentTelegramUser = UserTelegramInfo::query()->where(['unsubscribe_code' => $request->input('code'), 'hash' => $request->input('hash')])->first();
+            $currentTelegramUser->delete();
+        } else {
+            $user = Auth::user();
+            if (isset($user->telegramInfo->hash) && isset($user->telegramInfo->telegram_user_id)) {
+                $unsubscribeCode = mt_rand(1111, 9999);
+                $user->telegramInfo->update(['unsubscribe_code' => $unsubscribeCode]);
+                $telegramUserNotificationApiService->sendMessage($user->telegramInfo->telegram_user_id, $unsubscribeCode);
+                return response()->json(['data' => ['hash' => $user->telegramInfo->hash]]);
+            }
         }
     }
 
