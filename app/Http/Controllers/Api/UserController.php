@@ -97,7 +97,7 @@ class UserController extends Controller
     public function updateTelegramUser(Request $request): void
     {
         $params = $request->all();
-        Log::notice(json_decode($params));
+        Log::notice(json_encode($params));
 
 //        if (preg_match('/[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/', $params['text'], $matches)) {
 //
