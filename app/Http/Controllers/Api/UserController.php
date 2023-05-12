@@ -96,24 +96,22 @@ class UserController extends Controller
 
     public function updateTelegramUser(Request $request): void
     {
-        Log::notice(json_encode($request->all()));//from ->first_name
-//        Log::notice(json_encode($request->callback_query));//from ->first_name
-//        Log::notice(json_encode($request->pre_checkout_query));//from ->first_name
-//        Log::notice(json_encode($request->poll));//from ->first_name
-//        Log::notice(json_encode($request->my_chat_member));//from ->first_name
-//        Log::notice(json_encode($request->chat_member));//from ->first_name
-//        Log::notice(json_encode($request->chat_join_request));//from ->first_name
-//        $hash= '';
-//        $telegramUserName = 0;
-//        $telegramUserId = 0;
-//
-//        UserTelegramInfo::updateOrCreate(
-//            ['hash' => $hash],
-//            [
-//                'telegram_user_name' => $telegramUserName,
-//                'telegram_user_id' => $telegramUserId,
-//            ]
-//        );
+        $params = $request->all();
+
+        if (preg_match('/[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/', $params['text'], $matches)) {
+            $hash = $matches[0];
+            if (strlen($hash) === 36) {
+                $telegramUserName = $params['chat']['first_name'];
+                $telegramUserId = $params['chat']['id'];
+                UserTelegramInfo::updateOrCreate(
+                    ['hash' => $hash],
+                    [
+                        'telegram_user_name' => $telegramUserName,
+                        'telegram_user_id' => $telegramUserId,
+                    ]
+                );
+            }
+        }
     }
 
     public function getMyLocation(Request $request, UserLocationService $userLocationService): JsonResponse
