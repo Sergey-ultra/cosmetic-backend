@@ -168,7 +168,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/change-password', [AuthController::class, 'changePassword']);
     Route::get('/notification-bot', [TelegramController::class, 'startNotificationBot']);
     Route::get('/notification/telegram/account', [TelegramController::class, 'account']);
-    Route::get('/notification/telegram/account/unsubscribe', [TelegramController::class, 'unsubscribe']);
+    Route::post('/notification/telegram/account/unsubscribe', [TelegramController::class, 'unsubscribe']);
 
 
     Route::post('/files', [FileController::class, 'storeAsForm']);
