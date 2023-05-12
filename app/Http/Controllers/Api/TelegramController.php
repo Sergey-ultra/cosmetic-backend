@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\UserTelegramInfo;
 use App\Services\TelegramApiService\TelegramUserNotificationApiService;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,7 +77,12 @@ class TelegramController extends Controller
             if (isset($user->telegramInfo->hash) && isset($user->telegramInfo->telegram_user_id)) {
                 $unsubscribeCode = mt_rand(1111, 9999);
                 $user->telegramInfo->update(['unsubscribe_code' => $unsubscribeCode]);
-                $telegramUserNotificationApiService->sendMessage($user->telegramInfo->telegram_user_id, $unsubscribeCode);
+
+                try {
+                    $telegramUserNotificationApiService->sendMessage($user->telegramInfo->telegram_user_id, $unsubscribeCode);
+                } catch (ClientException $e) {
+                    return response()->json(['message' => $e->getResponse()]);
+                }
                 return response()->json(['data' => ['hash' => $user->telegramInfo->hash]]);
             }
         }
