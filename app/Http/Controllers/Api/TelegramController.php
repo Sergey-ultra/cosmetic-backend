@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use ReflectionClass;
 
 class TelegramController extends Controller
 {
@@ -81,7 +82,8 @@ class TelegramController extends Controller
                 try {
                     $telegramUserNotificationApiService->sendMessage($user->telegramInfo->telegram_user_id, $unsubscribeCode);
                 } catch (ClientException $e) {
-                    return response()->json(['message' => $e->getMessage()]);
+                    $r = new ReflectionClass($telegramUserNotificationApiService);
+                    return response()->json(['message' => $e->getMessage(), 'c' => $r->getProperties()]);
                 }
                 return response()->json(['data' => ['hash' => $user->telegramInfo->hash]]);
             }
