@@ -6,24 +6,15 @@ namespace App\Services\TelegramApiService;
 
 use GuzzleHttp\Client;
 
-abstract class TelegramApiService
+class TelegramApiService
 {
-    public Client $client;
+    protected string $baseUri;
+    public function __construct(protected Client $client){}
 
-//    private Client $client;
-    abstract public function __construct();
-//    {
-//        $this->client = new Client([
-//            'base_uri' => config('telegrambot.admin_notification_api_url'),
-//            'timeout' => 120,
-//            'connect_timeout' => 3,
-//                ]
-//        );
- //   }
 
     public function sendMessage($chatId, string $message)
     {
-        return $this->client->request(
+        return $this->request(
             'POST',
             '/sendMessage',
             [
@@ -33,5 +24,19 @@ abstract class TelegramApiService
                 ]
             ]
         );
+    }
+
+    protected function request(string $method, $uri = '', array $options = [])
+    {
+        return $this->client->request(
+            $method,
+            $this->baseUri . $uri,
+            $options
+        );
+    }
+
+    protected function setBaseUri(string $baseUri): void
+    {
+        $this->baseUri = $baseUri;
     }
 }

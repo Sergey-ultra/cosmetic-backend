@@ -6,13 +6,9 @@ use GuzzleHttp\Client;
 
 class TelegramAdminNotificationApiService extends TelegramApiService
 {
-    public function __construct()
+    public function __construct(Client $client)
     {
-        $this->client = new Client([
-                'base_uri' => config('telegrambot.admin_notification_api_url'),
-                'timeout' => 120,
-                'connect_timeout' => 3,
-            ]
-        );
+        parent::__construct($client);
+        $this->setBaseUri(config('telegrambot.admin_notification_api_url'));
     }
 }
