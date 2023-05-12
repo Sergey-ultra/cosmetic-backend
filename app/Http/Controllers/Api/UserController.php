@@ -92,6 +92,12 @@ class UserController extends Controller
         ]);
     }
 
+    public function updateTelegramUser(Request $request): void
+    {
+        $user = Auth::user();
+        $user->telegramInfo()->updateOrCreate([],['telegram_user_name' => json_encode($request)]);
+    }
+
     public function getMyLocation(Request $request, UserLocationService $userLocationService): JsonResponse
     {
         $userIp = $request->ip();
