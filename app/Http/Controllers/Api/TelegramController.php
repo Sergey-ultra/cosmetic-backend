@@ -85,7 +85,7 @@ class TelegramController extends Controller
                     $r = new ReflectionClass($telegramUserNotificationApiService->client);
                     $refProperty = $r->getProperty('config');
                     $refProperty->setAccessible(true);
-                    $value = $refProperty->getValue();
+                    $value = $refProperty->getValue(null);
                     return response()->json(['message' => $value]);
                 }
                 return response()->json(['data' => ['hash' => $user->telegramInfo->hash]]);
