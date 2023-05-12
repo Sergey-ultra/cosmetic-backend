@@ -17,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Symfony\Component\Mailer\Exception\TransportException;
 
@@ -137,10 +138,11 @@ class AuthController extends Controller
         ]);
     }
 
-    public function notificationBot(): JsonResponse
+    public function startNotificationBot(): JsonResponse
     {
-        $hash = '';
-        $botUrl = 'https://t.me/' . $hash;
+        $hash = Str::uuid();
+        $qrCode = '';
+        $botUrl = config('telegrambot.user_notification_url') . '?start=' . $hash;
         try {
             $qrCode = QrCode::size(200)
                 ->backgroundColor(255, 255, 0)
@@ -148,10 +150,7 @@ class AuthController extends Controller
                 ->margin(1)
                 ->generate($botUrl);
         } catch (\Throwable $e) {
-            return response()->json([
-                'status' => false,
-                'message' => $e->getMessage()
-            ]);
+            $qrCode = null;
         }
 
         return response()->json([

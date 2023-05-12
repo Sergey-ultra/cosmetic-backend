@@ -29,8 +29,8 @@ class AdminNotificationJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(TelegramBotService $telegramBotService)
+    public function handle(TelegramBotService $telegramBotService): void
     {
-        $telegramBotService->sendMessage(config('telegrambot.telegram_admin_chat_id'), $this->message);
+        $telegramBotService->sendMessage(config('telegrambot.admin_user_id'), $this->message);
     }
 }

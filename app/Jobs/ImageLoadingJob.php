@@ -34,7 +34,7 @@ class ImageLoadingJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(CompressImageService $compressImageService)
+    public function handle(CompressImageService $compressImageService): void
     {
         $fileContent = file_get_contents($this->sourcePath);
         $destinationPath = $this->destinationFolder . $this->imageName;

@@ -29,7 +29,7 @@ class CompressImageJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(CompressImageService $compressImageService)
+    public function handle(CompressImageService $compressImageService): void
     {
         try {
             $compressImageService->compress($this->path);

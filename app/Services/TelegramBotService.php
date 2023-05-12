@@ -19,7 +19,7 @@ final class TelegramBotService
     {
         return $this->client->request(
             'POST',
-            config('telegrambot.url').'/sendMessage',
+            config('telegrambot.admin_notification_api_url').'/sendMessage',
             [
                 'form_params' => [
                     'chat_id' => $chatId,
