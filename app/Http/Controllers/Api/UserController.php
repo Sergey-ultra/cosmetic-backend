@@ -7,10 +7,12 @@ use App\Http\Requests\UserUpdateRequest;
 use App\Models\Country;
 use App\Models\SkuRating;
 use App\Models\UserInfo;
+use App\Models\UserTelegramInfo;
 use App\Services\UserLocationService\UserLocationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
@@ -94,8 +96,18 @@ class UserController extends Controller
 
     public function updateTelegramUser(Request $request): void
     {
-        $user = Auth::user();
-        $user->telegramInfo()->updateOrCreate([],['telegram_user_name' => json_encode($request)]);
+        Log::notice(json_encode($request));
+//        $hash= '';
+//        $telegramUserName = 0;
+//        $telegramUserId = 0;
+//
+//        UserTelegramInfo::updateOrCreate(
+//            ['hash' => $hash],
+//            [
+//                'telegram_user_name' => $telegramUserName,
+//                'telegram_user_id' => $telegramUserId,
+//            ]
+//        );
     }
 
     public function getMyLocation(Request $request, UserLocationService $userLocationService): JsonResponse
