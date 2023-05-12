@@ -96,7 +96,7 @@ class UserController extends Controller
 
     public function updateTelegramUser(Request $request): void
     {
-        Log::notice(json_encode($request));
+        Log::notice(json_encode($request->message));
 //        $hash= '';
 //        $telegramUserName = 0;
 //        $telegramUserId = 0;
