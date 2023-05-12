@@ -10,9 +10,10 @@ class UserTelegramInfo extends Model
 
     protected $table = self::TABLE;
 
-    protected $fillable = ['hash', 'telegram_user_name', 'telegram_user_id'];
+    protected $fillable = ['hash', 'telegram_user_name', 'telegram_user_id', 'unsubscribe_code'];
 
     protected $casts = [
-        'telegram_user_id' => 'integer'
+        'telegram_user_id' => 'integer',
+        'unsubscribe_code' => 'integer',
     ];
 }

@@ -6,14 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\Country;
 use App\Models\SkuRating;
-use App\Models\UserInfo;
-use App\Models\UserTelegramInfo;
 use App\Services\UserLocationService\UserLocationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -62,59 +58,6 @@ class UserController extends Controller
         return response()->json(['data' => ['status' => true]]);
     }
 
-    public function startNotificationBot(): JsonResponse
-    {
-        $user = Auth::user();
-        if (!$user->telegramInfo) {
-            $hash = Str::uuid();
-            $user->telegramInfo()->updateOrCreate([],['hash' => $hash]);
-        } else {
-            $hash = $user->telegramInfo->hash;
-        }
-
-
-        $qrCode = '';
-        $botUrl = config('telegrambot.user_notification_url') . '?start=' . $hash;
-        try {
-            $qrCode = QrCode::size(200)
-                ->backgroundColor(255, 255, 0)
-                ->color(0, 0, 255)
-                ->margin(1)
-                ->generate($botUrl);
-        } catch (\Throwable $e) {
-            $qrCode = null;
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => [
-                'qr_code' => $qrCode,
-                'bot_url' => $botUrl
-            ]
-        ]);
-    }
-
-    public function updateTelegramUser(Request $request): void
-    {
-        $params = $request->all();
-
-        if (preg_match('/[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/', $params['message']['text'], $matches)) {
-
-            $hash = $matches[0];
-            if (strlen($hash) === 36) {
-                $telegramUserName = $params['message']['chat']['first_name'];
-                $telegramUserId = $params['message']['chat']['id'];
-
-                UserTelegramInfo::updateOrCreate(
-                    ['hash' => $hash],
-                    [
-                        'telegram_user_name' => $telegramUserName,
-                        'telegram_user_id' => $telegramUserId,
-                    ]
-                );
-            }
-        }
-    }
 
     public function getMyLocation(Request $request, UserLocationService $userLocationService): JsonResponse
     {

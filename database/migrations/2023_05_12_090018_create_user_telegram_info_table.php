@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('hash', 36)->nullable();
             $table->string('telegram_user_name')->nullable();
             $table->unsignedBigInteger('telegram_user_id')->nullable();
+            $table->unsignedSmallInteger('unsubscribe_code')->nullable();
             $table->timestamps();
         });
     }

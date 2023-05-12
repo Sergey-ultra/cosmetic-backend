@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SkuVideoController;
 use App\Http\Controllers\Api\AuthSocialController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\TelegramController;
 use App\Http\Controllers\Api\TrackingController;
 use App\Http\Controllers\Api\UserController;
 
@@ -95,7 +96,7 @@ Route::group(['prefix' => '/admin'], function () {
     Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth:api', 'role:admin']);
 });
 
-Route::post('/users/update-telegram-user', [UserController::class, 'updateTelegramUser']);
+Route::post('/users/update-telegram-user', [TelegramController::class, 'updateTelegramUser']);
 
 
 Route::post('/supplier/signin', [App\Http\Controllers\Api\Supplier\AuthController::class, 'login']);
@@ -165,7 +166,10 @@ Route::get('/routes/brands', [RouteController::class, 'brands']);
 Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
-    Route::get('/notification-bot', [UserController::class, 'startNotificationBot']);
+    Route::get('/notification-bot', [TelegramController::class, 'startNotificationBot']);
+    Route::get('/notification/telegram/account', [TelegramController::class, 'account']);
+    Route::get('/notification/telegram/account/unsubscribe', [TelegramController::class, 'unsubscribe']);
+
 
     Route::post('/files', [FileController::class, 'storeAsForm']);
 
