@@ -8,7 +8,7 @@ use GuzzleHttp\Client;
 
 abstract class TelegramApiService
 {
-    protected Client $client;
+    public Client $client;
 
 //    private Client $client;
     abstract public function __construct();
