@@ -95,6 +95,8 @@ Route::group(['prefix' => '/admin'], function () {
     Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth:api', 'role:admin']);
 });
 
+Route::post('/users/update-telegram-user', [UserController::class, 'updateTelegramUser']);
+
 
 Route::post('/supplier/signin', [App\Http\Controllers\Api\Supplier\AuthController::class, 'login']);
 Route::post('/supplier/signup', [App\Http\Controllers\Api\Supplier\AuthController::class, 'register']);
@@ -164,7 +166,6 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
     Route::get('/notification-bot', [UserController::class, 'startNotificationBot']);
-    Route::post('/users/update-telegram-user', [UserController::class, 'updateTelegramUser']);
 
     Route::post('/files', [FileController::class, 'storeAsForm']);
 
