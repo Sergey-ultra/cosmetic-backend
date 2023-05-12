@@ -81,7 +81,7 @@ class TelegramController extends Controller
                 try {
                     $telegramUserNotificationApiService->sendMessage($user->telegramInfo->telegram_user_id, $unsubscribeCode);
                 } catch (ClientException $e) {
-                    return response()->json(['message' => $e->getResponse()]);
+                    return response()->json(['message' => $e]);
                 }
                 return response()->json(['data' => ['hash' => $user->telegramInfo->hash]]);
             }
