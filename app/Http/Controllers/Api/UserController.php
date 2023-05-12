@@ -11,6 +11,7 @@ use App\Services\UserLocationService\UserLocationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -57,6 +58,30 @@ class UserController extends Controller
         ]);
 
         return response()->json(['data' => ['status' => true]]);
+    }
+
+    public function startNotificationBot(): JsonResponse
+    {
+        $hash = Str::uuid();
+        $qrCode = '';
+        $botUrl = config('telegrambot.user_notification_url') . '?start=' . $hash;
+        try {
+            $qrCode = QrCode::size(200)
+                ->backgroundColor(255, 255, 0)
+                ->color(0, 0, 255)
+                ->margin(1)
+                ->generate($botUrl);
+        } catch (\Throwable $e) {
+            $qrCode = null;
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'qr_code' => $qrCode,
+                'bot_url' => $botUrl
+            ]
+        ]);
     }
 
     public function getMyLocation(Request $request, UserLocationService $userLocationService): JsonResponse

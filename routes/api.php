@@ -163,7 +163,7 @@ Route::get('/routes/brands', [RouteController::class, 'brands']);
 Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
-    Route::get('/notification-bot', [AuthController::class, 'startNotificationBot']);
+    Route::get('/notification-bot', [UserController::class, 'startNotificationBot']);
 
     Route::post('/files', [FileController::class, 'storeAsForm']);
 
