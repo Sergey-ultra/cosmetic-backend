@@ -82,9 +82,10 @@ class TelegramController extends Controller
                 $user->telegramInfo->update(['unsubscribe_code' => $unsubscribeCode]);
 
                 try {
-                   $response = $telegramUserNotificationApiService->sendMessage($user->telegramInfo->telegram_user_id, $unsubscribeCode);
-                   $statusCode = $response->getStatusCode();
-                   Log::notice($statusCode);
+                    $message = $unsubscribeCode . ' - код для подтверждения отключения уведомлений в Телеграм';
+                    $response = $telegramUserNotificationApiService->sendMessage($user->telegramInfo->telegram_user_id, $message);
+                    $statusCode = $response->getStatusCode();
+                    Log::notice($statusCode);
                 } catch (ClientException $e) {
                     return response()->json(['message' => $e]);
                 }
