@@ -20,6 +20,6 @@ class UserTelegramInfo extends Model
 
     public function user(): BelongsTo
     {
-        $this->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 }
