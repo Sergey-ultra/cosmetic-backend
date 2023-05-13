@@ -9,6 +9,7 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use ReflectionClass;
 
@@ -80,7 +81,9 @@ class TelegramController extends Controller
                 $user->telegramInfo->update(['unsubscribe_code' => $unsubscribeCode]);
 
                 try {
-                    $telegramUserNotificationApiService->sendMessage($user->telegramInfo->telegram_user_id, $unsubscribeCode);
+                   $response = $telegramUserNotificationApiService->sendMessage($user->telegramInfo->telegram_user_id, $unsubscribeCode);
+                   $statusCode = $response->getStatusCode();
+                   Log::notice($statusCode);
                 } catch (ClientException $e) {
                     return response()->json(['message' => $e]);
                 }

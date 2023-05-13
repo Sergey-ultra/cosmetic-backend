@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\TelegramApiService;
 
 use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
 
 class TelegramApiService
 {
@@ -12,7 +13,7 @@ class TelegramApiService
     public function __construct(protected Client $client){}
 
 
-    public function sendMessage($chatId, string $message)
+    public function sendMessage($chatId, string $message): ResponseInterface
     {
         return $this->request(
             'POST',
@@ -26,7 +27,7 @@ class TelegramApiService
         );
     }
 
-    protected function request(string $method, $uri = '', array $options = [])
+    protected function request(string $method, $uri = '', array $options = []): ResponseInterface
     {
         return $this->client->request(
             $method,
