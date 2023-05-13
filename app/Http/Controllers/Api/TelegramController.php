@@ -47,7 +47,7 @@ class TelegramController extends Controller
         ]);
     }
 
-    public function updateTelegramUser(Request $request): void
+    public function updateTelegramUser(Request $request, TelegramUserNotificationApiService $telegramUserNotificationApiService): void
     {
         $params = $request->all();
 
@@ -58,13 +58,19 @@ class TelegramController extends Controller
                 $telegramUserName = $params['message']['chat']['first_name'];
                 $telegramUserId = $params['message']['chat']['id'];
 
-                UserTelegramInfo::query()->updateOrCreate(
-                    ['hash' => $hash],
-                    [
+                $currentTelegramUser = UserTelegramInfo::query()->where('hash', $hash)->first();
+                if ($currentTelegramUser) {
+                    $currentTelegramUser->update([
                         'telegram_user_name' => $telegramUserName,
                         'telegram_user_id' => $telegramUserId,
-                    ]
-                );
+                    ]);
+                    $userEmail = $currentTelegramUser->user->email;
+                    $message = "Готово! Аккаунт $userEmail синхронизирован 👌
+
+Теперь вы будете получать уведомления от Smart Beautiful прямо в этом чате";
+                    $telegramUserNotificationApiService->sendMessage($telegramUserId, $message);
+                }
+
             }
         }
     }

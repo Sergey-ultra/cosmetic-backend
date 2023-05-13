@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserTelegramInfo extends Model
 {
@@ -16,4 +17,9 @@ class UserTelegramInfo extends Model
         'telegram_user_id' => 'integer',
         'unsubscribe_code' => 'integer',
     ];
+
+    public function user(): BelongsTo
+    {
+        $this->belongsTo(User::class);
+    }
 }
