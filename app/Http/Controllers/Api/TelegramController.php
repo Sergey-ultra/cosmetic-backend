@@ -74,6 +74,7 @@ class TelegramController extends Controller
         if ($request->input('hash') && $request->input('code')) {
             $currentTelegramUser = UserTelegramInfo::query()->where(['unsubscribe_code' => $request->input('code'), 'hash' => $request->input('hash')])->first();
             $currentTelegramUser->delete();
+            return response()->json([]);
         } else {
             $user = Auth::user();
             if (isset($user->telegramInfo->hash) && isset($user->telegramInfo->telegram_user_id)) {
