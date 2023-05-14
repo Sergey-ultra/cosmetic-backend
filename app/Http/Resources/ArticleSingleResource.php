@@ -40,6 +40,7 @@ class ArticleSingleResource extends JsonResource
             'preview' => $this->preview,
             'image' => $this->image,
             'body' => $this->body,
+            'category_id' => $this->category_id,
             'category_name' => $this->category_name,
             'category_color' => $this->category_color,
             'comments' => $comments,

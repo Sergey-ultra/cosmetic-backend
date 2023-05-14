@@ -95,6 +95,7 @@ class ArticleController extends Controller
             'articles.image',
             'articles.created_at',
             'users.name AS user_name',
+            DB::raw('article_categories.id AS category_id'),
             DB::raw('article_categories.name AS category_name'),
             DB::raw('article_categories.color AS category_color'),
             'user_infos.avatar AS user_avatar',
