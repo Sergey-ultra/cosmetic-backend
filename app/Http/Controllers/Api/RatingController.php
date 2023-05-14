@@ -22,7 +22,7 @@ class RatingController extends Controller
     {
         $skuId = $request->sku_id;
         $visitorIp = request()->ip();
-        $user = Auth::guard('sanctum')->user();
+        $user = Auth::user();
 
         $existingRating = SkuRating::where([
             'sku_id' => $skuId,
@@ -56,11 +56,11 @@ class RatingController extends Controller
     public function createOrUpdate(RatingRequest $request): JsonResponse
     {
         $skuId = $request->sku_id;
-        $user = Auth::guard('sanctum')->user();
+        $user = Auth::user();
         $visitorIp = request()->ip();
 
 
-        $existingRating = SkuRating::where([
+        $existingRating = SkuRating::query()->where([
             'sku_id' => $skuId,
             'ip_address' => $visitorIp
         ])->first();

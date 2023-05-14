@@ -75,7 +75,7 @@ class QuestionController extends Controller
     public function store(QuestionRequest $request): JsonResponse
     {
         $skuId = $request->sku_id;
-        $user = Auth::guard('sanctum')->user();
+        $user = Auth::user();
         $visitorIp = request()->ip();
 
         $question = Question::create(

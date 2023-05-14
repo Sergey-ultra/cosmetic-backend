@@ -205,7 +205,7 @@ class ReviewController extends Controller
     {
         $conditions[] = ['sku_ratings.sku_id', '=', $request->sku_id];
 
-        $user = Auth::guard('sanctum')->user();
+        $user = Auth::user();
         if (isset($user)) {
            $conditions[] = ['sku_ratings.user_id' , '=', $user->id];
         } else {
