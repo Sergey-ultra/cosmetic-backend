@@ -50,8 +50,8 @@ export default class UploadAdapter
                 this.loader.file.then(file => {
                     this.uploadFile(file)
                         .then(resp => {
-                            console.log({ default: resp.data[0] })
-                            resolve({ default: resp.data[0] })
+                            console.log({ default: resp.data[0].url })
+                            resolve({ default: resp.data[0].url })
                         })
                 })
             } )

@@ -157,13 +157,12 @@ Route::get('/questions', [QuestionController::class, 'bySkuId']);
 Route::post('/rating/check-user-rating', [RatingController::class, 'checkUserRating']);
 Route::post('/rating/create-or-update', [RatingController::class, 'createOrUpdate']);
 Route::post('/likes', [LikeController::class, 'createOrUpdate']);
-
+Route::post('/files', [FileController::class, 'storeAsForm']);
 
 Route::get('/routes/skus-queries', [RouteController::class, 'skusQueries']);
 Route::get('/routes/articles', [RouteController::class, 'articles']);
 Route::get('/routes/categories', [RouteController::class, 'categories']);
 Route::get('/routes/brands', [RouteController::class, 'brands']);
-
 
 
 Route::group(['middleware' => ['auth:api']], function () {
@@ -174,7 +173,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/notification/telegram/account/unsubscribe', [TelegramController::class, 'unsubscribe']);
 
 
-    Route::post('/files', [FileController::class, 'storeAsForm']);
+
 
     Route::get('/articles/my', [ArticleController::class, 'my']);
     Route::get('/articles/categories', [ArticleController::class, 'articleCategories']);

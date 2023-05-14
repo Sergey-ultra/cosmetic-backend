@@ -248,9 +248,9 @@ class ReviewController extends Controller
         $skuId = $request->sku_id;
 
 
-        $currentRating = SkuRating::where([
+        $currentRating = SkuRating::query()->where([
             'sku_id' => $skuId,
-            'user_id' => Auth::guard('sanctum')->user()->id
+            'user_id' => Auth::user()->id
         ])->first();
 
         $currentSku = Sku::find($skuId);
