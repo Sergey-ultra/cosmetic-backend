@@ -26,7 +26,7 @@ class FileRequest extends JsonApiRequest
         return [
             'files' => 'required|array',
             'files.*' => 'file',
-            'entity' => 'string|in:sku,review',
+            'entity' => 'string|in:sku,review|article-ckeditor',
             'type' => 'string|in:image,video',
             'file_name' => 'string'
         ];

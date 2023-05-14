@@ -6,13 +6,19 @@ export default class UploadAdapter
         this.loader = loader;
     }
 
-    uploadFile(file){
-        let formData= new FormData();
-        formData.append('images[]', file);
-        formData.append('folder', 'articles/ckEditor')
+    uploadFile(file, fileName = null){
+
+        let form= new FormData();
+        form.append('files[]', file);
+        form.append('entity', 'article-ckeditor');
+        form.append('type', 'image');
+        if (fileName) {
+            form.append('file_name', fileName);
+        }
+
 
         const config = { headers: {'Content-Type': 'multipart/form-data' }}
-        return api.post('/images', formData, config);
+        return api.post('/files', form, config);
     }
 
 

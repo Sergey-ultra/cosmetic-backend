@@ -67,7 +67,7 @@ class ArticleController extends Controller
     }
 
 
-    public function byTag(string $tag)
+    public function byTag(string $tag): ArticleWithTagsCollection
     {
         $perPage = (int)($request->per_page ?? 10);
 
@@ -80,13 +80,13 @@ class ArticleController extends Controller
         return new ArticleWithTagsCollection($result, ['tag' => Tag::where('tag', $tag)->first()]);
     }
 
-    public function show(Request $request, string $slug)
+    public function show(Request $request, string $slug): ArticleSingleResource
     {
         $viewsCountSubQuery = DB::table('article_views')
             ->select([DB::raw('count(ip_address) as count'), 'article_id'])
             ->groupBy('article_id');
 
-        $article = Article::select(
+        $article = Article::query()->select(
             'articles.id',
             'articles.title',
             'articles.slug',
@@ -95,8 +95,10 @@ class ArticleController extends Controller
             'articles.image',
             'articles.created_at',
             'users.name AS user_name',
+            DB::raw('article_categories.name AS category_name'),
+            DB::raw('article_categories.color AS category_color'),
             'user_infos.avatar AS user_avatar',
-             DB::raw('IF(article_views.count IS NOT NULL, article_views.count, 0) AS views_count')
+            DB::raw('IF(article_views.count IS NOT NULL, article_views.count, 0) AS views_count')
         )
             ->with([
                 'tags',
@@ -118,6 +120,7 @@ class ArticleController extends Controller
                 $join->on('articles.id', '=', 'article_views.article_id');
             })
             ->join('users', 'articles.user_id', '=', 'users.id')
+            ->leftJoin('article_categories', 'article_categories.id', '=', 'articles.article_category_id')
             ->leftJoin('user_infos', 'users.id', '=', 'user_infos.user_id')
             ->where(['articles.slug' => $slug, 'articles.status' => 'published'])
             ->first();
@@ -128,7 +131,7 @@ class ArticleController extends Controller
         ArticleView::query()->updateOrCreate([
             'article_id' => $article->id,
             'ip_address' => $request->ip()
-        ],[]);
+        ], []);
 
         return new ArticleSingleResource($article);
     }

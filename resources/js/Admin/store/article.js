@@ -3,15 +3,15 @@ import prepareQueryParams from "../utils/prepareQueryParams";
 
 export default {
     namespaced: true,
-    state:{
+    state: {
         allArticles: [],
         articlesWithPagination:[],
         isLoading: false,
         tableOptions: {
             page: 1,
             perPage: 10,
-            sortBy:'',
-            sortDesc: false
+            sortBy: 'created_at',
+            sortDesc: true
         },
         total: 0,
         filterOptions: {
@@ -36,15 +36,15 @@ export default {
             state.tableOptions = {
                 page: 1,
                 perPage: 10,
-                sortBy: '',
-                sortDesc: false
+                sortBy: 'created_at',
+                sortDesc: true
             }
         },
         setTableOptionsToDefault: state => state.tableOptions = {
             page: 1,
             perPage: 10,
-            sortBy: '',
-            sortDesc: false
+            sortBy: 'created_at',
+            sortDesc: true
         },
         setCurrentArticle: (state, payload) => state.currentArticle = {...payload},
         setArticleCategories: (state, payload) => state.articleCategories = [...payload]

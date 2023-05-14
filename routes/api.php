@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\FavoritesController;
 use App\Http\Controllers\Api\FilterController;
 use App\Http\Controllers\Api\FileController;
+use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\PriceHistoryController;
 use App\Http\Controllers\Api\RouteController;
@@ -154,6 +155,7 @@ Route::get('/questions', [QuestionController::class, 'bySkuId']);
 
 Route::post('/rating/check-user-rating', [RatingController::class, 'checkUserRating']);
 Route::post('/rating/create-or-update', [RatingController::class, 'createOrUpdate']);
+Route::post('/likes', [LikeController::class, 'createOrUpdate']);
 
 
 Route::get('/routes/skus-queries', [RouteController::class, 'skusQueries']);

@@ -40,6 +40,8 @@ class ArticleSingleResource extends JsonResource
             'preview' => $this->preview,
             'image' => $this->image,
             'body' => $this->body,
+            'category_name' => $this->category_name,
+            'category_color' => $this->category_color,
             'comments' => $comments,
             'created_at' => $this->created_at->format('d-m-Y'),
             'user_name' => $this->user_name,
