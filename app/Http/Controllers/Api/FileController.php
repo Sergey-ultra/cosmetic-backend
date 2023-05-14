@@ -15,7 +15,9 @@ class FileController extends Controller
 {
     public const ENTITY_MAP_FOLDER = [
         'review' => 'premoderatedReviews',
-        'sku' => 'sku'
+        'sku' => 'sku',
+        'article-ckeditor' => 'articles/ckEditor'
+
     ];
     /**
      * @param FileRequest $request

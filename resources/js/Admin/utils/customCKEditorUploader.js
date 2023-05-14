@@ -7,7 +7,6 @@ export default class UploadAdapter
     }
 
     uploadFile(file, fileName = null){
-
         let form= new FormData();
         form.append('files[]', file);
         form.append('entity', 'article-ckeditor');

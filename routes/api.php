@@ -271,7 +271,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 
         //Route::delete('/images/{image}',[FileController::class, 'destroy']);
-
+        Route::post('/files', [FileController::class, 'storeAsForm']);
 
         Route::get('/articles/categories', [AdminArticleController::class, 'articleCategories']);
         Route::post('/articles/publish/{id}', [AdminArticleController::class, 'publish']);
