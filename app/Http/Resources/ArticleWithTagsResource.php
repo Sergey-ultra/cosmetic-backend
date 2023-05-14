@@ -25,6 +25,7 @@ class ArticleWithTagsResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'category_id' => $this->category_id,
             'category_name' => $this->category_name,
             'category_color' => $this->category_color,
             'title' => $this->title,

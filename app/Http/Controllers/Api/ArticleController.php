@@ -80,6 +80,19 @@ class ArticleController extends Controller
         return new ArticleWithTagsCollection($result, ['tag' => Tag::where('tag', $tag)->first()]);
     }
 
+    public function byCategoryId(int $categoryId): ArticleWithTagsCollection
+    {
+        $perPage = (int)($request->per_page ?? 10);
+
+        $result = Article::withTags()
+            ->where(['article_categories.id' => $categoryId, 'articles.status' => 'published'])
+            ->orderBy('articles.created_at', 'DESC')
+            ->paginate($perPage);
+
+
+        return new ArticleWithTagsCollection($result, ['category' => ArticleCategory::query()->find($categoryId)]);
+    }
+
     public function show(Request $request, string $slug): ArticleSingleResource
     {
         $viewsCountSubQuery = DB::table('article_views')
@@ -95,9 +108,9 @@ class ArticleController extends Controller
             'articles.image',
             'articles.created_at',
             'users.name AS user_name',
-            DB::raw('article_categories.id AS category_id'),
-            DB::raw('article_categories.name AS category_name'),
-            DB::raw('article_categories.color AS category_color'),
+            'article_categories.id AS category_id',
+            'article_categories.name AS category_name',
+            'article_categories.color AS category_color',
             'user_infos.avatar AS user_avatar',
             DB::raw('IF(article_views.count IS NOT NULL, article_views.count, 0) AS views_count')
         )
@@ -121,8 +134,8 @@ class ArticleController extends Controller
                 $join->on('articles.id', '=', 'article_views.article_id');
             })
             ->join('users', 'articles.user_id', '=', 'users.id')
-            ->leftJoin('article_categories', 'article_categories.id', '=', 'articles.article_category_id')
             ->leftJoin('user_infos', 'users.id', '=', 'user_infos.user_id')
+            ->leftJoin('article_categories', 'article_categories.id', '=', 'articles.article_category_id')
             ->where(['articles.slug' => $slug, 'articles.status' => 'published'])
             ->first();
 
@@ -142,7 +155,7 @@ class ArticleController extends Controller
      */
     public function articleCategories(): JsonResponse
     {
-        $result = ArticleCategory::select('id', 'name', 'color')->get();
+        $result = ArticleCategory::query()->select('id', 'name', 'color')->get();
         return response()->json(['data' => $result]);
     }
 
@@ -151,7 +164,7 @@ class ArticleController extends Controller
      */
     public function tags(): JsonResponse
     {
-        $result = Tag::select('id', 'tag', 'parent_id')->get();
+        $result = Tag::query()->select('id', 'tag', 'parent_id')->get();
         return response()->json(['data' => $result]);
     }
 }

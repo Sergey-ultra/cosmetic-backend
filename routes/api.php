@@ -118,6 +118,7 @@ Route::get('/location-list', [LocationController::class, 'index']);
 Route::get('/articles', [ArticleController::class, 'index']);
 Route::get('/articles/last', [ArticleController::class, 'last']);
 Route::get('/articles/by-tag/{tag}', [ArticleController::class, 'byTag']);
+Route::get('/articles/by-category-id/{id}', [ArticleController::class, 'byCategoryId']);
 Route::get('/articles/by-slug/{slug}', [ArticleController::class, 'show']);
 
 
