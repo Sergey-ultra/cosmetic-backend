@@ -54,17 +54,16 @@ class RatingController extends Controller
         $skuId = $request->input('sku_id');
         $user = Auth::guard('api')->user();
         $visitorIp = request()->ip();
-        $conditions['sku_id'] = $skuId;
+
 
         if (isset($user)) {
-           $conditions['user_id']=  $user->id;
-        } else {
-           $conditions['ip_address'] = $visitorIp;
+            $existingRating = SkuRating::query()->where(['sku_id' => $skuId, 'user_id' => $user->id])->first();
+        }
+        if (!isset($existingRating)) {
+            $existingRating = SkuRating::query()->where(['sku_id' => $skuId, 'ip_address' => $visitorIp])->first();
         }
 
-        $existingRating = SkuRating::query()->where($conditions)->first();
         $params['rating'] = $request->input('rating');
-
 
 
         $skuRatingCount = SkuRating::where('sku_id', $skuId)->count();

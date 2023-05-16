@@ -253,6 +253,7 @@ class ReviewController extends Controller
             'user_id' => Auth::guard('api')->user()->id
         ])->first();
 
+
         $currentSku = Sku::find($skuId);
 
         if (!$currentRating  || !$currentSku) {
