@@ -75,7 +75,7 @@ class SkuVideoController extends Controller
             ->updateOrCreate(
                 [
                     'sku_id' => $skuId,
-                    'user_id' => Auth::user()->id
+                    'user_id' => Auth::guard('api')->user()->id
                 ],
                 [
                     'video' => $request->file_path,
@@ -124,7 +124,7 @@ class SkuVideoController extends Controller
             ->updateOrCreate(
                 [
                     'sku_id' => $skuId,
-                    'user_id' => Auth::user()->id
+                    'user_id' => Auth::guard('api')->user()->id
                 ],
                 [
                     'video' => $videoFilePath,

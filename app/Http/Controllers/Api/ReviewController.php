@@ -40,7 +40,7 @@ class ReviewController extends Controller
                     ->where('reviews.status', '!=', 'deleted');
             })
             ->where([
-            'sku_ratings.user_id' => Auth::id(),
+            'sku_ratings.user_id' => Auth::guard('api')->id(),
             'sku_ratings.status' => 'published'
         ]);
 
@@ -205,7 +205,7 @@ class ReviewController extends Controller
     {
         $conditions[] = ['sku_ratings.sku_id', '=', $request->sku_id];
 
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
         if (isset($user)) {
            $conditions[] = ['sku_ratings.user_id' , '=', $user->id];
         } else {
@@ -250,7 +250,7 @@ class ReviewController extends Controller
 
         $currentRating = SkuRating::query()->where([
             'sku_id' => $skuId,
-            'user_id' => Auth::user()->id
+            'user_id' => Auth::guard('api')->user()->id
         ])->first();
 
         $currentSku = Sku::find($skuId);
@@ -281,7 +281,7 @@ class ReviewController extends Controller
         return response()->json([
             'data' => [
                 'status' => 'success',
-                'data' => $review
+                'data' => $review,
             ]
         ]);
 

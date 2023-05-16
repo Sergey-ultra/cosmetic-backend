@@ -20,28 +20,24 @@ class RatingController extends Controller
      */
     public function checkUserRating(Request $request): JsonResponse
     {
-        $skuId = $request->sku_id;
+        $skuId = $request->input('sku_id');
         $visitorIp = request()->ip();
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
+        $conditions['sku_id'] = $skuId;
 
-        $existingRating = SkuRating::where([
-            'sku_id' => $skuId,
-            'ip_address' => $visitorIp
-        ])->first();
-
-        if (!$existingRating && isset($user)) {
-            $existingRating = SkuRating::where([
-                'sku_id' => $skuId,
-                'user_id' => $user->id
-            ])->first();
+        if (isset($user)) {
+            $conditions['user_id']=  $user->id;
+        } else {
+            $conditions['ip_address'] = $visitorIp;
         }
+
+        $existingRating = SkuRating::query()->where($conditions)->first();
 
         if (!$existingRating) {
             return response()->json(['data' => 0]);
         }
 
-        return response()->json(['data'=>
-            [
+        return response()->json(['data'=> [
                 'status' => 'success',
                 'data' => $existingRating->rating
             ]
@@ -55,36 +51,32 @@ class RatingController extends Controller
      */
     public function createOrUpdate(RatingRequest $request): JsonResponse
     {
-        $skuId = $request->sku_id;
-        $user = Auth::user();
+        $skuId = $request->input('sku_id');
+        $user = Auth::guard('api')->user();
         $visitorIp = request()->ip();
-
-
-        $existingRating = SkuRating::query()->where([
-            'sku_id' => $skuId,
-            'ip_address' => $visitorIp
-        ])->first();
-
-
-
-        if (!$existingRating && isset($user)) {
-            $existingRating = SkuRating::where([
-                'sku_id' => $skuId,
-                'user_id' => $user->id
-            ])->first();
-        }
-
-        $params['rating'] = $request->rating;
+        $conditions['sku_id'] = $skuId;
 
         if (isset($user)) {
-            $params['user_id'] = $user->id;
-            $params['user_name'] = $user->name;
+           $conditions['user_id']=  $user->id;
+        } else {
+           $conditions['ip_address'] = $visitorIp;
         }
+
+        $existingRating = SkuRating::query()->where($conditions)->first();
+        $params['rating'] = $request->input('rating');
+
+
 
         $skuRatingCount = SkuRating::where('sku_id', $skuId)->count();
         $currentSku = Sku::find($skuId);
 
+
         if ($existingRating) {
+            if (isset($user)) {
+                $params['user_id'] = $user->id;
+                $params['user_name'] = $user->name;
+            }
+
             $newCommonRating = ($currentSku->rating * $skuRatingCount + $request->rating - $existingRating->rating) / $skuRatingCount;
             $existingRating->update($params);
         } else {

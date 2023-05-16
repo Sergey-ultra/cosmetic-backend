@@ -16,7 +16,7 @@ class UserController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
         $info = $user->info;
 
         $result = [

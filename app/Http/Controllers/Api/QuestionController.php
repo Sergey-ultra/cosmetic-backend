@@ -37,7 +37,7 @@ class QuestionController extends Controller
             ->join('users', 'users.id', '=', 'questions.user_id')
             ->leftjoin('user_infos', 'users.id', '=', 'user_infos.user_id')
             ->where([
-                'questions.user_id' => Auth::id(),
+                'questions.user_id' => Auth::guard('api')->id(),
                 ['questions.status', '!=', 'deleted']
             ])
         ;
@@ -75,7 +75,7 @@ class QuestionController extends Controller
     public function store(QuestionRequest $request): JsonResponse
     {
         $skuId = $request->sku_id;
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
         $visitorIp = request()->ip();
 
         $question = Question::create(
