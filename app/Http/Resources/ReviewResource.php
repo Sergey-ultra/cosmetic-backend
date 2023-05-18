@@ -26,10 +26,16 @@ class ReviewResource extends JsonResource
             'comment' => $this->comment,
             'plus' => $this->plus,
             'minus' => $this->minus,
-            'images' => $this->images ? json_decode($this->images,true) : [],
+            'images' => $this->images
+                ? json_decode($this->images,true)
+                : [],
             'created_at' => $this->created_at->toDateString(),
-            'user_name' => $this->anonymously === 0 ? $this->user_name : 'Имя скрыто',
-            'user_avatar' => $this->anonymously === 0 ? $this->avatar : '/storage/icons/user_avatar.png'
+            'user_name' => $this->anonymously === 0
+                ? $this->user_name
+                : 'Имя скрыто',
+            'user_avatar' => $this->anonymously === 0
+                ? $this->avatar ?? '/storage/icons/user_avatar.png'
+                : '/storage/icons/user_avatar.png'
         ];
     }
 }

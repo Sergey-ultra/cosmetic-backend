@@ -256,7 +256,7 @@ class ReviewController extends Controller
 
         $currentSku = Sku::find($skuId);
 
-        if (!$currentRating  || !$currentSku) {
+        if (!$currentRating || !$currentSku) {
             return response()->json([
                 'data' => [
                     'status' => 'success',
@@ -271,7 +271,7 @@ class ReviewController extends Controller
             ],
             [
                 'status' => 'moderated',
-                'comment' => $request->comment,
+                'comment' => mb_convert_encoding($request->comment, "UTF-8", "auto"),
                 'plus' => $request->plus,
                 'minus' => $request->minus,
                 'images' => $request->images,

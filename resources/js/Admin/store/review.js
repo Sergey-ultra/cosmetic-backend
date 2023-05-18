@@ -10,7 +10,7 @@ export default {
         loadedReview:{},
         tableOptions: {
             page: 1,
-            perPage: 10,
+            perPage: 20,
             sortBy: '',
             sortDesc: false,
         },
@@ -29,14 +29,14 @@ export default {
             state.filterOptions = {...payload}
             state.tableOptions = {
                 page: 1,
-                perPage: 10,
+                perPage: 20,
                 sortBy: '',
                 sortDesc: false
             }
         },
         setTableOptionsToDefault: state => state.tableOptions = {
             page: 1,
-            perPage: 10,
+            perPage: 20,
             sortBy: '',
             sortDesc: false,
         },
