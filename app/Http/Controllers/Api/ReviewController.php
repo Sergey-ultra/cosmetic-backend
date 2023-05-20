@@ -247,7 +247,6 @@ class ReviewController extends Controller
     {
         $skuId = $request->sku_id;
 
-
         $currentRating = SkuRating::query()->where([
             'sku_id' => $skuId,
             'user_id' => Auth::guard('api')->user()->id
@@ -271,6 +270,7 @@ class ReviewController extends Controller
             ],
             [
                 'status' => 'moderated',
+                'title' => $request->input('title'),
                 'comment' => mb_convert_encoding($request->comment, "UTF-8", "auto"),
                 'plus' => $request->plus,
                 'minus' => $request->minus,

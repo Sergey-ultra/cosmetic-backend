@@ -16,6 +16,7 @@ class CreateReviewsTable extends Migration
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sku_rating_id')->index();
+            $table->string('title', 256);
             $table->text('comment')->nullable();
             $table->text('plus')->nullable();
             $table->text('minus')->nullable();

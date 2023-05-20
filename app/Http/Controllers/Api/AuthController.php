@@ -95,7 +95,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Пользователь успешно авторизирован',
+            'message' => 'Вы успешно авторизированы',
             'isRequiredEmailVerification' => false,
             'name' => $user->name,
             'token' => $user->getBearerToken(),

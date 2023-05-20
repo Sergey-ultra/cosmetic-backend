@@ -23,6 +23,7 @@ class ReviewRequest extends JsonApiRequest
     public function rules(): array
     {
         return [
+            'title' => 'string|min:5|max:256',
             'plus' => 'string|min:5',
             'minus' => 'string|min:5',
             'comment' => 'required|string|min:5',
