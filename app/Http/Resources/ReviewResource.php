@@ -7,6 +7,7 @@ namespace App\Http\Resources;
 
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class ReviewResource extends JsonResource
 {
@@ -23,7 +24,8 @@ class ReviewResource extends JsonResource
             'id' => $this->id,
             'comments_count' => $this->comments_count,
             'rating' => $this->rating,
-            'comment' => $this->comment,
+            'title' => $this->title,
+            'comment' => Str::substr($this->comment, 0, 400) . (Str::length($this->comment) > 400 ? '...' : ''),
             'plus' => $this->plus,
             'minus' => $this->minus,
             'images' => $this->images

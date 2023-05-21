@@ -168,6 +168,7 @@ class ReviewController extends Controller
             'reviews.id as id',
             'sku_ratings.rating',
              DB::raw('IF(comments.comments_count IS NULL, 0, comments.comments_count) AS comments_count'),
+            'reviews.title',
             'reviews.comment',
             'reviews.plus',
             'reviews.minus',
