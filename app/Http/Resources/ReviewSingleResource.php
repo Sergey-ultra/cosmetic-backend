@@ -1,34 +1,28 @@
 <?php
 
-declare(strict_types=1);
-
-
 namespace App\Http\Resources;
 
-
-use Illuminate\Http\Request;
+use App\Services\TreeService\TreeService;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
-class ReviewResource extends JsonResource
+class ReviewSingleResource extends JsonResource
 {
-
-    /**
-     * Transform the resource into an array.
-     *
-     * @param Request $request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
+        $comments = [];
+        if ($this->comments) {
+            $arrayOfComments = $this->comments->toArray();
+            $comments = (new TreeService())->buildTree($arrayOfComments, 'reply_id');
+        }
+
         return [
             'id' => $this->id,
-            'comments_count' => $this->comments_count,
-            'rating' => $this->rating,
             'title' => $this->title,
-            'body' => Str::substr($this->body, 0, 400) . (Str::length($this->body) > 400 ? '...' : ''),
+            'rating' => $this->rating,
             'plus' => $this->plus,
             'minus' => $this->minus,
+            'body' => $this->body,
             'images' => $this->images,
             'created_at' => $this->created_at->toDateString(),
             'user_name' => $this->anonymously === 0
@@ -37,6 +31,8 @@ class ReviewResource extends JsonResource
             'user_avatar' => $this->anonymously === 0
                 ? $this->avatar ?? '/storage/icons/user_avatar.png'
                 : '/storage/icons/user_avatar.png',
+            'comments_count' => $this->comments->count(),
+            'comments' => $comments,
         ];
     }
 }

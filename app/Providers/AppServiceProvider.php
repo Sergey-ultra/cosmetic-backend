@@ -18,6 +18,8 @@ use App\Services\PriceHistoryService\PriceHistoryInterface;
 use App\Services\PriceHistoryService\PriceHistoryService;
 use App\Services\ProxyHttpClientService\ProxyHttpClientInterface;
 use App\Services\ProxyHttpClientService\ProxyHttpClientService;
+use App\Services\ReviewService\IReview;
+use App\Services\ReviewService\ReviewService;
 use App\Services\TreeService\TreeInterface;
 use App\Services\TreeService\TreeService;
 use App\Services\UrlService\IUrlService;
@@ -33,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->singleton(TreeInterface::class, TreeService::class);
         $this->app->singleton(ProxyHttpClientInterface::class, ProxyHttpClientService::class);
@@ -43,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ILinkParser::class, LinkCrawlerParser::class);
         $this->app->singleton(IUrlService::class, UrlService::class);
         $this->app->singleton(ImageLoadingInterface::class, ImageLoadingService::class);
+        $this->app->singleton(IReview::class, ReviewService::class);
 
         $this->app->bind(
             PriceCrawlerService::class,
@@ -69,7 +72,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->app->singleton(TreeInterface::class, TreeService::class);
         $this->app->singleton(Configuration::class);

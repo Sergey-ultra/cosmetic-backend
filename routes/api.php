@@ -191,6 +191,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 
     Route::get('/reviews/my', [ReviewController::class, 'my']);
+    Route::get('/reviews/{id}', [ReviewController::class, 'show']);
     Route::post('/review/check-existing-review', [ReviewController::class, 'checkExistingReview']);
     Route::post('/reviews', [ReviewController::class, 'updateOrCreate']);
     Route::post('/reviews/add-video', [SkuVideoController::class, 'addOrUpdateVideoWithBase64Data']);
