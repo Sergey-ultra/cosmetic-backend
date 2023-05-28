@@ -21,6 +21,7 @@ class ReviewSingleResource extends JsonResource
             'title' => $this->title,
             'rating' => $this->rating,
             'views_count' => $this->views_count,
+            'likes' => $this->likes,
             'plus' => $this->plus,
             'minus' => $this->minus,
             'body' => $this->body,

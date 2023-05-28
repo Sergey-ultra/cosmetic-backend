@@ -11,9 +11,9 @@ use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\FavoritesController;
 use App\Http\Controllers\Api\FilterController;
 use App\Http\Controllers\Api\FileController;
-use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\PriceHistoryController;
+use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\RouteController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\SkuController;
@@ -151,13 +151,14 @@ Route::get('/reviews/by-sku-id/{id}', [ReviewController::class, 'bySkuId']);
 Route::get('/reviews/{id}', [ReviewController::class, 'show']);
 Route::get('/reviews/additional-info-by-sku-id/{id}', [ReviewController::class, 'additionalInfoBySkuId']);
 
+Route::post('/likes/{id}', [LikeController::class, 'createOrUpdate']);
+
 Route::get('/comments', [CommentController::class, 'byReviewId']);
 
 Route::get('/questions', [QuestionController::class, 'bySkuId']);
 
 Route::post('/rating/check-user-rating', [RatingController::class, 'checkUserRating']);
 Route::post('/rating/create-or-update', [RatingController::class, 'createOrUpdate']);
-Route::post('/likes', [LikeController::class, 'createOrUpdate']);
 Route::post('/files', [FileController::class, 'storeAsForm']);
 
 Route::get('/routes/skus-queries', [RouteController::class, 'skusQueries']);

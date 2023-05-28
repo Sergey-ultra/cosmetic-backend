@@ -3,6 +3,7 @@
 namespace App\Services\ReviewService;
 
 use App\Models\Review;
+use App\Models\ReviewLike;
 use App\Models\SkuRating;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -83,9 +84,17 @@ class ReviewService implements IReview
             ->select([DB::raw('count(ip_address) as count'), 'review_id'])
             ->groupBy('review_id');
 
+        $likesCountSubQuery = DB::table(ReviewLike::TABLE)
+            ->select([DB::raw('count(plus_ip_address) as count'), 'review_id'])
+            ->whereNotNull('plus_ip_address')
+            ->groupBy('review_id');
+
         return $this
             ->getReviewQuery()
-            ->addSelect(DB::raw('IF(views.count IS NOT NULL, views.count, 0) AS views_count'))
+            ->addSelect([
+                DB::raw('IF(views.count IS NOT NULL, views.count, 0) AS views_count'),
+                DB::raw('IF(likes.count IS NOT NULL, likes.count, 0) AS likes'),
+            ])
             ->with(['comments' => function ($query) {
                 $query
                     ->select(
@@ -104,6 +113,9 @@ class ReviewService implements IReview
             }])
             ->leftJoinSub($viewsCountSubQuery, 'views', function ($join) {
                 $join->on('reviews.id', '=', 'views.review_id');
+            })
+            ->leftJoinSub($likesCountSubQuery, 'likes', function ($join) {
+                $join->on('reviews.id', '=', 'likes.review_id');
             })
             ->where('reviews.id', $id)
             ->first();
