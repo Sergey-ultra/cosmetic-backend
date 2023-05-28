@@ -5,6 +5,7 @@ namespace App\Services\ReviewService;
 use App\Models\Review;
 use App\Models\SkuRating;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class ReviewService implements IReview
@@ -45,6 +46,7 @@ class ReviewService implements IReview
 
         return $this
             ->getReviewQuery()
+            ->addSelect(DB::raw('IF(comments.comments_count IS NULL, 0, comments.comments_count) AS comments_count'))
             ->leftJoinSub($commentCountSubQuery, 'comments', function ($join) {
                 $join->on('reviews.id', '=', 'comments.review_id');
             });
@@ -53,25 +55,57 @@ class ReviewService implements IReview
     public function getReviewQuery(): Builder
     {
         return Review::query()
+            ->select([
+                'reviews.id as id',
+                'sku_ratings.rating',
+                'reviews.title',
+                'reviews.comment AS body',
+                'reviews.plus',
+                'reviews.minus',
+                'reviews.images',
+                'reviews.created_at AS created_at',
+                'reviews.anonymously',
+                'users.name AS user_name',
+                'user_infos.avatar'
+            ])
             ->join('sku_ratings', 'sku_ratings.id', '=', 'reviews.sku_rating_id')
             ->join('users', 'users.id', '=', 'sku_ratings.user_id')
             ->leftjoin('user_infos', 'users.id', '=', 'user_infos.user_id');
     }
 
-    public function getSelectForCommonQuery(): array
+    /**
+     * @param int $id
+     * @return Builder|Model|null
+     */
+    public function getSingleReview(int $id): Builder|Model|null
     {
-        return [
-            'reviews.id as id',
-            'sku_ratings.rating',
-            'reviews.title',
-            'reviews.comment AS body',
-            'reviews.plus',
-            'reviews.minus',
-            'reviews.images',
-            'reviews.created_at AS created_at',
-            'reviews.anonymously',
-            'users.name AS user_name',
-            'user_infos.avatar'
-        ];
+        $viewsCountSubQuery = DB::table('review_views')
+            ->select([DB::raw('count(ip_address) as count'), 'review_id'])
+            ->groupBy('review_id');
+
+        return $this
+            ->getReviewQuery()
+            ->addSelect(DB::raw('IF(views.count IS NOT NULL, views.count, 0) AS views_count'))
+            ->with(['comments' => function ($query) {
+                $query
+                    ->select(
+                        'comments.id',
+                        'comments.user_name',
+                        'comments.reply_id',
+                        'comments.review_id',
+                        'comments.comment',
+                        DB::raw('DATE(comments.created_at) AS created_at'),
+                        'user_infos.avatar as user_avatar'
+
+                    )
+                    ->leftjoin('user_infos', 'comments.user_id', '=', 'user_infos.user_id')
+                    ->where('comments.status', 'published')
+                    ->orderBy('created_at', 'DESC');
+            }])
+            ->leftJoinSub($viewsCountSubQuery, 'views', function ($join) {
+                $join->on('reviews.id', '=', 'views.review_id');
+            })
+            ->where('reviews.id', $id)
+            ->first();
     }
 }

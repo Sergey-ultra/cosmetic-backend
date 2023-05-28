@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+declare(strict_types=1);
 
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
 use App\Http\Requests\ReviewRequest;
 use App\Http\Resources\MyReviewsCollection;
 use App\Http\Resources\ReviewCollection;
-use App\Http\Resources\ReviewResource;
 use App\Http\Resources\ReviewSingleResource;
 use App\Models\Review;
+use App\Models\ReviewView;
 use App\Models\Sku;
 use App\Models\SkuRating;
 use App\Models\SkuVideo;
@@ -20,12 +21,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
-
+use Symfony\Component\HttpFoundation\Response;
 
 class ReviewController extends Controller
 {
     use DataProvider;
+
+    public const LAST_LIMIT = 10;
 
     /**
      * @param IReview $reviewService
@@ -63,7 +65,7 @@ class ReviewController extends Controller
                     ->where('reviews.status', '!=', 'deleted');
             })
             ->orderBy('sku_ratings.created_at', 'DESC')
-            ->limit(10)
+            ->limit(self::LAST_LIMIT)
             ->get();
 
         return new MyReviewsCollection($result);
@@ -78,12 +80,9 @@ class ReviewController extends Controller
     public function bySkuId(IReview $reviewService, Request $request, int $id): ResourceCollection
     {
         $perPage = (int)($request->per_page ?? 10);
-        $select = $reviewService->getSelectForCommonQuery();
-        $select[] = DB::raw('IF(comments.comments_count IS NULL, 0, comments.comments_count) AS comments_count');
 
         $query = $reviewService
             ->getReviewWithCommentCountQuery()
-            ->select($select)
             ->where([
                 'sku_ratings.sku_id' => $id,
                 'reviews.status' => 'published'
@@ -96,32 +95,23 @@ class ReviewController extends Controller
 
     /**
      * @param IReview $reviewService
+     * @param Request $request
      * @param int $id
-     * @return ReviewSingleResource
+     * @return ReviewSingleResource|JsonResponse
      */
-    public function show(IReview $reviewService, int $id): ReviewSingleResource
+    public function show(IReview $reviewService, Request $request, int $id): ReviewSingleResource|JsonResponse
     {
-        $result = $reviewService
-            ->getReviewQuery()
-            ->select($reviewService->getSelectForCommonQuery())
-            ->with(['comments' => function ($query) {
-                $query
-                    ->select(
-                        'comments.id',
-                        'comments.user_name',
-                        'comments.reply_id',
-                        'comments.review_id',
-                        'comments.comment',
-                        DB::raw('DATE(comments.created_at) AS created_at'),
-                        'user_infos.avatar as user_avatar'
+        $result = $reviewService->getSingleReview($id);
 
-                    )
-                    ->leftjoin('user_infos', 'comments.user_id', '=', 'user_infos.user_id')
-                    ->where('comments.status', 'published')
-                    ->orderBy('created_at', 'DESC');
-                }])
-            ->where('reviews.id', $id)
-            ->first();
+        if (!$result) {
+            return response()->json([], Response::HTTP_NOT_FOUND);
+        }
+
+
+        ReviewView::query()->updateOrCreate([
+            'review_id' => $result->id,
+            'ip_address' => $request->ip()
+        ], []);
 
         return new ReviewSingleResource($result);
     }
@@ -132,7 +122,6 @@ class ReviewController extends Controller
      */
     public function additionalInfoBySkuId(int $id): JsonResponse
     {
-
         $videos = SkuVideo::query()
             ->where(['sku_id' => $id, 'status' => 'published'])
             ->get();
@@ -152,10 +141,11 @@ class ReviewController extends Controller
         );
 
 
-        $reviews = Review::select(
-            'reviews.images',
-            'sku_ratings.rating'
-        )
+        $reviews = Review::query()
+            ->select(
+                'reviews.images',
+                'sku_ratings.rating'
+            )
             ->join('sku_ratings', 'sku_ratings.id', '=', 'reviews.sku_rating_id')
             ->where([
                 'sku_ratings.sku_id' => $id,
@@ -178,9 +168,11 @@ class ReviewController extends Controller
         );
 
 
-        $ratingFilter = $reviews->groupBy('rating')->map(function($group) {
-            return count($group);
-        })->all();
+        $ratingFilter = $reviews
+            ->groupBy('rating')
+            ->map(function ($group) {
+                return count($group);
+            })->all();
 
         return response()->json(['data'=>
             [
