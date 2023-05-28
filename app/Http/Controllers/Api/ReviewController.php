@@ -10,6 +10,7 @@ use App\Http\Requests\ReviewRequest;
 use App\Http\Resources\MyReviewsCollection;
 use App\Http\Resources\ReviewCollection;
 use App\Http\Resources\ReviewSingleResource;
+use App\Jobs\AdminNotificationJob;
 use App\Models\Review;
 use App\Models\ReviewView;
 use App\Models\Sku;
@@ -265,6 +266,11 @@ class ReviewController extends Controller
                 'anonymously' => $request->anonymously ?? 0
             ]
         );
+
+        if (request()->ip() !== config('telegrambot.admin_ip')) {
+            $message = sprintf("Добавлен/обновлен отзыв с id %d", $review->id);
+            AdminNotificationJob::dispatch($message);
+        }
 
         return response()->json([
             'data' => [

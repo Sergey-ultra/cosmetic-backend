@@ -120,7 +120,7 @@ class CommentController extends Controller
      *
      * @param  int  $id
      */
-    public function destroy(int $id)
+    public function destroy(int $id): void
     {
         Comment::where('id', $id)->update(['status' => 'deleted']);
     }
