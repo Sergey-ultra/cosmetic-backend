@@ -148,6 +148,7 @@ Route::get('/skus/viewed', [SkuController::class, 'viewed']);
 
 Route::get('/reviews/last', [ReviewController::class, 'last']);
 Route::get('/reviews/by-sku-id/{id}', [ReviewController::class, 'bySkuId']);
+Route::get('/reviews/{id}', [ReviewController::class, 'show']);
 Route::get('/reviews/additional-info-by-sku-id/{id}', [ReviewController::class, 'additionalInfoBySkuId']);
 
 Route::get('/comments', [CommentController::class, 'byReviewId']);
@@ -191,7 +192,6 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 
     Route::get('/reviews/my', [ReviewController::class, 'my']);
-    Route::get('/reviews/{id}', [ReviewController::class, 'show']);
     Route::post('/review/check-existing-review', [ReviewController::class, 'checkExistingReview']);
     Route::post('/reviews', [ReviewController::class, 'updateOrCreate']);
     Route::post('/reviews/add-video', [SkuVideoController::class, 'addOrUpdateVideoWithBase64Data']);
