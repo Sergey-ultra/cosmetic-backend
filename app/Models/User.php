@@ -16,6 +16,9 @@ use Laravel\Sanctum\NewAccessToken;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
+    public const TABLE = 'users';
+
+    protected $table = self::TABLE;
 
     use HasApiTokens, HasFactory, Notifiable;
 

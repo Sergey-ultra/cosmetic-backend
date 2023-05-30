@@ -3,14 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Comment extends Model
 {
     protected $fillable = ['comment', 'review_id', 'user_id', 'user_name', 'reply_id', 'status'];
     protected $casts = [
-        'created_at' => 'datetime'
+        'created_at'  => 'date:Y-m-d',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     /**
      * @return MorphMany

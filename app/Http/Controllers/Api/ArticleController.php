@@ -9,8 +9,11 @@ use App\Http\Resources\ArticleSingleResource;
 use App\Http\Resources\ArticleWithTagsCollection;
 use App\Models\Article;
 use App\Models\ArticleCategory;
+use App\Models\ArticleComment;
 use App\Models\ArticleView;
 use App\Models\Tag;
+use App\Models\User;
+use App\Models\UserInfo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -118,18 +121,30 @@ class ArticleController extends Controller
                 'tags',
                 'comments' => function ($query) {
                     $query
-                        ->select(
-                            'id',
-                            'user_name',
-                            'user_avatar',
+                        ->select([
+                            sprintf('%s.id', ArticleComment::TABLE),
+                            sprintf('%s.name AS user_name', User::TABLE),
+                            sprintf('%s.avatar as user_avatar', UserInfo::TABLE),
                             'reply_id',
                             'article_id',
                             'comment',
-                            DB::raw('DATE(created_at) AS created_at'),
-                            DB::raw('0 as likes')
+                            DB::raw(sprintf('DATE(%s.created_at) AS created_at', ArticleComment::TABLE))
+                        ])
+                        ->withCount('likes AS likes')
+                        ->leftJoin(
+                            User::TABLE,
+                            sprintf('%s.user_id', ArticleComment::TABLE),
+                            '=',
+                            sprintf('%s.id', User::TABLE)
                         )
-                        ->where('status', 'published')
-                        ->orderBy('created_at', 'DESC');
+                        ->leftjoin(
+                            UserInfo::TABLE,
+                            sprintf('%s.user_id', ArticleComment::TABLE),
+                            '=',
+                            sprintf('%s.user_id', UserInfo::TABLE)
+                        )
+                        ->where(sprintf('%s.status', ArticleComment::TABLE), 'published')
+                        ->orderBy(sprintf('%s.created_at', ArticleComment::TABLE), 'DESC');
                 }])
             ->leftJoinSub($viewsCountSubQuery, 'article_views', function ($join) {
                 $join->on('articles.id', '=', 'article_views.article_id');

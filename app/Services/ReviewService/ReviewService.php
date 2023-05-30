@@ -84,17 +84,18 @@ class ReviewService implements IReview
             ->select([DB::raw('count(ip_address) as count'), 'review_id'])
             ->groupBy('review_id');
 
-        $likesCountSubQuery = DB::table(Like::TABLE)
-            ->select([DB::raw('count(plus_ip_address) as count'), 'review_id'])
-            ->whereNotNull('plus_ip_address')
-            ->groupBy('review_id');
+//        $likesCountSubQuery = DB::table(Like::TABLE)
+//            ->select([DB::raw('count(plus_ip_address) as count'), 'review_id'])
+//            ->whereNotNull('plus_ip_address')
+//            ->groupBy('review_id');
 
         return $this
             ->getReviewQuery()
             ->addSelect([
                 DB::raw('IF(views.count IS NOT NULL, views.count, 0) AS views_count'),
-                DB::raw('IF(likes.count IS NOT NULL, likes.count, 0) AS likes'),
+               // DB::raw('IF(likes.count IS NOT NULL, likes.count, 0) AS likes'),
             ])
+            ->withCount('likes')
             ->with(['comments' => function ($query) {
                 $query
                     ->select(
@@ -104,9 +105,9 @@ class ReviewService implements IReview
                         'comments.review_id',
                         'comments.comment',
                         DB::raw('DATE(comments.created_at) AS created_at'),
-                        DB::raw('0 as likes'),
                         'user_infos.avatar as user_avatar'
                     )
+                    ->withCount('likes AS likes')
                     ->leftjoin('user_infos', 'comments.user_id', '=', 'user_infos.user_id')
                     ->where('comments.status', 'published')
                     ->orderBy('created_at', 'DESC');
@@ -114,9 +115,9 @@ class ReviewService implements IReview
             ->leftJoinSub($viewsCountSubQuery, 'views', function ($join) {
                 $join->on('reviews.id', '=', 'views.review_id');
             })
-            ->leftJoinSub($likesCountSubQuery, 'likes', function ($join) {
-                $join->on('reviews.id', '=', 'likes.review_id');
-            })
+//            ->leftJoinSub($likesCountSubQuery, 'likes', function ($join) {
+//                $join->on('reviews.id', '=', 'likes.review_id');
+//            })
             ->where('reviews.id', $id)
             ->first();
     }
