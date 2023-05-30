@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 
 class Article extends Model
@@ -26,17 +27,34 @@ class Article extends Model
         'created_at'  => 'date:Y-m-d',
     ];
 
+    /**
+     * @return BelongsToMany
+     */
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
     }
 
+    /**
+     * @return HasMany
+     */
     public function comments(): HasMany
     {
         return $this->hasMany(ArticleComment::class);
     }
 
+    /**
+     * @return MorphMany
+     */
+    public function likes(): MorphMany
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
 
+
+    /**
+     * @return BelongsTo
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -102,6 +120,7 @@ class Article extends Model
             'article_categories.color AS category_color',
         )
             ->with('tags')
+            ->withCount('likes')
             ->join('users', 'articles.user_id', '=', 'users.id')
             ->leftJoin('user_infos', 'users.id', '=', 'user_infos.user_id')
             ->leftJoin('article_categories', 'article_categories.id', '=', 'articles.article_category_id')

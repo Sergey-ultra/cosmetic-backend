@@ -33,6 +33,7 @@ class ArticleWithTagsResource extends JsonResource
             'preview' => $this->preview,
             'image' => $this->image,
             'tags' => $tags,
+            'likes' => $this->likes_count,
             'user_name' => $this->user_name,
             'user_avatar' => $this->user_avatar,
             'views_count' => $this->views_count,

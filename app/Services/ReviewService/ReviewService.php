@@ -3,7 +3,7 @@
 namespace App\Services\ReviewService;
 
 use App\Models\Review;
-use App\Models\ReviewLike;
+use App\Models\Like;
 use App\Models\SkuRating;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -84,7 +84,7 @@ class ReviewService implements IReview
             ->select([DB::raw('count(ip_address) as count'), 'review_id'])
             ->groupBy('review_id');
 
-        $likesCountSubQuery = DB::table(ReviewLike::TABLE)
+        $likesCountSubQuery = DB::table(Like::TABLE)
             ->select([DB::raw('count(plus_ip_address) as count'), 'review_id'])
             ->whereNotNull('plus_ip_address')
             ->groupBy('review_id');
@@ -104,8 +104,8 @@ class ReviewService implements IReview
                         'comments.review_id',
                         'comments.comment',
                         DB::raw('DATE(comments.created_at) AS created_at'),
+                        DB::raw('0 as likes'),
                         'user_infos.avatar as user_avatar'
-
                     )
                     ->leftjoin('user_infos', 'comments.user_id', '=', 'user_infos.user_id')
                     ->where('comments.status', 'published')

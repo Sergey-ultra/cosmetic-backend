@@ -125,7 +125,8 @@ class ArticleController extends Controller
                             'reply_id',
                             'article_id',
                             'comment',
-                            DB::raw('DATE(created_at) AS created_at')
+                            DB::raw('DATE(created_at) AS created_at'),
+                            DB::raw('0 as likes')
                         )
                         ->where('status', 'published')
                         ->orderBy('created_at', 'DESC');

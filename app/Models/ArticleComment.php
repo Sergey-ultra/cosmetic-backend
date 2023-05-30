@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class ArticleComment extends Model
 {
@@ -15,8 +16,20 @@ class ArticleComment extends Model
         'created_at'  => 'date:Y-m-d',
     ];
 
+    /**
+     * @return BelongsTo
+     */
     public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class);
     }
+
+    /**
+     * @return MorphMany
+     */
+    public function likes(): MorphMany
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
 }

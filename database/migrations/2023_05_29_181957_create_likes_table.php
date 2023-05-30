@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateReviewLikesTable extends Migration
+class CreateLikesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateReviewLikesTable extends Migration
      */
     public function up()
     {
-        Schema::create('review_likes', function (Blueprint $table) {
+        Schema::create('likes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('review_id');
+            $table->morphs('likeable');
             $table->string('plus_ip_address');
             $table->string('minus_ip_address');
             $table->timestamps();
