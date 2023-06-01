@@ -16,6 +16,8 @@ class FileController extends Controller
     public const ENTITY_MAP_FOLDER = [
         'review' => 'premoderatedReviews',
         'sku' => 'sku',
+        'article' => 'articles',
+        'brand' => 'brand',
         'article-ckeditor' => 'articles/ckEditor',
         'avatar' => 'avatar',
 

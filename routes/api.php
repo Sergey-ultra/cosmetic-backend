@@ -209,6 +209,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 
     Route::get('/me', [UserController::class, 'me']);
     Route::post('/users/me', [UserController::class, 'updateMe']);
+    Route::post('/users/me/avatar', [UserController::class, 'updateAvatar']);
+
 
     //доступ только у админа
     Route::group([

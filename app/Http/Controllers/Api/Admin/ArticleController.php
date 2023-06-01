@@ -91,14 +91,18 @@ class ArticleController extends Controller
 
         $params['image'] = [];
         if ($request->has('image')) {
-            $params['image'] = $imageSavingService->saveOneImage($request->image, self::IMAGES_FOLDER, $slugName);
+            $params['image'] = $imageSavingService->saveOneImage(
+                $request->input('image'),
+                self::IMAGES_FOLDER,
+                $slugName
+            );
         }
 
 
         $article = Article::create($params);
 
-        if ($request->tags_ids) {
-            foreach($request->tags_ids as $tagId) {
+        if ($request->input('tags_ids')) {
+            foreach($request->input('tags_ids') as $tagId) {
                 $article->tags->create(['tag_id' => $tagId]);
             }
         }

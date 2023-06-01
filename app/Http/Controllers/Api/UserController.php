@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AvatarRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\Country;
 use App\Models\SkuRating;
+use App\Services\ImageSavingService\ImageSavingService;
 use App\Services\UserLocationService\UserLocationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-
+    public const IMAGES_FOLDER = 'public/image/avatar/';
     public function me(Request $request): JsonResponse
     {
         $user = Auth::guard('api')->user();
@@ -45,7 +47,7 @@ class UserController extends Controller
 
     public function updateMe(UserUpdateRequest $request): JsonResponse
     {
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
         $user->name = $request->input('name');
         $user->save();
 
@@ -53,6 +55,19 @@ class UserController extends Controller
         $user->info()->updateOrCreate([], [
             'sex' => $request->input('sex') ?? null,
             'birthday_year' => $request->input('birthday_year')
+        ]);
+
+        return response()->json(['data' => ['status' => true]]);
+    }
+
+    public function updateAvatar(AvatarRequest $request, ImageSavingService $imageSavingService): JsonResponse
+    {
+        $user = Auth::guard('api')->user();
+
+        $image = $imageSavingService->saveOneImage($request->input('avatar'), self::IMAGES_FOLDER, $user->name);
+
+        $user->info()->updateOrCreate([], [
+            'avatar' => $image,
         ]);
 
         return response()->json(['data' => ['status' => true]]);
