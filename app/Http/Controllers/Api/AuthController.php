@@ -9,6 +9,7 @@ use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use App\Services\AuthService;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -22,27 +23,24 @@ use Symfony\Component\Mailer\Exception\TransportException;
 
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request, Configuration $configuration): JsonResponse
+    public function register(RegisterRequest $request, Configuration $configuration, AuthService $authService): JsonResponse
     {
-        $email = $request->email;
-        if (User::query()->where(['email' => $email, 'service' => NULL])->first()) {
+        $email = $request->input('email');
+
+        $user = $authService->saveUser($email, $request->input('name'), $request->input('password'));
+
+        if (is_null($user)) {
             return response()->json([
                 'status' => false,
-                'message' => 'Этот email уже используется.'
+                'message' => 'Этот email уже используется.',
             ]);
-        };
-
-        $user = User::query()->create([
-            'name' => $request->name,
-            'email' => $email,
-            'password' => bcrypt($request->password)
-        ]);
+        }
 
         $response = [
             'status' => true,
             'isRequiredEmailVerification' => false,
             'email' => $email,
-            'message' => 'Вы успешно зарегистрировались'
+            'message' => 'Вы успешно зарегистрировались',
         ];
 
         $isRequiredEmailVerification = $configuration->getBoolean('is_required_email_verification');
@@ -64,20 +62,26 @@ class AuthController extends Controller
 
 
 
-    public function login(LoginRequest $request, Configuration $configuration): JsonResponse
+    public function login(LoginRequest $request, Configuration $configuration, AuthService $authService): JsonResponse
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        $user = $authService->getAuthUser($request->input('email'), $request->input('password'));
+
+        if (is_null($user)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Неправильный логин или пароль'
             ]);
         }
 
-        $user = Auth::user();
 
         $isRequiredEmailVerification = $configuration->getBoolean('is_required_email_verification');
 
-        if ($isRequiredEmailVerification && $user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
+
+        if (
+            $isRequiredEmailVerification &&
+            $user->role_id !== User::ROLE_BOT &&
+            $user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()
+        ) {
             return response()->json([
                 'status' => true,
                 'message' => 'Необходимо подтверждение email',
@@ -99,7 +103,7 @@ class AuthController extends Controller
             'isRequiredEmailVerification' => false,
             'name' => $user->name,
             'token' => $user->getBearerToken(),
-            'role' => $user->role->name,
+            'role' => $user->role(),
             'avatar' => isset($user->info)
                 ? ($user->info->avatar ?? '/storage/icons/user_avatar.png')
                 : '/storage/icons/user_avatar.png'

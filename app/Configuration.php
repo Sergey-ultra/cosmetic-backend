@@ -30,7 +30,12 @@ class Configuration extends ParameterBag
         parent::__construct($options);
     }
 
-    public function set(string $key, $value)
+    /**
+     * @param string $key
+     * @param $value
+     * @return void
+     */
+    public function set(string $key, $value): void
     {
         ConfigurationOption::query()->updateOrCreate(['key' => $key], ['value' => $value]);
 
@@ -38,9 +43,23 @@ class Configuration extends ParameterBag
     }
 
 
+    /**
+     * @param string $key
+     * @param bool $value
+     * @return void
+     */
     public function setBoolean(string $key, bool $value): void
     {
         $value = $value ? 'true' : 'false';
         $this->set($key, $value);
+    }
+
+    /**
+     * @return string
+     * Получить соль для мастер-пароля
+     */
+    public function getSaltMasterPassword(): string
+    {
+        return (string)env('SALT_MASTER_PASSWORD', 'c0210sovsecontej2022');
     }
 }

@@ -25,11 +25,11 @@ class AuthController extends Controller
             ]);
         };
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role_id' => 5
+        User::query()->create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => bcrypt($request->input('password')),
+            'role_id' => User::ROLE_SUPPLIER,
         ]);
 
         return response()->json(['data' => [
@@ -68,7 +68,7 @@ class AuthController extends Controller
             'avatar' => isset($user->info)
                 ? ($user->info->avatar ?? '/storage/icons/user_avatar.png')
                 : '/storage/icons/user_avatar.png',
-            'role' => $user->role->name,
+            'role' => $user->role(),
         ]);
     }
 

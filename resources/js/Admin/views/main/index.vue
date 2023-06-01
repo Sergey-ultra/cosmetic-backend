@@ -98,6 +98,9 @@
             border-radius: 8px;
             width: 49%;
             margin-bottom: 25px;
+            &:hover {
+                box-shadow: 0 8px 8px #0000000d,0 29px 26px #00000014;
+            }
         }
         &__title {
             font-weight: 700;

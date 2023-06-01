@@ -16,11 +16,27 @@ use Laravel\Sanctum\NewAccessToken;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
+    use HasApiTokens, HasFactory, Notifiable;
+    public const ROLE_ADMIN = 1;
+    public const ROLE_MODERATOR = 2;
+    public const ROLE_CLIENT = 3;
+    public const ROLE_WRITER = 4;
+    public const ROLE_SUPPLIER= 5;
+    public const ROLE_BOT = 6;
+
+    public const ROLE_MAP_NAME = [
+        self::ROLE_ADMIN => 'Admin',
+        self::ROLE_MODERATOR => 'Moderator',
+        self::ROLE_CLIENT => 'Client',
+        self::ROLE_WRITER => 'Writer',
+        self::ROLE_SUPPLIER => 'Supplier',
+        self::ROLE_BOT => 'Bot',
+    ];
+
     public const TABLE = 'users';
 
     protected $table = self::TABLE;
 
-    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -81,9 +97,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(UserTelegramInfo::class);
     }
 
-    public function role(): BelongsTo
+    public function role(): string
     {
-        return $this->belongsTo(Role::class);
+        return self::ROLE_MAP_NAME[$this->role_id];
     }
 
     public function hasAnyRole($roles): bool
@@ -93,7 +109,7 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         foreach ($roles as $role) {
-            if (strtolower($role) === strtolower($this->role->name)) {
+            if (strtolower($role) === strtolower($this->role())) {
                 return true;
             }
         }

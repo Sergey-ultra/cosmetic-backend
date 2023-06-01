@@ -316,6 +316,8 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::apiResource('/article-comments', AdminArticleCommentController::class);
 
         Route::get('/users/show-available-roles', [AdminUserController::class, 'showAvailableRoles']);
+        Route::get('/users/master-password', [AdminUserController::class, 'getMasterPassword']);
+        Route::post('/users/save-bots', [AdminUserController::class, 'saveBots']);
         Route::apiResource('/users', AdminUserController::class);
 
         Route::get('/trackings', [AdminTrackingController::class, 'index']);

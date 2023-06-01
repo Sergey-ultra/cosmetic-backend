@@ -21,7 +21,7 @@ class UserController extends Controller
 
         $result = [
             'email' => $user->email,
-            'role' => $user->role->name,
+            'role' => $user->role(),
             'name' => $user->name,
             'avatar' => $info->avatar ?? '/storage/icons/user_avatar.png'
         ];

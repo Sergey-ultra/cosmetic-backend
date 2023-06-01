@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Requests\Admin\BotsRequest;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\AuthService;
+use App\Services\PasswordService\PasswordService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -31,20 +34,19 @@ class UserController extends Controller
             return response()->json(['data' => $users]);
         }
 
-        $query = DB::table('users')
+        $query = User::query()
             ->select([
                 'users.id as id',
                 'users.name as name',
                 'users.email as email',
                 'users.created_at as created_at',
                 'users.service as service',
-                'roles.name as role',
-                'user_infos.avatar as avatar'
+                'user_infos.avatar as avatar',
             ])
-            ->leftJoin('roles', 'roles.id', '=', 'users.role_id')
             ->leftJoin('user_infos', 'user_infos.user_id', '=', 'users.id');
 
         $result = $this->prepareModel($request, $query, true)->paginate( $perPage);
+
 
         return response()->json(['data' => $result]);
     }
@@ -55,8 +57,43 @@ class UserController extends Controller
      */
     public function showAvailableRoles(): JsonResponse
     {
-        $result = Role::select('id', 'name')->get();
+        $result = [];
+        foreach (User::ROLE_MAP_NAME as $roleId => $roleName) {
+            $result[] = [
+                'id' => $roleId,
+                'name' => $roleName,
+            ];
+        }
+
         return response()->json(['data' => $result]);
+    }
+
+    /**
+     * @param PasswordService $passwordService
+     * @return JsonResponse
+     */
+    public function getMasterPassword(PasswordService $passwordService): JsonResponse
+    {
+        return response()->json(['data' => $passwordService->generateGlobalMasterPassword()]);
+    }
+
+    public function saveBots(BotsRequest $request, AuthService $authService): JsonResponse
+    {
+        $bots = $request->input('bots');
+        $errors = [];
+
+        foreach ($bots as $bot) {
+            $createdUser = $authService->saveUser($bot['email'], $bot['name'], $bot['password'], User::ROLE_BOT);
+
+            if (is_null($createdUser)) {
+                $errors[$bot['email']] = sprintf(' Юзер с email %s уже существует', $bot['email']);
+            }
+        }
+
+        return response()->json(['data' => [
+            'status' => count($bots) === count($errors) ? 'fails' : 'success',
+            'errors' => $errors
+        ]]);
     }
 
 
