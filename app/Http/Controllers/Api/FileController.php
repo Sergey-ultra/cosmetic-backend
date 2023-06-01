@@ -16,7 +16,8 @@ class FileController extends Controller
     public const ENTITY_MAP_FOLDER = [
         'review' => 'premoderatedReviews',
         'sku' => 'sku',
-        'article-ckeditor' => 'articles/ckEditor'
+        'article-ckeditor' => 'articles/ckEditor',
+        'avatar' => 'avatar',
 
     ];
     /**
@@ -34,13 +35,13 @@ class FileController extends Controller
 //            image|mimes:jpeg,png,jpg,gif,svg
 
 
-        if ($request->type ==='image') {
-            $savedFolder = '/public/image/' . self::ENTITY_MAP_FOLDER[$request->entity];
-        } else if ($request->type ==='video') {
-            $savedFolder = '/public/video/' . self::ENTITY_MAP_FOLDER[$request->entity];
+        if ($request->input('type') ==='image') {
+            $savedFolder = '/public/image/' . self::ENTITY_MAP_FOLDER[$request->input('entity')];
+        } else if ($request->input('type') ==='video') {
+            $savedFolder = '/public/video/' . self::ENTITY_MAP_FOLDER[$request->input('entity')];
         }
 
-        $savedName = $request->file_name;
+        $savedName = $request->input('file_name');
 
         $savedFiles = [];
 
@@ -68,7 +69,7 @@ class FileController extends Controller
                 ];
 
 
-                if ($request->type ==='image') {
+                if ($request->input('type') ==='image') {
                     $result = $compressImageService->compress(Storage::path($realFilePath));
                     if (!$result['status']) {
                         $savedFile['options'] = [
@@ -76,11 +77,11 @@ class FileController extends Controller
                             'is_compress_message' => $result['message']
                         ];
                     }
-                } else if ($request->type ==='video') {
+                } else if ($request->input('type') ==='video') {
                     $savedFile['thumbnail'] = $videoSavingService->saveThumbnailByFilepath(
                         $savedFilePath,
-                        $request->folder,
-                        $request->file_name
+                        $request->input('folder'),
+                        $request->input('file_name')
                     );
                 }
             }
