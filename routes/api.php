@@ -148,10 +148,10 @@ Route::get('/skus/viewed', [SkuController::class, 'viewed']);
 
 Route::get('/reviews/last', [ReviewController::class, 'last']);
 Route::get('/reviews/by-sku-id/{id}', [ReviewController::class, 'bySkuId']);
-Route::get('/reviews/{id}', [ReviewController::class, 'show']);
+Route::get('/reviews/{id}', [ReviewController::class, 'show'])->where(['id' => '[0-9]+']);
 Route::get('/reviews/additional-info-by-sku-id/{id}', [ReviewController::class, 'additionalInfoBySkuId']);
 
-Route::post('/likes/{id}', [LikeController::class, 'createOrUpdate']);
+Route::post('/likes/{id}', [LikeController::class, 'createOrUpdate'])->where(['id' => '[0-9]+']);
 
 Route::get('/comments', [CommentController::class, 'byReviewId']);
 
@@ -187,7 +187,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 
     Route::get('/comments/my', [CommentController::class, 'my']);
     Route::post('/comments', [CommentController::class, 'store']);
-    Route::delete('/comments/{id}', [CommentController::class, 'destroy']);
+    Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->where(['id' => '[0-9]+']);
 
     Route::get('/videos/my', [SkuVideoController::class, 'my']);
 
@@ -196,16 +196,16 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/review/check-existing-review', [ReviewController::class, 'checkExistingReview']);
     Route::post('/reviews', [ReviewController::class, 'updateOrCreate']);
     Route::post('/reviews/add-video', [SkuVideoController::class, 'addOrUpdateVideoWithBase64Data']);
-    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
+    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->where(['id' => '[0-9]+']);
 
     Route::get('/questions/my', [QuestionController::class, 'my']);
     Route::post('/questions', [QuestionController::class, 'store']);
-    Route::delete('/questions/{id}', [QuestionController::class, 'destroy']);
+    Route::delete('/questions/{id}', [QuestionController::class, 'destroy'])->where(['id' => '[0-9]+']);
 
     Route::get('/favorites', [FavoritesController::class, 'index']);
     Route::get('/show-favorite-skus', [FavoritesController::class, 'showFavoriteSkus']);
     Route::post('/favorites', [FavoritesController::class, 'store']);
-    Route::delete('/favorites/{id}', [FavoritesController::class, 'destroy']);
+    Route::delete('/favorites/{id}', [FavoritesController::class, 'destroy'])->where(['id' => '[0-9]+']);
 
     Route::get('/me', [UserController::class, 'me']);
     Route::post('/users/me', [UserController::class, 'updateMe']);
@@ -277,7 +277,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/files', [FileController::class, 'storeAsForm']);
 
         Route::get('/articles/categories', [AdminArticleController::class, 'articleCategories']);
-        Route::post('/articles/publish/{id}', [AdminArticleController::class, 'publish']);
+        Route::post('/articles/publish/{id}', [AdminArticleController::class, 'publish'])->where(['id' => '[0-9]+']);
         Route::post('/articles/withdraw-from-publication/{id}', [AdminArticleController::class, 'withdrawFromPublication']);
         Route::apiResource('/articles', AdminArticleController::class);
         Route::get('/tags/tree', [AdminTagController::class, 'tree']);
@@ -298,23 +298,23 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 
         Route::get('/suppliers', [SupplierController::class, 'index']);
-        Route::post('/suppliers/set-status/{id}', [SupplierController::class, 'setStatus']);
+        Route::post('/suppliers/set-status/{id}', [SupplierController::class, 'setStatus'])->where(['id' => '[0-9]+']);
 
-        Route::post('/reviews/set-status/{id}', [AdminReviewController::class, 'setStatus']);
+        Route::post('/reviews/set-status/{id}', [AdminReviewController::class, 'setStatus'])->where(['id' => '[0-9]+']);
         Route::get('/reviews/dynamics', [AdminReviewController::class, 'dynamics']);
         Route::apiResource('/reviews', AdminReviewController::class);
 
-        Route::post('/questions/set-status/{id}', [AdminQuestionController::class, 'setStatus']);
+        Route::post('/questions/set-status/{id}', [AdminQuestionController::class, 'setStatus'])->where(['id' => '[0-9]+']);
         Route::get('/questions', [AdminQuestionController::class, 'index']);
 
-        Route::post('/videos/set-status/{id}', [AdminSkuVideoController::class, 'setStatus']);
+        Route::post('/videos/set-status/{id}', [AdminSkuVideoController::class, 'setStatus'])->where(['id' => '[0-9]+']);
         Route::get('/videos', [AdminSkuVideoController::class, 'index']);
 
 
-        Route::post('/comments/set-status/{id}', [AdminCommentController::class, 'setStatus']);
+        Route::post('/comments/set-status/{id}', [AdminCommentController::class, 'setStatus'])->where(['id' => '[0-9]+']);
         Route::apiResource('/comments', AdminCommentController::class);
 
-        Route::post('/article-comments/set-status/{id}', [AdminArticleCommentController::class, 'setStatus']);
+        Route::post('/article-comments/set-status/{id}', [AdminArticleCommentController::class, 'setStatus'])->where(['id' => '[0-9]+']);
         Route::apiResource('/article-comments', AdminArticleCommentController::class);
 
         Route::get('/users/show-available-roles', [AdminUserController::class, 'showAvailableRoles']);
