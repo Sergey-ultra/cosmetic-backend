@@ -56,34 +56,35 @@ class RatingController extends Controller
         $visitorIp = request()->ip();
 
 
+        $params['ip_address'] = $visitorIp;
+
         if (isset($user)) {
             $existingRating = SkuRating::query()->where(['sku_id' => $skuId, 'user_id' => $user->id])->first();
+            $params['user_id'] = $user->id;
+            $params['user_name'] = $user->name;
         }
+
         if (!isset($existingRating)) {
             $existingRating = SkuRating::query()->where(['sku_id' => $skuId, 'ip_address' => $visitorIp])->first();
         }
 
+
+
         $params['rating'] = $request->input('rating');
 
 
-        $skuRatingCount = SkuRating::where('sku_id', $skuId)->count();
-        $currentSku = Sku::find($skuId);
+        $skuRatingCount = SkuRating::query()->where('sku_id', $skuId)->count();
+        $currentSku = Sku::query()->find($skuId);
 
 
         if ($existingRating) {
-            if (isset($user)) {
-                $params['user_id'] = $user->id;
-                $params['user_name'] = $user->name;
-            }
-
-            $newCommonRating = ($currentSku->rating * $skuRatingCount + $request->rating - $existingRating->rating) / $skuRatingCount;
+            $newCommonRating = ($currentSku->rating * $skuRatingCount + $request->input('rating') - $existingRating->rating) / $skuRatingCount;
             $existingRating->update($params);
         } else {
             $params['sku_id'] = $skuId;
-            $params['ip_address'] = $visitorIp;
 
-            SkuRating::create($params);
-            $newCommonRating = ($currentSku->rating * $skuRatingCount + $request->rating ) / ($skuRatingCount + 1);
+            SkuRating::query()->create($params);
+            $newCommonRating = ($currentSku->rating * $skuRatingCount + $request->input('rating')) / ($skuRatingCount + 1);
         }
 
         $currentSku->rating = $newCommonRating;
