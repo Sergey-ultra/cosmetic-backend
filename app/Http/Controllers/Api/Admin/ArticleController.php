@@ -54,7 +54,7 @@ class ArticleController extends Controller
 
     public function articleCategories(): JsonResponse
     {
-        $result = ArticleCategory::select('id', 'name', 'color')->get();
+        $result = ArticleCategory::query()->select('id', 'name', 'color')->get();
         return response()->json(['data' => $result]);
     }
 
