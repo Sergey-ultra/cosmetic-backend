@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Review extends Model
 {
+    public const TABLE = 'reviews';
+
+    protected $table = self::TABLE;
+
     protected $fillable = ['sku_rating_id', 'title', 'plus', 'minus', 'comment', 'anonymously', 'images', 'status'];
 
     protected $casts = [

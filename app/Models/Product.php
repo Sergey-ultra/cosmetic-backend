@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
+    public const TABLE = 'products';
+
+    protected $table = self::TABLE;
+
     protected $fillable = [
         'category_id',
         'brand_id',

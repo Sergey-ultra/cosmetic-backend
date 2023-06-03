@@ -9,10 +9,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
 use App\Http\Resources\Admin\ReviewCollection;
 use App\Http\Resources\Admin\ReviewOneResource;
+use App\Models\Product;
 use App\Models\Review;
 use App\Models\Sku;
 use App\Models\SkuRating;
+use App\Models\User;
 use App\Services\ImageSavingService\ImageSavingService;
+use App\Services\ReviewService\IReview;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,37 +28,15 @@ class ReviewController extends Controller
     const IMAGES_FOLDER = 'public/image/premoderatedReviews/';
 
     /**
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \App\Http\Resources\Admin\ReviewCollection
+     * @param  IReview $reviewService
+     * @param  Request $request
+     * @return ReviewCollection
      */
-    public function index(Request $request): ReviewCollection
+    public function index(IReview $reviewService, Request $request): ReviewCollection
     {
         $perPage = (int)  ($request->per_page ?? 10);
 
-        $query = DB::table('reviews')
-            ->select([
-            'reviews.id AS review_id',
-            'sku_ratings.rating',
-            'sku_ratings.id AS sku_rating_id',
-            'sku_ratings.user_name AS user',
-            'sku_ratings.status AS rating_status',
-            'skus.id AS sku_id',
-            'products.name',
-            'products.code',
-            'reviews.comment',
-            'reviews.minus',
-            'reviews.plus',
-            'reviews.anonymously',
-            'reviews.images',
-            'reviews.status AS review_status'
-        ])
-            ->rightJoin('sku_ratings', 'reviews.sku_rating_id', '=', 'sku_ratings.id')
-            ->join('skus', 'sku_ratings.sku_id', '=', 'skus.id')
-            ->join('products', 'skus.product_id', '=', 'products.id')
-            ->whereNotNull('sku_ratings.user_id')
-        ;
-
+        $query = $reviewService->getAdminReviewListQuery();
 
         $result = $this->prepareModel($request, $query, true)->paginate($perPage);
 

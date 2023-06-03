@@ -13,6 +13,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Sku extends Model
 {
+    public const TABLE = 'skus';
+
+    protected $table = self::TABLE;
+
     protected $fillable = ['product_id', 'images', 'volume', 'rating', 'reviews_count'];
 
     protected $casts = [

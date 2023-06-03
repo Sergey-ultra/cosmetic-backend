@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class SkuRating extends Model
 {
+    public const TABLE = 'sku_ratings';
+
+    protected $table = self::TABLE;
+
     protected $fillable = ['rating', 'user_id', 'ip_address', 'user_name', 'sku_id', 'status'];
 
     public function user(): BelongsTo
