@@ -8,27 +8,36 @@ use App\Models\Like;
 use App\Models\Sku;
 use App\Models\SkuRating;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\UserInfo;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 class ReviewService implements IReview
 {
+    /** @var EloquentBuilder|Builder */
+    protected EloquentBuilder|Builder $query;
+
     /**
-     * @return \Illuminate\Database\Query\Builder
+     * @return EloquentBuilder|Builder
      */
-    public function getAdminReviewListQuery(): \Illuminate\Database\Query\Builder
+    public function getQuery(): EloquentBuilder|Builder
     {
-        return DB::table(Review::TABLE)
+        return $this->query;
+    }
+
+    /**
+     * @return Builder
+     */
+    public function getAdminReviewListQuery(): Builder
+    {
+        $this->query = DB::table(Review::TABLE)
             ->select([
                 'reviews.id AS review_id',
                 'sku_ratings.rating',
                 'sku_ratings.id AS sku_rating_id',
-                'users.name AS user',
                 'sku_ratings.status AS rating_status',
-                'skus.id AS sku_id',
-                'products.name',
-                'products.code',
                 'reviews.body',
                 'reviews.minus',
                 'reviews.plus',
@@ -41,125 +50,72 @@ class ReviewService implements IReview
                 sprintf('%s.sku_rating_id', Review::TABLE),
                 '=',
                 sprintf('%s.id', SkuRating::TABLE)
-            )
-            ->leftJoin(
-                User::TABLE,
-                sprintf('%s.id', User::TABLE),
-                '=',
-                sprintf('%s.user_id', SkuRating::TABLE),
-            )
-            ->join(
-                Sku::TABLE,
-                sprintf('%s.sku_id', SkuRating::TABLE),
-                '=',
-                sprintf('%s.id', Sku::TABLE)
-            )
-            ->join(
-                Product::TABLE,
-                sprintf('%s.product_id', Sku::TABLE),
-                '=',
-                sprintf('%s.id', Product::TABLE)
-            )
-            ->whereNotNull(sprintf('%s.user_id', SkuRating::TABLE));
-    }
-
-    /**
-     * @return Builder
-     */
-    public function getReviewWithProductInfoQuery(): Builder
-    {
-        $viewsCountSubQuery = DB::table('review_views')
-            ->select([DB::raw('count(ip_address) as view_count'), 'review_id'])
-            ->groupBy('review_id');
-
-        return SkuRating::query()->select([
-            'sku_ratings.id AS sku_rating_id',
-            'sku_ratings.rating',
-            'products.name AS sku_name',
-            'products.code AS product_code',
-            'skus.id AS sku_id',
-            'skus.volume',
-            'skus.images AS sku_images',
-            'reviews.id AS review_id',
-            'reviews.body',
-            'reviews.plus',
-            'reviews.minus',
-            'reviews.anonymously',
-            'reviews.images AS review_images',
-            'reviews.status',
-            'sku_ratings.created_at',
-            'users.name AS user_name',
-            'user_infos.avatar',
-            'views.view_count'
-        ])
-            ->leftJoinSub($viewsCountSubQuery, 'views', function ($join) {
-                $join->on('reviews.id', '=', 'views.review_id');
-            })
-            ->join('skus', 'skus.id', '=', 'sku_ratings.sku_id')
-            ->join('products', 'skus.product_id', '=', 'products.id')
-            ->join('users', 'users.id', '=', 'sku_ratings.user_id')
-            ->leftjoin('user_infos', 'users.id', '=', 'user_infos.user_id');
-    }
-
-    /**
-     * @return Builder
-     */
-    public function getReviewWithCommentCountQuery(): Builder
-    {
-        $commentCountSubQuery = DB::table('comments')
-            ->selectRaw('count(review_id) as comments_count, review_id')
-            ->where('status', 'published')
-            ->groupBy('review_id');
+            );
 
         return $this
-            ->getReviewQuery()
-            ->addSelect(DB::raw('IF(comments.comments_count IS NULL, 0, comments.comments_count) AS comments_count'))
-            ->leftJoinSub($commentCountSubQuery, 'comments', function ($join) {
-                $join->on('reviews.id', '=', 'comments.review_id');
-            });
+            ->addUserQuery()
+            ->addProductInfoQuery()
+            ->addUserIsNotNullCondition()
+            ->getQuery();
     }
 
     /**
-     * @return Builder
+     * @return EloquentBuilder
      */
-    public function getReviewQuery(): Builder
+    public function getReviewWithProductInfoQuery(): EloquentBuilder
     {
-        return Review::query()
+        $this->query = SkuRating::query()
             ->select([
-                'reviews.id as id',
+                'sku_ratings.id AS sku_rating_id',
                 'sku_ratings.rating',
-                'reviews.title',
+                'sku_ratings.created_at',
+                'reviews.id AS review_id',
                 'reviews.body',
                 'reviews.plus',
                 'reviews.minus',
-                'reviews.images',
-                'reviews.created_at AS created_at',
                 'reviews.anonymously',
-                'users.name AS user_name',
-                'user_infos.avatar'
+                'reviews.images AS review_images',
+                'reviews.status',
             ])
-            ->join('sku_ratings', 'sku_ratings.id', '=', 'reviews.sku_rating_id')
-            ->join('users', 'users.id', '=', 'sku_ratings.user_id')
-            ->leftjoin('user_infos', 'users.id', '=', 'user_infos.user_id');
+            ->join('reviews', function($join) {
+                $join->on('reviews.sku_rating_id', '=', 'sku_ratings.id')
+                    ->where('reviews.status', '!=', 'deleted');
+            });
+
+        return $this
+            ->addViewsCountSubQuery()
+            ->addProductInfoQuery()
+            ->addUserQuery()
+            ->addUserAdditionalInfoQuery()
+            ->getQuery();
     }
 
     /**
-     * @param int $id
-     * @return Builder|Model|null
+     * @return EloquentBuilder
      */
-    public function getSingleReview(int $id): Builder|Model|null
+    public function getReviewWithCommentCountQuery(): EloquentBuilder
     {
-        $viewsCountSubQuery = DB::table('review_views')
-            ->select([DB::raw('count(ip_address) as count'), 'review_id'])
-            ->groupBy('review_id');
-
-
         return $this
             ->getReviewQuery()
-            ->addSelect([
-                DB::raw('IF(views.count IS NOT NULL, views.count, 0) AS views_count'),
-               // DB::raw('IF(likes.count IS NOT NULL, likes.count, 0) AS likes'),
-            ])
+            ->addCommentCountSubQuery()
+            ->getQuery();
+    }
+
+
+
+    /**
+     * @param int $id
+     * @return EloquentBuilder|Model|null
+     */
+    public function getSingleReview(int $id): EloquentBuilder|Model|null
+    {
+        $this
+            ->getReviewQuery()
+            ->addProductInfoQuery()
+            ->addViewsCountSubQuery()
+            ->addUserReviewCountSubQuery();
+
+        return $this->query
             ->withCount('likes')
             ->with(['comments' => function ($query) {
                 $query
@@ -177,10 +133,198 @@ class ReviewService implements IReview
                     ->where('comments.status', 'published')
                     ->orderBy('created_at', 'DESC');
             }])
-            ->leftJoinSub($viewsCountSubQuery, 'views', function ($join) {
-                $join->on('reviews.id', '=', 'views.review_id');
-            })
             ->where('reviews.id', $id)
             ->first();
+    }
+
+    /**
+     * @return $this
+     */
+    protected function getReviewQuery(): self
+    {
+        $this->query = Review::query()
+            ->select([
+                'reviews.id as id',
+                'sku_ratings.rating',
+                'reviews.title',
+                'reviews.body',
+                'reviews.plus',
+                'reviews.minus',
+                'reviews.images',
+                'reviews.created_at AS created_at',
+                'reviews.anonymously'
+            ])
+            ->join('sku_ratings', 'sku_ratings.id', '=', 'reviews.sku_rating_id');
+
+        $this
+            ->addUserQuery()
+            ->addUserAdditionalInfoQuery();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function addUserQuery(): self
+    {
+        $this->query
+            ->addSelect(sprintf('%s.name AS user_name', User::TABLE))
+            ->join(
+                User::TABLE,
+                sprintf('%s.id', User::TABLE),
+                '=',
+                sprintf('%s.user_id', SkuRating::TABLE),
+            );
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function addUserAdditionalInfoQuery(): self
+    {
+        $this->query
+            ->addSelect(sprintf('%s.avatar', UserInfo::TABLE))
+            ->leftJoin(
+                UserInfo::TABLE,
+                sprintf('%s.id', User::TABLE),
+                '=',
+                sprintf('%s.user_id', UserInfo::TABLE)
+            );
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function addProductInfoQuery(): self
+    {
+        $this->query
+            ->addSelect(
+                'skus.id AS sku_id',
+                'products.name AS sku_name',
+                'products.code AS product_code',
+                'skus.volume',
+                'skus.images AS sku_images',
+            )
+            ->join(
+                Sku::TABLE,
+                sprintf('%s.sku_id', SkuRating::TABLE),
+                '=',
+                sprintf('%s.id', Sku::TABLE)
+            )
+            ->join(
+                Product::TABLE,
+                sprintf('%s.product_id', Sku::TABLE),
+                '=',
+                sprintf('%s.id', Product::TABLE)
+            );
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function addCommentCountSubQuery(): self
+    {
+        $commentCountSubQuery = DB::table('comments')
+            ->selectRaw('count(review_id) as comments_count, review_id')
+            ->where('status', 'published')
+            ->groupBy('review_id');
+
+        $this->query
+            ->addSelect(DB::raw('IF(comments.comments_count IS NULL, 0, comments.comments_count) AS comments_count'))
+            ->leftJoinSub($commentCountSubQuery, 'comments', function ($join) {
+                $join->on('reviews.id', '=', 'comments.review_id');
+            });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function addViewsCountSubQuery(): self
+    {
+        $viewsCountSubQuery = DB::table('review_views')
+            ->select([
+                DB::raw('count(ip_address) as count'),
+                'review_id',
+            ])
+            ->groupBy('review_id');
+
+        $this->query
+            ->addSelect(DB::raw('IF(views.count IS NOT NULL, views.count, 0) AS views_count'))
+            ->leftJoinSub($viewsCountSubQuery, 'views', function ($join) {
+                $join->on(sprintf('%s.id', Review::TABLE), '=', 'views.review_id');
+            });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function addUserReviewCountSubQuery(): self
+    {
+        $userReviewCountSubQuery = DB::table(Review::TABLE)
+            ->join(
+                SkuRating::TABLE,
+                sprintf('%s.sku_rating_id', Review::TABLE),
+                '=',
+                sprintf('%s.id', SkuRating::TABLE)
+            )
+            ->select([
+                DB::raw('count(sku_rating_id) as count'),
+                'user_id',
+            ])
+            ->groupBy(sprintf('%s.user_id', SkuRating::TABLE));
+
+        $this->query
+            ->addSelect(DB::raw('IF(user_review_count.count IS NOT NULL, user_review_count.count, 0) AS user_review_count'))
+            ->leftJoinSub($userReviewCountSubQuery, 'user_review_count', function ($join) {
+            $join->on(sprintf('%s.id', User::TABLE), '=', 'user_review_count.user_id');
+        });
+
+        return $this;
+    }
+
+    protected function addIsRecommendPercentQuery(): self
+    {
+//        $isRecommendPercentQuery = DB::table(SkuRating::TABLE)
+//            ->select([
+//                DB::raw('count(sku_rating_id) as count'),
+//                'sku_id',
+//            ])
+//            ->join(
+//                Review::TABLE,
+//                sprintf('%s.id', SkuRating::TABLE),
+//                '=',
+//                sprintf('%s.sku_rating_id', Review::TABLE)
+//            )
+//            ->groupBy(sprintf('%s.sku_id', SkuRating::TABLE));
+//
+//        $this->query
+//            ->addSelect(DB::raw('IF(user_review_count.count IS NOT NULL, user_review_count.count, 0) AS user_review_count'))
+//            ->leftJoinSub($isRecommendPercentQuery, 'user_review_count', function ($join) {
+//                $join->on(sprintf('%s.id', User::TABLE), '=', 'user_review_count.user_id');
+//            });
+//
+//        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function addUserIsNotNullCondition(): self
+    {
+        $this->query
+            ->whereNotNull(sprintf('%s.user_id', SkuRating::TABLE));
+
+        return $this;
     }
 }

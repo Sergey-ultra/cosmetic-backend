@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Supplier\LoginRequest;
 use App\Http\Requests\Supplier\RegisterRequest;
 use App\Models\User;
+use App\Models\UserInfo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -66,8 +67,8 @@ class AuthController extends Controller
             'token' => $token,
             'message' => 'Пользователь успешно авторизирован',
             'avatar' => isset($user->info)
-                ? ($user->info->avatar ?? '/storage/icons/user_avatar.png')
-                : '/storage/icons/user_avatar.png',
+                ? $user->info->avatar ??  UserInfo::DEFAULT_AVATAR
+                :  UserInfo::DEFAULT_AVATAR,
             'role' => $user->role(),
         ]);
     }

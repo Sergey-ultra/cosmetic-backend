@@ -4,6 +4,7 @@
 namespace App\Http\Resources;
 
 
+use App\Models\UserInfo;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MyVideoResource extends JsonResource
@@ -28,8 +29,7 @@ class MyVideoResource extends JsonResource
             'status' => $this->status,
             'created_at' => $this->created_at ? $this->created_at->toDateString() : null,
             'user_name' => $this->user_name,
-            'user_avatar' => $this->avatar ?? '/storage/icons/user_avatar.png'
-
+            'user_avatar' => $this->avatar ?? UserInfo::DEFAULT_AVATAR,
         ];
     }
 }

@@ -40,10 +40,6 @@ class ReviewController extends Controller
         $perPage = (int)($request->per_page ?? 10);
         $query = $reviewService
             ->getReviewWithProductInfoQuery()
-            ->leftJoin('reviews', function($join) {
-                $join->on('reviews.sku_rating_id', '=', 'sku_ratings.id')
-                    ->where('reviews.status', '!=', 'deleted');
-            })
             ->where([
             'sku_ratings.user_id' => Auth::guard('api')->id(),
             'sku_ratings.status' => 'published'
@@ -60,11 +56,8 @@ class ReviewController extends Controller
      */
     public function last(IReview $reviewService): MyReviewsCollection
     {
-        $result = $reviewService->getReviewWithProductInfoQuery()
-            ->join('reviews', function($join) {
-                $join->on('reviews.sku_rating_id', '=', 'sku_ratings.id')
-                    ->where('reviews.status', '!=', 'deleted');
-            })
+        $result = $reviewService
+            ->getReviewWithProductInfoQuery()
             ->orderBy('sku_ratings.created_at', 'DESC')
             ->limit(self::LAST_LIMIT)
             ->get();
@@ -212,6 +205,7 @@ class ReviewController extends Controller
                 'reviews.images',
                 'reviews.status',
                 'reviews.anonymously',
+                'reviews.is_recommend',
             ])
             ->rightJoin('sku_ratings', function ($join) {
                 $join->on('reviews.sku_rating_id', '=', 'sku_ratings.id')
@@ -262,10 +256,11 @@ class ReviewController extends Controller
                 'status' => 'moderated',
                 'title' => $request->input('title'),
                 'body' => mb_convert_encoding($request->input('body'), "UTF-8", "auto"),
-                'plus' => $request->plus,
-                'minus' => $request->minus,
-                'images' => $request->images,
-                'anonymously' => $request->anonymously ?? 0
+                'plus' => $request->input('plus'),
+                'minus' => $request->input('minus'),
+                'images' => $request->input('images'),
+                'anonymously' => $request->input('anonymously') ?? 0,
+                'is_recommend' => $request->input('is_recommend') ?? 0,
             ]
         );
 

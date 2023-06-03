@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 
+use App\Models\UserInfo;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MyReviewsResource extends JsonResource
@@ -40,7 +41,7 @@ class MyReviewsResource extends JsonResource
                     : $this->user_name,
             'user_avatar' =>
                 isset($this->review_id)
-                    ? ($this->anonymously === 0 ? $this->avatar : '/storage/icons/user_avatar.png')
+                    ? $this->anonymously === 0 ? $this->avatar : UserInfo::DEFAULT_AVATAR
                     : $this->avatar
         ];
     }

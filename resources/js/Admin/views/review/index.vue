@@ -119,7 +119,7 @@
                 {title: 'Юзер', value: 'user', width: '5%', filter: {type: 'input'}},
                 {title: 'Рейтинг', value: 'rating', width: '5%', filter: {type:'select'}},
                 {title: 'Статус оценки', value: 'rating_status', width: '5%'},
-                {title: 'Коммент', value: 'comment', width: '15%', filter: {type:'input'}},
+                {title: 'Отзыв', value: 'body', width: '15%', filter: {type:'input'}},
                 {title: 'Плюс', value: 'plus', width: '15%', filter: {type: 'input'}},
                 {title: 'Минус', value: 'minus', width: '12%', filter: {type: 'input'}},
                 {title: 'Анонимно', value: 'anonymously', width: '5%', filter: { type:'checkbox'}},

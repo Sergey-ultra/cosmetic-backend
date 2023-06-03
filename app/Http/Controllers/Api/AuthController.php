@@ -9,6 +9,7 @@ use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use App\Models\UserInfo;
 use App\Services\AuthService;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -105,8 +106,8 @@ class AuthController extends Controller
             'token' => $user->getBearerToken(),
             'role' => $user->role(),
             'avatar' => isset($user->info)
-                ? ($user->info->avatar ?? '/storage/icons/user_avatar.png')
-                : '/storage/icons/user_avatar.png'
+                ? $user->info->avatar ?? UserInfo::DEFAULT_AVATAR
+                : UserInfo::DEFAULT_AVATAR
         ]);
     }
 

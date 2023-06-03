@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 
+use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
@@ -35,8 +36,8 @@ class ReviewResource extends JsonResource
                 ? $this->user_name
                 : 'Имя скрыто',
             'user_avatar' => $this->anonymously === 0
-                ? $this->avatar ?? '/storage/icons/user_avatar.png'
-                : '/storage/icons/user_avatar.png',
+                ? $this->avatar ??  UserInfo::DEFAULT_AVATAR
+                :  UserInfo::DEFAULT_AVATAR,
         ];
     }
 }

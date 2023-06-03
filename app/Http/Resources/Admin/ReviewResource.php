@@ -20,8 +20,8 @@ class ReviewResource extends JsonResource
         return [
             'sku_rating_id' => $this->sku_rating_id,
             'rating_status' => $this->rating_status,
-            'product_name' => $this->name,
-            'product_link' => "/product/{$this->code}-{$this->sku_id}",
+            'product_name' => $this->sku_name,
+            'product_link' => "/product/{$this->product_code}-{$this->sku_id}",
             'rating' => $this->rating,
             'user' => $this->user,
             'review_id' => $this->review_id,

@@ -7,6 +7,7 @@ use App\Http\Requests\AvatarRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\Country;
 use App\Models\SkuRating;
+use App\Models\UserInfo;
 use App\Services\ImageSavingService\ImageSavingService;
 use App\Services\UserLocationService\UserLocationService;
 use Illuminate\Http\JsonResponse;
@@ -25,7 +26,7 @@ class UserController extends Controller
             'email' => $user->email,
             'role' => $user->role(),
             'name' => $user->name,
-            'avatar' => $info->avatar ?? '/storage/icons/user_avatar.png'
+            'avatar' => $info->avatar ??  UserInfo::DEFAULT_AVATAR,
         ];
 
         if ((bool)$request->is_expand) {
