@@ -24,6 +24,8 @@ class Text
         $name = preg_replace('#:#u', '', $name);
         //убрать знак (.)
         $name = preg_replace('#\(\.\)#u', '', $name);
+        //убрать слэш /
+        $name = preg_replace('#\/#u', '', $name);
 
 
         //return $string = iconv("utf-8", "us-ascii//TRANSLIT", $string);
