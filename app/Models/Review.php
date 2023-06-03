@@ -13,7 +13,7 @@ class Review extends Model
 
     protected $table = self::TABLE;
 
-    protected $fillable = ['sku_rating_id', 'title', 'plus', 'minus', 'comment', 'anonymously', 'images', 'status'];
+    protected $fillable = ['sku_rating_id', 'title', 'plus', 'minus', 'body', 'anonymously', 'images', 'status'];
 
     protected $casts = [
         'images' => 'array'
