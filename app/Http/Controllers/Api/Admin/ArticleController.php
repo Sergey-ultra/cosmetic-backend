@@ -9,6 +9,7 @@ use App\Http\Resources\Admin\ArticleCollection;
 use App\Http\Resources\Admin\ArticleSingleResource;
 use App\Models\Article;
 use App\Models\ArticleCategory;
+use App\Services\ArticleService\IArticle;
 use App\Services\CodeService;
 use App\Services\ImageSavingService\ImageSavingService;
 use Illuminate\Http\Request;
@@ -25,34 +26,15 @@ class ArticleController extends Controller
     const IMAGES_FOLDER = 'public/image/articles/';
 
     /**
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \App\Http\Resources\Admin\ArticleCollection
+     * @param  IArticle $articleService
+     * @param  Request $request
+     * @return ArticleCollection
      */
-    public function index(Request $request): ArticleCollection
+    public function index(IArticle $articleService, Request $request): ArticleCollection
     {
-        $perPage = (int) ($request->per_page ?? 10);
+        $perPage = (int)($request->per_page ?? 10);
 
-        $viewsCountSubQuery = DB::table('article_views')
-            ->select([DB::raw('count(ip_address) as view_count'), 'article_id'])
-            ->groupBy('article_id');
-
-        $query = DB::table('articles')
-            ->select(
-                'articles.id as id',
-                'articles.title as title',
-                'articles.preview as preview',
-                'article_categories.name AS category_name',
-                'articles.status as status',
-                'articles.created_at as created_at',
-                'users.name as user',
-                'article_views.view_count'
-            )
-            ->leftJoinSub($viewsCountSubQuery, 'article_views', function ($join) {
-                $join->on('articles.id', '=', 'article_views.article_id');
-            })
-            ->leftJoin('article_categories', 'article_categories.id', '=', 'articles.article_category_id')
-            ->join('users', 'articles.user_id', '=', 'users.id');
+        $query = $articleService->getAdminArticleList();
 
         $result = $this->prepareModel($request, $query, true)->paginate($perPage);
 
@@ -71,11 +53,12 @@ class ArticleController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return ArticleSingleResource
      */
     public function show(int $id): ArticleSingleResource
     {
-        $article = Article::select('id', 'title', 'slug', 'preview', 'body', 'article_category_id', 'status', 'image', 'user_id')
+        $article = Article::query()
+            ->select('id', 'title', 'slug', 'preview', 'body', 'article_category_id', 'status', 'image', 'user_id')
             ->where('id', $id)
             ->first();
 

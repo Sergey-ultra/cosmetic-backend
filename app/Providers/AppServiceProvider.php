@@ -4,6 +4,8 @@ namespace App\Providers;
 
 
 use App\Configuration;
+use App\Services\ArticleService\ArticleService;
+use App\Services\ArticleService\IArticle;
 use App\Services\CompressImageService\CompressImageInterface;
 use App\Services\CompressImageService\CompressImageService;
 use App\Services\ImageLoadingService\ImageLoadingInterface;
@@ -46,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(IUrlService::class, UrlService::class);
         $this->app->singleton(ImageLoadingInterface::class, ImageLoadingService::class);
         $this->app->singleton(IReview::class, ReviewService::class);
+        $this->app->singleton(IArticle::class, ArticleService::class);
 
         $this->app->bind(
             PriceCrawlerService::class,
