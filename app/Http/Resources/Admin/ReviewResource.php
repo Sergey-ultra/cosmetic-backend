@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-
 namespace App\Http\Resources\Admin;
 
-
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class ReviewResource extends JsonResource
 {
@@ -26,11 +25,20 @@ class ReviewResource extends JsonResource
             'rating' => $this->rating,
             'user' => $this->user,
             'review_id' => $this->review_id,
-            'comment' => $this->comment ? substr(mb_convert_encoding($this->comment, "UTF-8", "UTF-8"), 0, 100): null,
-            'minus' => $this->minus ? substr($this->minus, 0, 100): null,
-            'plus' =>  $this->plus ? substr($this->plus, 0, 100): null,
+            'comment' => $this->comment
+                ? Str::substr($this->comment, 0, 100)
+                : null
+            ,
+            'minus' => $this->minus
+                ? Str::substr($this->minus, 0, 100)
+                : null,
+            'plus' =>  $this->plus
+                ? Str::substr($this->plus, 0, 100)
+                : null,
             'anonymously' => $this->anonymously ?? null,
-            'images' => $this->images ? json_decode($this->images, true):  [],
+            'images' => $this->images
+                ? json_decode($this->images, true)
+                :  [],
             'review_status' => $this->review_status,
         ];
     }
