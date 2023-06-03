@@ -34,7 +34,7 @@ class ReviewController extends Controller
      */
     public function index(IReview $reviewService, Request $request): ReviewCollection
     {
-        $perPage = (int)  ($request->per_page ?? 10);
+        $perPage = (int)($request->per_page ?? 10);
 
         $query = $reviewService->getAdminReviewListQuery();
 

@@ -28,7 +28,7 @@ class MyReviewsResource extends JsonResource
             'volume' => $this->volume,
             'sku_image' => $this->sku_images ? json_decode($this->sku_images, true)[0] : [],
             'review_id' => $this->review_id,
-            'comment' => $this->comment,
+            'comment' => $this->body,
             'plus' => $this->plus,
             'minus' => $this->minus,
             'images' => $this->review_images ? json_decode($this->review_images,true) : [],

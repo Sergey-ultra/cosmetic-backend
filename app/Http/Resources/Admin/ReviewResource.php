@@ -25,8 +25,8 @@ class ReviewResource extends JsonResource
             'rating' => $this->rating,
             'user' => $this->user,
             'review_id' => $this->review_id,
-            'comment' => $this->comment
-                ? Str::substr($this->comment, 0, 100)
+            'body' => $this->body
+                ? Str::substr($this->body, 0, 100)
                 : null
             ,
             'minus' => $this->minus

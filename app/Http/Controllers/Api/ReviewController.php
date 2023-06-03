@@ -201,16 +201,18 @@ class ReviewController extends Controller
         }
         //$conditions[] = ['reviews.status', '<>', 'deleted'];
 
-        $existingReview = Review::select([
-            'sku_ratings.rating',
-            'reviews.id',
-            'reviews.comment',
-            'reviews.plus',
-            'reviews.minus',
-            'reviews.images',
-            'reviews.status',
-            'reviews.anonymously',
-        ])
+        $existingReview = Review::query()
+            ->select([
+                'sku_ratings.rating',
+                'reviews.id',
+                'reviews.title',
+                'reviews.body',
+                'reviews.plus',
+                'reviews.minus',
+                'reviews.images',
+                'reviews.status',
+                'reviews.anonymously',
+            ])
             ->rightJoin('sku_ratings', function ($join) {
                 $join->on('reviews.sku_rating_id', '=', 'sku_ratings.id')
                     ->where('reviews.status', '!=', 'deleted');
@@ -259,7 +261,7 @@ class ReviewController extends Controller
             [
                 'status' => 'moderated',
                 'title' => $request->input('title'),
-                'comment' => mb_convert_encoding($request->comment, "UTF-8", "auto"),
+                'body' => mb_convert_encoding($request->input('body'), "UTF-8", "auto"),
                 'plus' => $request->plus,
                 'minus' => $request->minus,
                 'images' => $request->images,
@@ -278,7 +280,6 @@ class ReviewController extends Controller
                 'data' => $review,
             ]
         ]);
-
     }
 
     /**

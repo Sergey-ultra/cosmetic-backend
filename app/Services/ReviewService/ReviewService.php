@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\DB;
 
 class ReviewService implements IReview
 {
+    /**
+     * @return \Illuminate\Database\Query\Builder
+     */
     public function getAdminReviewListQuery(): \Illuminate\Database\Query\Builder
     {
         return DB::table(Review::TABLE)
@@ -26,7 +29,7 @@ class ReviewService implements IReview
                 'skus.id AS sku_id',
                 'products.name',
                 'products.code',
-                'reviews.comment',
+                'reviews.body',
                 'reviews.minus',
                 'reviews.plus',
                 'reviews.anonymously',
@@ -60,6 +63,9 @@ class ReviewService implements IReview
             ->whereNotNull(sprintf('%s.user_id', SkuRating::TABLE));
     }
 
+    /**
+     * @return Builder
+     */
     public function getReviewWithProductInfoQuery(): Builder
     {
         $viewsCountSubQuery = DB::table('review_views')
@@ -75,7 +81,7 @@ class ReviewService implements IReview
             'skus.volume',
             'skus.images AS sku_images',
             'reviews.id AS review_id',
-            'reviews.comment',
+            'reviews.body',
             'reviews.plus',
             'reviews.minus',
             'reviews.anonymously',
@@ -95,6 +101,9 @@ class ReviewService implements IReview
             ->leftjoin('user_infos', 'users.id', '=', 'user_infos.user_id');
     }
 
+    /**
+     * @return Builder
+     */
     public function getReviewWithCommentCountQuery(): Builder
     {
         $commentCountSubQuery = DB::table('comments')
@@ -110,6 +119,9 @@ class ReviewService implements IReview
             });
     }
 
+    /**
+     * @return Builder
+     */
     public function getReviewQuery(): Builder
     {
         return Review::query()
@@ -117,7 +129,7 @@ class ReviewService implements IReview
                 'reviews.id as id',
                 'sku_ratings.rating',
                 'reviews.title',
-                'reviews.comment AS body',
+                'reviews.body',
                 'reviews.plus',
                 'reviews.minus',
                 'reviews.images',

@@ -26,7 +26,7 @@ class ReviewRequest extends JsonApiRequest
             'title' => 'string|min:5|max:256',
             'plus' => 'string|min:5',
             'minus' => 'string|min:5',
-            'comment' => 'required|string|min:5',
+            'body' => 'required|string|min:5',
             'sku_id' => 'required|numeric'
         ];
     }
