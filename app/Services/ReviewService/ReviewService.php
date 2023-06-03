@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\DB;
 
 class ReviewService implements IReview
 {
-    public function getAdminReviewListQuery(): Builder
+    public function getAdminReviewListQuery(): \Illuminate\Database\Query\Builder
     {
-        return Review::query()
+        return DB::table(Review::TABLE)
             ->select([
                 'reviews.id AS review_id',
                 'sku_ratings.rating',
