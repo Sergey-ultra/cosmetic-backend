@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class Article extends Model
 {
+    public const STATUS_MODERATED = 'moderated';
+
+    public const STATUS_PUBLISHED = 'published';
+
     protected $fillable = [
         'title',
         'slug',

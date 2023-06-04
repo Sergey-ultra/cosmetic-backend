@@ -156,7 +156,7 @@ class ArticleController extends Controller
         if (!$article) {
             return response()->json(['data' => ['status' => false]], 404);
         }
-        $article->update(['status' => 'published']);
+        $article->update(['status' => Article::STATUS_PUBLISHED]);
 
         return response()->json(['data' => ['status' => true]]);
     }
@@ -172,7 +172,7 @@ class ArticleController extends Controller
         if (!$article) {
             return response()->json(['data' => ['status' => false]], 404);
         }
-        $article->update(['status' => 'moderated']);
+        $article->update(['status' => Article::STATUS_MODERATED]);
 
         return response()->json(['data' => ['status' => true]]);
     }

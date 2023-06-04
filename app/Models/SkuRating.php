@@ -8,6 +8,19 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class SkuRating extends Model
 {
+    public const RATING_ONE = 1;
+    public const RATING_TWO = 2;
+    public const RATING_THREE = 3;
+    public const RATING_FOUR = 4;
+    public const RATING_FIVE = 5;
+
+    public const RATINGS = [
+        self::RATING_ONE,
+        self::RATING_TWO,
+        self::RATING_THREE,
+        self::RATING_FOUR,
+        self::RATING_FIVE,
+    ];
     public const TABLE = 'sku_ratings';
 
     protected $table = self::TABLE;

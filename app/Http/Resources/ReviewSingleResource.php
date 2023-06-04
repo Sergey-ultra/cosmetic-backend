@@ -20,18 +20,22 @@ class ReviewSingleResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'common_rating' => round($this->common_rating, 1),
             'rating' => $this->rating,
             'views_count' => $this->views_count,
             'likes' => $this->likes_count,
+            'recommend_reviews_percent' => $this->recommend_reviews_percent,
+            'reviews_count' => $this->reviews_count,
+            'rating_percentage' => $this->rating_percentage,
 
-            'sku_name' => $this->sku_name,
-            'product_link' => "/product/{$this->product_code}-{$this->sku_id}",
-            'volume' => $this->volume,
+            'sku_name' => "{$this->sku_name} {$this->volume}",
+            'sku_code' => "{$this->product_code}-{$this->sku_id}",
             'sku_image' => $this->sku_images ? json_decode($this->sku_images, true)[0] : [],
 
             'plus' => $this->plus,
             'minus' => $this->minus,
             'body' => $this->body,
+            'is_recommend' => $this->is_recommend,
             'images' => $this->images,
             'created_at' => $this->created_at->toDateString(),
             'user_name' => $this->anonymously === 0

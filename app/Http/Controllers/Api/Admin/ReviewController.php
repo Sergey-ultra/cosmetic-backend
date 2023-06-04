@@ -40,6 +40,7 @@ class ReviewController extends Controller
 
         $result = $this->prepareModel($request, $query, true)->paginate($perPage);
 
+
         return new ReviewCollection($result);
     }
 

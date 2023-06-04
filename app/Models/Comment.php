@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Comment extends Model
 {
+    public const STATUS_PUBLISHED = 'published';
     protected $fillable = ['comment', 'review_id', 'user_id', 'user_name', 'reply_id', 'status'];
     protected $casts = [
         'created_at'  => 'date:Y-m-d',

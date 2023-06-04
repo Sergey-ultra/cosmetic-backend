@@ -41,9 +41,9 @@ class ReviewController extends Controller
         $query = $reviewService
             ->getReviewWithProductInfoQuery()
             ->where([
-            'sku_ratings.user_id' => Auth::guard('api')->id(),
-            'sku_ratings.status' => 'published'
-        ]);
+                'sku_ratings.user_id' => Auth::guard('api')->id(),
+                'sku_ratings.status' => 'published'
+            ]);
 
         $result = $this->prepareModel($request, $query)->paginate($perPage);
 
@@ -253,7 +253,7 @@ class ReviewController extends Controller
                 'sku_rating_id' => $currentRating->id
             ],
             [
-                'status' => 'moderated',
+                'status' => Review::STATUS_MODERATED,
                 'title' => $request->input('title'),
                 'body' => mb_convert_encoding($request->input('body'), "UTF-8", "auto"),
                 'plus' => $request->input('plus'),

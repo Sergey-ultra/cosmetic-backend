@@ -23,7 +23,7 @@ class ReviewResource extends JsonResource
             'product_name' => $this->sku_name,
             'product_link' => "/product/{$this->product_code}-{$this->sku_id}",
             'rating' => $this->rating,
-            'user' => $this->user,
+            'user' => $this->user_name,
             'review_id' => $this->review_id,
             'body' => $this->body
                 ? Str::substr($this->body, 0, 100)

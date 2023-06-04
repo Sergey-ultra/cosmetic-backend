@@ -224,7 +224,7 @@ class SkuController extends Controller
                     'name' => $currentSku->product->name,
                     'code' => $currentSku->product->code,
                     'volume' => $currentSku->volume,
-                    'rating' => $currentSku->rating,
+                    'rating' => round($currentSku->rating, 1),
                     'reviews_count' => $currentSku->reviews_count,
                     'question_count' => 0,
                     'images' => $currentSku->images ?? []
