@@ -4,6 +4,7 @@
 namespace App\Http\Resources;
 
 
+use App\Models\Like;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ArticleWithTagsResource extends JsonResource
@@ -33,7 +34,11 @@ class ArticleWithTagsResource extends JsonResource
             'preview' => $this->preview,
             'image' => $this->image,
             'tags' => $tags,
-            'likes' => $this->likes_count,
+            'likes' => $this->likes->count(),
+            'is_vote' => $this->likes
+                ->contains(function (Like $like) use ($request) {
+                    return $like->ip_address = $request->ip();
+                }),
             'user_name' => $this->user_name,
             'user_avatar' => $this->user_avatar,
             'views_count' => $this->views_count,

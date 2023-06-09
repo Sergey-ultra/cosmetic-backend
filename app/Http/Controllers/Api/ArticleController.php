@@ -130,7 +130,7 @@ class ArticleController extends Controller
                             'comment',
                             DB::raw(sprintf('DATE(%s.created_at) AS created_at', ArticleComment::TABLE))
                         ])
-                        ->withCount('likes AS likes')
+                        ->with('likes')
                         ->leftJoin(
                             User::TABLE,
                             sprintf('%s.user_id', ArticleComment::TABLE),
@@ -143,7 +143,7 @@ class ArticleController extends Controller
                             '=',
                             sprintf('%s.user_id', UserInfo::TABLE)
                         )
-                        ->where(sprintf('%s.status', ArticleComment::TABLE), 'published')
+                        ->where(sprintf('%s.status', ArticleComment::TABLE), ArticleComment::STATUS_PUBLISHED)
                         ->orderBy(sprintf('%s.created_at', ArticleComment::TABLE), 'DESC');
                 }])
             ->leftJoinSub($viewsCountSubQuery, 'article_views', function ($join) {
@@ -152,7 +152,7 @@ class ArticleController extends Controller
             ->join('users', 'articles.user_id', '=', 'users.id')
             ->leftJoin('user_infos', 'users.id', '=', 'user_infos.user_id')
             ->leftJoin('article_categories', 'article_categories.id', '=', 'articles.article_category_id')
-            ->where(['articles.slug' => $slug, 'articles.status' => 'published'])
+            ->where(['articles.slug' => $slug, 'articles.status' => Article::STATUS_PUBLISHED])
             ->first();
 
 

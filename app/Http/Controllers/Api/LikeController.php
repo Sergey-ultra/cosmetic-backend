@@ -38,11 +38,11 @@ class LikeController extends Controller
             $conditions['ip_address'] = $request->ip();
             Like::query()->create($conditions);
             ++$existingCount;
-            $isVote = 'success';
+            $isVote = true;
         } else {
             $existingLikeByIp->delete();
             --$existingCount;
-            $isVote = 'false';
+            $isVote = false;
         }
 
         return response()->json([

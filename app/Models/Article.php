@@ -123,8 +123,7 @@ class Article extends Model
             'article_categories.name AS category_name',
             'article_categories.color AS category_color',
         )
-            ->with('tags')
-            ->withCount('likes')
+            ->with(['tags', 'likes'])
             ->join('users', 'articles.user_id', '=', 'users.id')
             ->leftJoin('user_infos', 'users.id', '=', 'user_infos.user_id')
             ->leftJoin('article_categories', 'article_categories.id', '=', 'articles.article_category_id')

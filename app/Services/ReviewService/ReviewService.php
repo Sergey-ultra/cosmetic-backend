@@ -2,6 +2,7 @@
 
 namespace App\Services\ReviewService;
 
+use App\Models\ArticleComment;
 use App\Models\Comment;
 use App\Models\Product;
 use App\Models\Review;
@@ -121,21 +122,32 @@ class ReviewService implements IReview
             ->addUserReviewCountSubQuery();
 
         $result = $this->query
-            ->withCount('likes')
+            ->with('likes')
             ->with(['comments' => function ($query) {
                 $query
-                    ->select(
+                    ->select([
                         'comments.id',
-                        'comments.user_name',
+                        sprintf('%s.name AS user_name', User::TABLE),
                         'comments.reply_id',
                         'comments.review_id',
                         'comments.comment',
-                        DB::raw('DATE(comments.created_at) AS created_at'),
-                        'user_infos.avatar as user_avatar'
+                        DB::raw(sprintf('DATE(%s.created_at) AS created_at', Comment::TABLE)),
+                        sprintf('%s.avatar as user_avatar', UserInfo::TABLE),
+                    ])
+                    ->with('likes')
+                    ->leftJoin(
+                        User::TABLE,
+                        sprintf('%s.user_id', Comment::TABLE),
+                        '=',
+                        sprintf('%s.id', User::TABLE)
                     )
-                    ->withCount('likes AS likes')
-                    ->leftjoin('user_infos', 'comments.user_id', '=', 'user_infos.user_id')
-                    ->where('comments.status', Comment::STATUS_PUBLISHED)
+                    ->leftjoin(
+                        UserInfo::TABLE,
+                        sprintf('%s.user_id', Comment::TABLE),
+                        '=',
+                        sprintf('%s.user_id', UserInfo::TABLE)
+                    )
+                    ->where(sprintf('%s.status', Comment::TABLE), Comment::STATUS_PUBLISHED)
                     ->orderBy('created_at', 'DESC');
             }])
             ->where('reviews.id', $id)
