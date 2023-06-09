@@ -16,8 +16,7 @@ class CreateLikesTable extends Migration
         Schema::create('likes', function (Blueprint $table) {
             $table->id();
             $table->morphs('likeable');
-            $table->string('plus_ip_address');
-            $table->string('minus_ip_address');
+            $table->string('ip_address');
             $table->timestamps();
         });
     }

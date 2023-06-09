@@ -10,5 +10,5 @@ class Like extends Model
 
     protected $table = self::TABLE;
 
-    protected $fillable = ['likeable_id', 'likeable_type', 'plus_ip_address', 'minus_ip_address'];
+    protected $fillable = ['likeable_id', 'likeable_type', 'ip_address'];
 }

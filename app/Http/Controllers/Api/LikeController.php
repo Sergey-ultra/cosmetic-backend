@@ -17,14 +17,6 @@ class LikeController extends Controller
 {
     public function createOrUpdate(Request $request, int $id): JsonResponse
     {
-        $status = 'false';
-
-        $conditions = [
-            'likeable_id' => $id,
-            'plus_ip_address' => $request->ip()
-        ];
-
-
         $entity = match ($request->input('entity')) {
             'review' => Review::class,
             'article' => Article::class,
@@ -32,16 +24,32 @@ class LikeController extends Controller
             'article_comment' => ArticleComment::class,
         };
 
+        $conditions = [
+            'likeable_type' => $entity,
+            'likeable_id' => $id,
+        ];
 
-        $conditions = array_merge($conditions, ['likeable_type' => $entity]);
+        $existingLikesCollection = Like::query()->where($conditions)->get();
+        $existingCount = $existingLikesCollection->count();
 
-        $existingLike = Like::query()->where($conditions)->first();
+        $existingLikeByIp = $existingLikesCollection->where( 'ip_address', $request->ip())->first();
 
-        if (! $existingLike) {
+        if (! $existingLikeByIp) {
+            $conditions['ip_address'] = $request->ip();
             Like::query()->create($conditions);
-            $status = 'success';
+            ++$existingCount;
+            $isVote = 'success';
+        } else {
+            $existingLikeByIp->delete();
+            --$existingCount;
+            $isVote = 'false';
         }
 
-        return response()->json(['data' => ['status' => $status]]);
+        return response()->json([
+            'data' => [
+                'is_vote' => $isVote,
+                'count' => $existingCount,
+            ]
+        ]);
     }
 }
