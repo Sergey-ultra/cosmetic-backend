@@ -40,7 +40,7 @@ class CommentController extends Controller
                 sprintf('%s.status', Comment::TABLE),
                 sprintf('%s.created_at', Comment::TABLE),
                 sprintf('%s.review_id', Comment::TABLE),
-                DB::raw(sprintf('CONCAT(%s.name-%s.id) AS product_link', Product::TABLE, Sku::TABLE)),
+                DB::raw(sprintf("CONCAT(%s.name,'-',%s.id) AS product_link", Product::TABLE, Sku::TABLE)),
                 sprintf('%s.volume', Sku::TABLE),
                 sprintf('%s.name AS user_name', User::TABLE),
             ])
