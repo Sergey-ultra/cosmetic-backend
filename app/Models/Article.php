@@ -11,9 +11,11 @@ use Illuminate\Support\Facades\DB;
 
 class Article extends Model
 {
+    public const TABLE = 'articles';
     public const STATUS_MODERATED = 'moderated';
-
     public const STATUS_PUBLISHED = 'published';
+
+    protected $table = self::TABLE;
 
     protected $fillable = [
         'title',

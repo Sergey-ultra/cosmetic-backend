@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
 use App\Models\Comment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -26,7 +27,22 @@ class CommentController extends Controller
     {
         $perPage = (int)  ($request->per_page ?? 10);
 
-        $query = Comment::select('id', 'user_name', 'comment', 'review_id', 'reply_id', 'status', 'created_at');
+        $query = Comment::query()
+            ->select([
+                sprintf('%s.id', Comment::TABLE),
+                sprintf('%s.review_id', Comment::TABLE),
+                sprintf('%s.comment', Comment::TABLE),
+                sprintf('%s.reply_id', Comment::TABLE),
+                sprintf('%s.status', Comment::TABLE),
+                sprintf('%s.created_at', Comment::TABLE),
+                sprintf('%s.name AS user_name', User::TABLE),
+            ])
+            ->leftJoin(
+                User::TABLE,
+                sprintf('%s.user_id', Comment::TABLE),
+                '=',
+                sprintf('%s.id', User::TABLE)
+            );
         $result = $this->prepareModel($request, $query)->paginate($perPage);
 
         return response()->json(['data' => $result]);
