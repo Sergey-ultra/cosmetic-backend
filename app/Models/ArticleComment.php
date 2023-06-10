@@ -14,7 +14,7 @@ class ArticleComment extends Model
 
     public const STATUS_PUBLISHED = 'published';
 
-    protected $fillable = ['comment', 'article_id', 'user_id', 'user_name', 'user_avatar', 'reply_id', 'status'];
+    protected $fillable = ['comment', 'article_id', 'user_id', 'reply_id', 'status'];
 
     protected $casts = [
         'created_at'  => 'date:Y-m-d',

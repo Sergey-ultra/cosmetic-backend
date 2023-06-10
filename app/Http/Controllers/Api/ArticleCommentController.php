@@ -54,10 +54,9 @@ class ArticleCommentController extends Controller
         $params = $request->all();
         $user = Auth::user();
         $params['user_id'] = $user->id;
-        $params['user_name'] =  $user->name;
-        $params['user_avatar'] =  $user->info->avatar ?? null;
 
-        $newRecord = ArticleComment::create($params);
+
+        $newRecord = ArticleComment::query()->create($params);
 
         return response()->json([
             'data' => [

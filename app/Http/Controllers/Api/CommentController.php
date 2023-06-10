@@ -88,9 +88,9 @@ class CommentController extends Controller
         $params = $request->all();
         $user = Auth::user();
         $params['user_id'] = $user->id;
-        $params['user_name'] =  $user->name;
 
-        $newComment = Comment::create($params);
+
+        $newComment = Comment::query()->create($params);
 
         return response()->json([
             'data' => [
