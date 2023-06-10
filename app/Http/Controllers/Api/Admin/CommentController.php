@@ -16,6 +16,7 @@ use App\Models\SkuRating;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class CommentController extends Controller
 {
@@ -39,7 +40,7 @@ class CommentController extends Controller
                 sprintf('%s.status', Comment::TABLE),
                 sprintf('%s.created_at', Comment::TABLE),
                 sprintf('%s.review_id', Comment::TABLE),
-                sprintf('%s.name', Product::TABLE),
+                DB::raw(sprintf('CONCAT(%s.name-%s.id) AS product_link', Product::TABLE, Sku::TABLE)),
                 sprintf('%s.volume', Sku::TABLE),
                 sprintf('%s.name AS user_name', User::TABLE),
             ])
