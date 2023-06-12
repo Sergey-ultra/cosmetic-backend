@@ -10,6 +10,7 @@ use App\Models\Tag;
 use App\Services\TreeService\TreeInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class TagController extends Controller
 {
@@ -45,7 +46,7 @@ class TagController extends Controller
                 'status' => 'success',
                 'data' => $new
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     public function update(Request $request, Tag $tag): JsonResponse

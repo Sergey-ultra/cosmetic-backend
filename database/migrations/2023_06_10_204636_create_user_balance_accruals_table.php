@@ -9,17 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      *
-     * @return void
+     * @return void 
      */
     public function up()
     {
-        Schema::create('review_views', function (Blueprint $table) {
+        Schema::create('user_balance_accruals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('review_id');
-            $table->string('ip_address', 40);
-            $table->unsignedTinyInteger('handled')->default(0);
+            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('review_id');
+            $table->unsignedInteger('accrual');
+            $table->enum('type', ['views, bonus']);
+            $table->date('date');
             $table->timestamps();
-            $table->unique(['review_id', 'ip_address']);
         });
     }
 
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('review_views');
+        Schema::dropIfExists('user_balance_transactions');
     }
 };

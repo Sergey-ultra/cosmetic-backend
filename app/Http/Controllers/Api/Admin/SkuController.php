@@ -15,6 +15,7 @@ use App\Services\Parser\Text;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class SkuController extends Controller
@@ -142,7 +143,7 @@ class SkuController extends Controller
                 'status' => 'success',
                 'data' => $createdProduct
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     /**

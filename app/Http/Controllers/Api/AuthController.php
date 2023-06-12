@@ -105,6 +105,7 @@ class AuthController extends Controller
             'name' => $user->name,
             'token' => $user->getBearerToken(),
             'role' => $user->role(),
+            'balance' => $user->balanceNormal,
             'avatar' => isset($user->info)
                 ? $user->info->avatar ?? UserInfo::DEFAULT_AVATAR
                 : UserInfo::DEFAULT_AVATAR

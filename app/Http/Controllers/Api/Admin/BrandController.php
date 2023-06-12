@@ -13,6 +13,7 @@ use App\Services\Parser\Text;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 class BrandController extends Controller
 {
@@ -100,7 +101,7 @@ class BrandController extends Controller
                 'status'=> 'success',
                 'data' => $newBrand
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
 

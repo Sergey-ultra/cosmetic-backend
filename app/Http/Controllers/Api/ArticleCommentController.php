@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 class ArticleCommentController extends Controller
 {
@@ -63,7 +64,7 @@ class ArticleCommentController extends Controller
                 'status' => true,
                 'data' => $newRecord
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     /**

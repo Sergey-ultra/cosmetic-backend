@@ -16,7 +16,8 @@
         </template>
 
         <template v-slot:product_name="review">
-            <a :href="review.item.product_link">
+            <a :href="review.item.product_link" class="flex">
+                <img class="image" :src="review.item.sku_image">
                 <span>{{ review.item.product_name }}</span>
             </a>
         </template>
@@ -26,7 +27,7 @@
 
         <template v-slot:images="review">
             <div class="image__wrapper">
-                <img  v-for="image in review.item.images"  :key="image" class="image" :src="image" :alt="image">
+                <img v-for="image in review.item.images" :key="image" class="image" :src="image" :alt="image">
             </div>
         </template>
 
@@ -115,16 +116,16 @@
         data: () => ({
             headers: [
                 {title: 'id', value: 'sku_rating_id', width: '3%'},
-                {title: 'Имя sku', value: 'product_name', width: '15%'},
-                {title: 'Юзер', value: 'user', width: '5%', filter: {type: 'input'}},
-                {title: 'Рейтинг', value: 'rating', width: '5%', filter: {type:'select'}},
+                {title: 'Имя sku', value: 'product_name', width: '20%'},
+                {title: 'Юзер', value: 'user', width: '5%', filter: { type: 'input' }},
+                {title: 'Рейтинг', value: 'rating', width: '5%', filter: { type:'select' }},
                 {title: 'Статус оценки', value: 'rating_status', width: '5%'},
-                {title: 'Отзыв', value: 'body', width: '15%', filter: {type:'input'}},
-                {title: 'Плюс', value: 'plus', width: '15%', filter: {type: 'input'}},
-                {title: 'Минус', value: 'minus', width: '12%', filter: {type: 'input'}},
-                {title: 'Анонимно', value: 'anonymously', width: '5%', filter: { type:'checkbox'}},
+                {title: 'Название отзыва', value: 'title', width: '20%', filter: { type:'input' }},
+                {title: 'Просмотры', value: 'views_count', width: '5%'},
+                {title: 'Лайки', value: 'likes_count', width: '5%'},
+                {title: 'Анонимно', value: 'anonymously', width: '5%', filter: { type:'checkbox' }},
                 {title: 'Статус отзыва', value: 'review_status', width: '5%', filter: { type: 'select' }},
-                {title: 'Картинка', value: 'images', width: '10%', sort: false},
+                {title: 'Картинка', value: 'images', width: '17%', sort: false},
                 {title: 'Действия', value: 'action', width: '5%'}
             ],
             optionsItemsPerPage: [5, 10, 20, 50, 100],
@@ -186,4 +187,7 @@
 
 <style scoped lang="scss">
     @import './resources/css/admin/table.scss';
+    .flex {
+        display:flex;
+    }
 </style>

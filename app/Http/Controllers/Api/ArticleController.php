@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\DataProvider;
 use App\Http\Resources\ArticleCollection;
 use App\Http\Resources\ArticleSingleResource;
 use App\Http\Resources\ArticleWithTagsCollection;
+use App\Jobs\ArticleViewJob;
 use App\Models\Article;
 use App\Models\ArticleCategory;
 use App\Models\ArticleComment;
@@ -14,6 +15,7 @@ use App\Models\ArticleView;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\UserInfo;
+use App\Services\ArticleService\IArticle;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -96,72 +98,11 @@ class ArticleController extends Controller
         return new ArticleWithTagsCollection($result, ['category' => ArticleCategory::query()->find($categoryId)]);
     }
 
-    public function show(Request $request, string $slug): ArticleSingleResource
+    public function show(Request $request, string $slug, IArticle $articleService): ArticleSingleResource
     {
-        $viewsCountSubQuery = DB::table('article_views')
-            ->select([DB::raw('count(ip_address) as count'), 'article_id'])
-            ->groupBy('article_id');
+        $article = $articleService->getSingleArticleBySlug($slug);
 
-        $article = Article::query()->select(
-            'articles.id',
-            'articles.title',
-            'articles.slug',
-            'articles.preview',
-            'articles.body',
-            'articles.image',
-            'articles.created_at',
-            'users.name AS user_name',
-            'article_categories.id AS category_id',
-            'article_categories.name AS category_name',
-            'article_categories.color AS category_color',
-            'user_infos.avatar AS user_avatar',
-            DB::raw('IF(article_views.count IS NOT NULL, article_views.count, 0) AS views_count')
-        )
-            ->with([
-                'tags',
-                'comments' => function ($query) {
-                    $query
-                        ->select([
-                            sprintf('%s.id', ArticleComment::TABLE),
-                            sprintf('%s.name AS user_name', User::TABLE),
-                            sprintf('%s.avatar as user_avatar', UserInfo::TABLE),
-                            'reply_id',
-                            'article_id',
-                            'comment',
-                            DB::raw(sprintf('DATE(%s.created_at) AS created_at', ArticleComment::TABLE))
-                        ])
-                        ->with('likes')
-                        ->leftJoin(
-                            User::TABLE,
-                            sprintf('%s.user_id', ArticleComment::TABLE),
-                            '=',
-                            sprintf('%s.id', User::TABLE)
-                        )
-                        ->leftjoin(
-                            UserInfo::TABLE,
-                            sprintf('%s.user_id', ArticleComment::TABLE),
-                            '=',
-                            sprintf('%s.user_id', UserInfo::TABLE)
-                        )
-                        ->where(sprintf('%s.status', ArticleComment::TABLE), ArticleComment::STATUS_PUBLISHED)
-                        ->orderBy(sprintf('%s.created_at', ArticleComment::TABLE), 'DESC');
-                }])
-            ->leftJoinSub($viewsCountSubQuery, 'article_views', function ($join) {
-                $join->on('articles.id', '=', 'article_views.article_id');
-            })
-            ->join('users', 'articles.user_id', '=', 'users.id')
-            ->leftJoin('user_infos', 'users.id', '=', 'user_infos.user_id')
-            ->leftJoin('article_categories', 'article_categories.id', '=', 'articles.article_category_id')
-            ->where(['articles.slug' => $slug, 'articles.status' => Article::STATUS_PUBLISHED])
-            ->first();
-
-
-
-
-        ArticleView::query()->updateOrCreate([
-            'article_id' => $article->id,
-            'ip_address' => $request->ip()
-        ], []);
+        ArticleViewJob::dispatch($article->id, $request->ip());
 
         return new ArticleSingleResource($article);
     }

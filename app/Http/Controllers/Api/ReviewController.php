@@ -11,6 +11,7 @@ use App\Http\Resources\MyReviewsCollection;
 use App\Http\Resources\ReviewCollection;
 use App\Http\Resources\ReviewSingleResource;
 use App\Jobs\AdminNotificationJob;
+use App\Jobs\ReviewViewJob;
 use App\Models\Review;
 use App\Models\ReviewView;
 use App\Models\Sku;
@@ -101,11 +102,8 @@ class ReviewController extends Controller
             return response()->json([], Response::HTTP_NOT_FOUND);
         }
 
+        ReviewViewJob::dispatch($result->user_id, $result->id, $request->ip());
 
-        ReviewView::query()->updateOrCreate([
-            'review_id' => $result->id,
-            'ip_address' => $request->ip()
-        ], []);
 
         return new ReviewSingleResource($result);
     }
@@ -282,7 +280,7 @@ class ReviewController extends Controller
      *
      * @param  int  $id
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $reviewInfo = SkuRating::select(
             'reviews.id AS review_id',

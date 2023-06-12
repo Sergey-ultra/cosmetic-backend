@@ -11,6 +11,7 @@ use App\Models\Sku;
 use App\Models\SkuRating;
 use App\Models\User;
 use App\Models\UserInfo;
+use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
@@ -40,11 +41,13 @@ class ReviewService implements IReview
                 'sku_ratings.rating',
                 'sku_ratings.id AS sku_rating_id',
                 'sku_ratings.status AS rating_status',
+                'reviews.title',
                 'reviews.body',
                 'reviews.minus',
                 'reviews.plus',
                 'reviews.anonymously',
                 'reviews.images',
+                'reviews.created_at',
                 'reviews.status AS review_status'
             ])
             ->rightJoin(
@@ -55,6 +58,8 @@ class ReviewService implements IReview
             );
 
         return $this
+            ->addViewsCountSubQuery()
+            ->addLikesCountSubQuery()
             ->addUserQuery()
             ->addProductInfoQuery()
             ->addUserIsNotNullCondition()
@@ -79,7 +84,7 @@ class ReviewService implements IReview
                 'reviews.images AS review_images',
                 'reviews.status',
             ])
-            ->join(Review::TABLE, function($join) {
+            ->join(Review::TABLE, function ($join) {
                 $join->on(
                     sprintf('%s.sku_rating_id', Review::TABLE),
                     '=',
@@ -108,12 +113,42 @@ class ReviewService implements IReview
     }
 
 
-
     /**
      * @param int $id
      * @return EloquentBuilder|Model|null
      */
     public function getSingleReview(int $id): EloquentBuilder|Model|null
+    {
+        $result = $this->getSingleReviewRawModel($id);
+
+
+        $reviewsWithSameSku = SkuRating::query()
+            ->select(sprintf('%s.is_recommend', Review::TABLE))
+            ->join(
+                Review::TABLE,
+                sprintf('%s.sku_rating_id', Review::TABLE),
+                '=',
+                sprintf('%s.id', SkuRating::TABLE)
+            )
+            ->where([
+                sprintf('%s.sku_id', SkuRating::TABLE) => $result->sku_id,
+                sprintf('%s.status', Review::TABLE) => Review::STATUS_PUBLISHED,
+            ])
+            ->get();
+
+
+        $allReviews = $reviewsWithSameSku->count();
+
+        $recommendReviewsPercent = (int)round((100 * $reviewsWithSameSku->where('is_recommend', 1)->count()) / $allReviews);
+
+        $result->recommend_reviews_percent = $recommendReviewsPercent;
+        $result->reviews_count = $allReviews;
+        $result->rating_percentage = $this->getRatingsPercentageWithSameSku($result->sku_id);
+
+        return $result;
+    }
+
+    protected function getSingleReviewRawModel(int $id): Model|null
     {
         $this
             ->getReviewQuery()
@@ -121,7 +156,7 @@ class ReviewService implements IReview
             ->addViewsCountSubQuery()
             ->addUserReviewCountSubQuery();
 
-        $result = $this->query
+        return $this->query
             ->with('likes')
             ->with(['comments' => function ($query) {
                 $query
@@ -153,21 +188,14 @@ class ReviewService implements IReview
             ->where('reviews.id', $id)
             ->first();
 
+    }
 
-        $reviewsWithSameSku = SkuRating::query()
-            ->select(sprintf('%s.is_recommend', Review::TABLE))
-            ->join(
-                Review::TABLE,
-                sprintf('%s.sku_rating_id', Review::TABLE),
-                '=',
-                sprintf('%s.id', SkuRating::TABLE)
-            )
-            ->where([
-                sprintf('%s.sku_id', SkuRating::TABLE) => $result->sku_id,
-                sprintf('%s.status', Review::TABLE) => Review::STATUS_PUBLISHED,
-            ])
-            ->get();
-
+    /**
+     * @param int $skuId
+     * @return array
+     */
+    protected function getRatingsPercentageWithSameSku(int $skuId): array
+    {
         $ratingsWithSameSku = SkuRating::query()
             ->selectRaw(sprintf('count(%s.rating) AS count, %s.rating', SkuRating::TABLE, SkuRating::TABLE))
             ->leftJoin(
@@ -176,16 +204,16 @@ class ReviewService implements IReview
                 '=',
                 sprintf('%s.id', SkuRating::TABLE)
             )
-            ->where(sprintf('%s.sku_id', SkuRating::TABLE), $result->sku_id)
+            ->where(sprintf('%s.sku_id', SkuRating::TABLE), $skuId)
             ->groupBy(sprintf('%s.rating', SkuRating::TABLE))
             ->get();
 
-        $totalRatingsCount = $ratingsWithSameSku->sum( 'count');
+        $totalRatingsCount = $ratingsWithSameSku->sum('count');
         $groupedRatingsWithSameSku = $ratingsWithSameSku->keyBy('rating');
 
 
-        $ratingPercentage = array_map(
-            static function(int $item) use ($groupedRatingsWithSameSku, $totalRatingsCount) {
+        return array_map(
+            static function (int $item) use ($groupedRatingsWithSameSku, $totalRatingsCount) {
                 if ($existingRating = $groupedRatingsWithSameSku->get($item)) {
                     return [
                         'rating' => $item,
@@ -201,17 +229,6 @@ class ReviewService implements IReview
             },
             array_reverse(SkuRating::RATINGS)
         );
-
-
-        $allReviews = $reviewsWithSameSku->count();
-
-        $recommendReviewsPercent = (int)round((100 * $reviewsWithSameSku->where('is_recommend', 1)->count()) / $allReviews);
-
-        $result->recommend_reviews_percent = $recommendReviewsPercent;
-        $result->reviews_count = $allReviews;
-        $result->rating_percentage = $ratingPercentage;
-
-        return $result;
     }
 
     /**
@@ -223,6 +240,7 @@ class ReviewService implements IReview
             ->select([
                 'reviews.id as id',
                 'sku_ratings.rating',
+                'sku_ratings.user_id',
                 'reviews.title',
                 'reviews.body',
                 'reviews.plus',
@@ -350,6 +368,28 @@ class ReviewService implements IReview
         return $this;
     }
 
+    protected function addLikesCountSubQuery(): self
+    {
+        $viewsCountSubQuery = DB::table('likes')
+            ->select([
+                DB::raw('count(ip_address) as count'),
+                'likeable_id',
+                'likeable_type',
+            ])
+            ->groupBy('likeable_id', 'likeable_type');
+
+        $this->query
+            ->addSelect(DB::raw('IF(likes.count IS NOT NULL, likes.count, 0) AS likes_count'))
+            ->leftJoinSub($viewsCountSubQuery, 'likes', function ($join) {
+                $join
+                    ->on(sprintf('%s.id', Review::TABLE), '=', 'likes.likeable_id')
+                    ->where('likes.likeable_id', Review::class);
+            });
+
+        return $this;
+    }
+
+
     /**
      * @return $this
      */
@@ -371,8 +411,8 @@ class ReviewService implements IReview
         $this->query
             ->addSelect(DB::raw('IF(user_review_count.count IS NOT NULL, user_review_count.count, 0) AS user_review_count'))
             ->leftJoinSub($userReviewCountSubQuery, 'user_review_count', function ($join) {
-            $join->on(sprintf('%s.id', User::TABLE), '=', 'user_review_count.user_id');
-        });
+                $join->on(sprintf('%s.id', User::TABLE), '=', 'user_review_count.user_id');
+            });
 
         return $this;
     }

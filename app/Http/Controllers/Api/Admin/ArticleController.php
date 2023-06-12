@@ -17,6 +17,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class ArticleController extends Controller
@@ -103,7 +104,7 @@ class ArticleController extends Controller
                 'status' => true,
                 'data' => $article
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
 

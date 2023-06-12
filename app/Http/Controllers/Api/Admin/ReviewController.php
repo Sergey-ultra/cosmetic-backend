@@ -19,6 +19,7 @@ use App\Services\ReviewService\IReview;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class ReviewController extends Controller
@@ -70,7 +71,7 @@ class ReviewController extends Controller
                 'message' => 'Отзыв успешно создан',
                 'data' => $createdReview
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     /**

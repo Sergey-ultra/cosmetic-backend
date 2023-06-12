@@ -116,7 +116,7 @@ class IngredientController extends Controller
      *
      * @param  int  $id
      */
-    public function destroy($id): void
+    public function destroy(int $id): void
     {
         Ingredient::destroy($id);
     }

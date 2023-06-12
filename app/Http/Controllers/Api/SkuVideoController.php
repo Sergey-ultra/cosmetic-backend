@@ -15,6 +15,7 @@ use App\Services\VideoSavingService\VideoSavingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class SkuVideoController extends Controller
 {
@@ -90,7 +91,7 @@ class SkuVideoController extends Controller
                 'status'=> 'success',
                 'data' => $skuVideo
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     public function addOrUpdateVideoWithBase64Data(ReviewVideoWithBase64 $request, VideoSavingService $videoSavingService): JsonResponse
@@ -139,6 +140,6 @@ class SkuVideoController extends Controller
                 'status'=> 'success',
                 'data' => $skuVideo
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 }

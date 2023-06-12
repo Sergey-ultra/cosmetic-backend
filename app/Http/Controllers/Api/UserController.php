@@ -26,6 +26,7 @@ class UserController extends Controller
             'email' => $user->email,
             'role' => $user->role(),
             'name' => $user->name,
+            'balance' => $user->balanceNormal,
             'avatar' => $info->avatar ??  UserInfo::DEFAULT_AVATAR,
         ];
 

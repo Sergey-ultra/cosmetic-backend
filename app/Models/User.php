@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -48,6 +49,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'role_id',
+        'balance',
         'service',
         'service_user_id'
     ];
@@ -70,6 +72,37 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Хранится в тысячных рубля
+     * @return Attribute
+     */
+    protected function balanceNormal(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, $attributes) => (float)$attributes['balance'] / 1000
+        );
+    }
+
+    public function role(): string
+    {
+        return self::ROLE_MAP_NAME[$this->role_id];
+    }
+
+    public function hasAnyRole($roles): bool
+    {
+        if (!is_array($roles)) {
+            $roles = [$roles];
+        }
+
+        foreach ($roles as $role) {
+            if (strtolower($role) === strtolower($this->role())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public function getBearerToken(): ?string
     {
@@ -97,23 +130,4 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(UserTelegramInfo::class);
     }
 
-    public function role(): string
-    {
-        return self::ROLE_MAP_NAME[$this->role_id];
-    }
-
-    public function hasAnyRole($roles): bool
-    {
-        if (!is_array($roles)) {
-            $roles = [$roles];
-        }
-
-        foreach ($roles as $role) {
-            if (strtolower($role) === strtolower($this->role())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Services\ImageSavingService\ImageSavingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends Controller
 {
@@ -59,7 +60,7 @@ class CategoryController extends Controller
         return response()->json([
             'status'=> true,
             'message' =>'Категория успешно создана'
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     /**

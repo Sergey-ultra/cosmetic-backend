@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 class CommentController extends Controller
 {
@@ -57,14 +58,15 @@ class CommentController extends Controller
     public function my(Request $request): JsonResponse
     {
         $perPage = (int)($request->per_page ?? 10);
-        $query = Comment::select([
-            'reviews.comment as body',
-            'reviews.plus',
-            'reviews.minus',
-            'comments.comment',
-            'comments.id',
-            'comments.status',
-        ])
+        $query = Comment::query()
+            ->select([
+                'reviews.body',
+                'reviews.plus',
+                'reviews.minus',
+                'comments.comment',
+                'comments.id',
+                'comments.status',
+            ])
             ->join('reviews', 'comments.review_id', '=', 'reviews.id')
             //->join('sku_ratings', 'reviews.sku_rating_id', '=', 'sku_ratings.id')
             //->join('skus', 'sku_ratings.sku_id', '=', 'skus.id')
@@ -97,7 +99,7 @@ class CommentController extends Controller
                 'status' => true,
                 'data' => $newComment
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
 
