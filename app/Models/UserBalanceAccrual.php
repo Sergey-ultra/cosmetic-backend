@@ -10,9 +10,11 @@ class UserBalanceAccrual extends Model
 
     public const VIEW_TYPE = 'view';
     public const VIEW_BONUS = 'bonus';
+    public const VIEW_REFERRAL = 'referral';
 
     //85 тысячных рубля
     public const REVIEW_COST = 85;
+    public const REFERRAL_COST = 85;
 
     public const REVIEW_BONUS_COST = 13580;
 

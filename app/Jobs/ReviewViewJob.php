@@ -33,6 +33,7 @@ class ReviewViewJob implements ShouldQueue
             ], []);
 
             $currentDate = now()->toDate();
+            $user = User::query()->find($this->reviewUserId);
 
             $existingBalanceAccrual = UserBalanceAccrual::query()
                 ->where([
@@ -57,9 +58,38 @@ class ReviewViewJob implements ShouldQueue
             }
 
 
-            $user = User::query()->find($this->reviewUserId);
+
             $user->balance += UserBalanceAccrual::REVIEW_COST;
             $user->save();
+
+            $referralOwner = User::query()->find($user->referral_owner);
+            if ($referralOwner) {
+                $referralOwnerBalanceAccrual = UserBalanceAccrual::query()
+                    ->where([
+                        'review_id' => $this->reviewId,
+                        'user_id' => $referralOwner->id,
+                        'type' => UserBalanceAccrual::VIEW_REFERRAL,
+                        'date' => $currentDate,
+                    ])
+                    ->first();
+
+                if (!$referralOwnerBalanceAccrual) {
+                    UserBalanceAccrual::query()->create([
+                        'review_id' => $this->reviewId,
+                        'user_id' => $referralOwner->id,
+                        'type' => UserBalanceAccrual::VIEW_REFERRAL,
+                        'accrual' => UserBalanceAccrual::REFERRAL_COST,
+                        'date' => $currentDate,
+                    ]);
+                } else {
+                    $referralOwnerBalanceAccrual->accrual += UserBalanceAccrual::REFERRAL_COST;
+                    $referralOwnerBalanceAccrual->save();
+                }
+
+                $referralOwner->balance += UserBalanceAccrual::REFERRAL_COST;
+                $referralOwner->referral_balance += UserBalanceAccrual::REFERRAL_COST;
+                $referralOwner->save();
+            }
 
             DB::commit();
         } catch (\Exception $e) {

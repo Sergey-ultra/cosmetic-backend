@@ -26,10 +26,10 @@ class UserController extends Controller
             'email' => $user->email,
             'role' => $user->role(),
             'name' => $user->name,
-            'balance' => $user->balanceNormal,
+            'balance' => $user->balanceNormal ?? 0,
             'avatar' => $info->avatar ??  UserInfo::DEFAULT_AVATAR,
             'refLink' => sprintf('/ref=%s', $user->ref),
-            'refBalance' => 0,
+            'refBalance' => $user->referralBalanceNormal ?? 0,
         ];
 
         if ((bool)$request->is_expand) {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,6 +16,25 @@ use Laravel\Passport\HasApiTokens;
 use Laravel\Passport\PersonalAccessTokenResult;
 use Laravel\Sanctum\NewAccessToken;
 
+/**
+ * @property int id
+ * @property string name
+ * @property string email
+ * @property string password
+ * @property int role_id
+ * @property int balance
+ * @property int referral_balance
+ * @property string|null service
+ * @property string|null service_user_id
+ * @property string|null ref
+ * @property int|null referral_owner
+ * @property Carbon|null created_at
+ * @property Carbon|null updated_at
+ *
+ * @property-read string|null remember_token
+ * @property-read float balanceNormal
+ * @property-read float referralBalanceNormal
+ */
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -50,6 +70,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'role_id',
         'balance',
+        'referral_balance',
         'service',
         'service_user_id',
         'ref',
@@ -85,6 +106,19 @@ class User extends Authenticatable implements MustVerifyEmail
             get: fn ($value, $attributes) => (float)$attributes['balance'] / 1000
         );
     }
+
+    /**
+     * Хранится в тысячных рубля
+     * @return Attribute
+     */
+    protected function referralBalanceNormal(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, $attributes) => (float)$attributes['referral_balance'] / 1000
+        );
+    }
+
+
 
     public function role(): string
     {

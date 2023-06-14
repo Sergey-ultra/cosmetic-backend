@@ -73,15 +73,13 @@ class AuthService
     }
 
 
-    /**
-     * @param User $user
-     */
-    public function checkUserTokens(User $user)
-    {
-        if ($user->tokens()) {
-            $user->tokens()->delete();
-        }
-    }
-
-
+//    /**
+//     * @param User $user
+//     */
+//    public function checkUserTokens(User $user)
+//    {
+//        if ($user->tokens()) {
+//            $user->tokens()->delete();
+//        }
+//    }
 }
