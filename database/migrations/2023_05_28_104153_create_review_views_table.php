@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('ip_address', 40);
             $table->unsignedTinyInteger('handled')->default(0);
             $table->timestamps();
-            $table->unique(['review_id', 'ip_address']);
+            $table->unique(['review_id', 'ip_address', 'handled']);
         });
     }
 

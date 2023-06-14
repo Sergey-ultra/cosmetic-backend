@@ -6,7 +6,7 @@ namespace App\Services\Parser;
 
 class Token
 {
-    private static function crypto_rand_secure($min, $max)
+    private static function crypto_rand_secure(int $min, int $max)
     {
         $range = $max - $min;
         if ($range < 1) return $min; // not so random...
@@ -21,7 +21,7 @@ class Token
         return $min + $rnd;
     }
 
-    public static function getToken($length = 16)
+    public static function getToken(int $length = 16): string
     {
         $token = "";
         $codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -30,7 +30,7 @@ class Token
         $max = strlen($codeAlphabet); // edited
 
         for ($i=0; $i < $length; $i++) {
-            $token .= $codeAlphabet[self::crypto_rand_secure(0, $max-1)];
+            $token .= $codeAlphabet[self::crypto_rand_secure(0, $max - 1)];
         }
 
         return $token;

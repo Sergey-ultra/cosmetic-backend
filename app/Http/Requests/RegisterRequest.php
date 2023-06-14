@@ -25,7 +25,8 @@ class RegisterRequest extends JsonApiRequest
         return [
             'name' => 'required|string|min:2|max:32',
             'email' => 'required|string|email',
-            'password' => 'required|string|confirmed|min:6|max:48'
+            'password' => 'required|string|confirmed|min:6|max:48',
+            'ref' => 'string'
         ];
     }
 }

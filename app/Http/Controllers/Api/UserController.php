@@ -28,6 +28,8 @@ class UserController extends Controller
             'name' => $user->name,
             'balance' => $user->balanceNormal,
             'avatar' => $info->avatar ??  UserInfo::DEFAULT_AVATAR,
+            'refLink' => sprintf('/ref=%s', $user->ref),
+            'refBalance' => 0,
         ];
 
         if ((bool)$request->is_expand) {
@@ -35,7 +37,8 @@ class UserController extends Controller
                 $result['sex'] = $info->sex;
                 $result['birthday_year'] = $info->birthday_year;
             }
-            $reviewCount = SkuRating::join('reviews', 'reviews.sku_rating_id', '=', 'sku_ratings.id')
+            $reviewCount = SkuRating::query()
+                ->join('reviews', 'reviews.sku_rating_id', '=', 'sku_ratings.id')
                 ->where([
                     ['sku_ratings.user_id', $user->id],
                     ['reviews.status', 'published']

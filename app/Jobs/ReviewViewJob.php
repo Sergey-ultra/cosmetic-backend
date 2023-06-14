@@ -48,17 +48,17 @@ class ReviewViewJob implements ShouldQueue
                     'review_id' => $this->reviewId,
                     'user_id' => $this->reviewUserId,
                     'type' => UserBalanceAccrual::VIEW_TYPE,
-                    'accrual' => ReviewView::REVIEW_COST,
+                    'accrual' => UserBalanceAccrual::REVIEW_COST,
                     'date' => $currentDate,
                 ]);
             } else {
-                $existingBalanceAccrual->accrual += ReviewView::REVIEW_COST;
+                $existingBalanceAccrual->accrual += UserBalanceAccrual::REVIEW_COST;
                 $existingBalanceAccrual->save();
             }
 
 
             $user = User::query()->find($this->reviewUserId);
-            $user->balance += ReviewView::REVIEW_COST;
+            $user->balance += UserBalanceAccrual::REVIEW_COST;
             $user->save();
 
             DB::commit();

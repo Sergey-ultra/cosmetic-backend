@@ -51,7 +51,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'role_id',
         'balance',
         'service',
-        'service_user_id'
+        'service_user_id',
+        'ref',
+        'referral_owner',
     ];
 
     /**

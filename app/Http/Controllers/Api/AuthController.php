@@ -28,7 +28,7 @@ class AuthController extends Controller
     {
         $email = $request->input('email');
 
-        $user = $authService->saveUser($email, $request->input('name'), $request->input('password'));
+        $user = $authService->saveUser($email, $request->input('name'), $request->input('password'), User::ROLE_CLIENT, $request->input('ref'));
 
         if (is_null($user)) {
             return response()->json([

@@ -4,6 +4,7 @@ namespace App\Services;
 
 
 use App\Models\User;
+use App\Services\Parser\Token;
 use App\Services\PasswordService\PasswordService;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
@@ -39,18 +40,36 @@ class AuthService
         return Auth::user();
     }
 
-    public function saveUser(string $email, string $name, string $password, int $role = User::ROLE_CLIENT): ?User
+    /**
+     * @param string $email
+     * @param string $name
+     * @param string $password
+     * @param int $role
+     * @param string|null $ref
+     * @return User|null
+     */
+    public function saveUser(string $email, string $name, string $password, int $role = User::ROLE_CLIENT, ?string $ref = null): ?User
     {
         if (User::query()->where(['email' => $email, 'service' => NULL])->first()) {
             return null;
         }
 
-        return User::query()->create([
+        $params = [
             'name' => $name,
             'email' => $email,
             'password' => bcrypt($password),
             'role_id' => $role,
-        ]);
+        ];
+
+        if ($role === User::ROLE_CLIENT) {
+            $params['ref'] = Token::getToken(12);
+        }
+
+        if ($ref) {
+            $params['referral_owner'] = User::query()->where('ref', $ref)->first()?->id;
+        }
+
+        return User::query()->create($params);
     }
 
 

@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('service')->nullable();
             $table->string('service_user_id')->nullable();
             $table->unsignedTinyInteger('role_id');
+            $table->string('ref', 12);
+            $table->unsignedBigInteger('referral_owner');
             $table->rememberToken();
             $table->timestamps();
         });

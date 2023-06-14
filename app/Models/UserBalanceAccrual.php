@@ -9,6 +9,13 @@ class UserBalanceAccrual extends Model
     public const TABLE = 'user_balance_accruals';
 
     public const VIEW_TYPE = 'view';
+    public const VIEW_BONUS = 'bonus';
+
+    //85 тысячных рубля
+    public const REVIEW_COST = 85;
+
+    public const REVIEW_BONUS_COST = 13580;
+
 
     protected $table = self::TABLE;
 

@@ -9,11 +9,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
 use App\Http\Resources\Admin\ReviewCollection;
 use App\Http\Resources\Admin\ReviewOneResource;
-use App\Models\Product;
+use App\Jobs\ReviewPublishedJob;
 use App\Models\Review;
 use App\Models\Sku;
 use App\Models\SkuRating;
-use App\Models\User;
 use App\Services\ImageSavingService\ImageSavingService;
 use App\Services\ReviewService\IReview;
 use Illuminate\Http\JsonResponse;
@@ -139,11 +138,13 @@ class ReviewController extends Controller
      */
     public function setStatus(int $id, Request $request): JsonResponse
     {
-        $reviewInfo = SkuRating::select(
-            'reviews.id AS review_id',
-            'reviews.status AS review_status',
-            'skus.id AS sku_id'
-        )
+        $reviewInfo = SkuRating::query()
+            ->select(
+                'reviews.id AS review_id',
+                'reviews.status AS review_status',
+                'skus.id AS sku_id',
+                'sku_ratings.user_id'
+            )
             ->join('skus', 'skus.id', '=', 'sku_ratings.sku_id')
             ->leftJoin('reviews', 'sku_ratings.id', '=', 'reviews.sku_rating_id')
             ->where('sku_ratings.id', $id)
@@ -151,17 +152,19 @@ class ReviewController extends Controller
 
 
         if ($request->status === 'deleted') {
-            SkuRating::where('id', $id)->update(['status' => 'deleted']);
+            SkuRating::where('id', $id)->update(['status' => SkuRating::STATUS_DELETED]);
         } else {
-            SkuRating::where('id', $id)->update(['status' => 'published']);
+            SkuRating::where('id', $id)->update(['status' => SkuRating::STATUS_PUBLISHED]);
         }
 
         if ($reviewInfo->review_id) {
             Review::where('id', $reviewInfo->review_id)->update(['status' => $request->status]);
 
-            if ($request->status === 'published') {
+            if ($request->status === Review::STATUS_PUBLISHED) {
                 Sku::where('id', $reviewInfo->sku_id)->update(['reviews_count' => DB::raw('reviews_count + 1')]);
-            } else if ($reviewInfo->review_status === 'published' && $request->status !== 'published') {
+
+                ReviewPublishedJob::dispatch($reviewInfo->user_id, $reviewInfo->review_id);
+            } else if ($reviewInfo->review_status === Review::STATUS_PUBLISHED && $request->status !== Review::STATUS_PUBLISHED) {
                 Sku::where('id', $reviewInfo->sku_id)->update(['reviews_count' => DB::raw('reviews_count - 1')]);
             }
         }
