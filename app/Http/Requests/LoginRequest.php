@@ -24,7 +24,7 @@ class LoginRequest extends JsonApiRequest
     {
         return [
             'email' => 'required|email|string',
-            'password' => 'required|string',
+            'password' => 'required|string|min:6|max:48',
         ];
     }
 }

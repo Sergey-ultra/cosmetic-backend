@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportException;
 
 class AuthController extends Controller
@@ -88,7 +89,7 @@ class AuthController extends Controller
                 'message' => 'Необходимо подтверждение email',
                 'isRequiredEmailVerification' => true,
                 'email' => $request->email
-            ], 403);
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
         if ($request->has('asAdmin') && !$user->hasAnyRole(['admin', 'moderator'])) {

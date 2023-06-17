@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\DataProvider;
 use App\Http\Requests\Admin\BotsRequest;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserInfo;
 use App\Services\AuthService;
 use App\Services\PasswordService\PasswordService;
 use Illuminate\Http\JsonResponse;
@@ -30,7 +31,7 @@ class UserController extends Controller
         $perPage = (int) ($request->per_page ?? 10);
 
         if ($perPage === -1) {
-            $users = User::select(['id', 'name'])->get();
+            $users = User::query()->select(['id', 'name'])->get();
             return response()->json(['data' => $users]);
         }
 
@@ -41,9 +42,18 @@ class UserController extends Controller
                 'users.email as email',
                 'users.created_at as created_at',
                 'users.service as service',
+                'users.balance',
+                'users.referral_balance',
+                'users.ref',
+                'users.referral_owner',
                 'user_infos.avatar as avatar',
             ])
-            ->leftJoin('user_infos', 'user_infos.user_id', '=', 'users.id');
+            ->leftJoin(
+                UserInfo::TABLE,
+                sprintf('%s.user_id', UserInfo::TABLE),
+                '=',
+                sprintf('%s.id', User::TABLE)
+            );
 
         $result = $this->prepareModel($request, $query, true)->paginate( $perPage);
 

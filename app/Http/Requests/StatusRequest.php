@@ -26,7 +26,7 @@ class StatusRequest extends JsonApiRequest
     public function rules(): array
     {
         return [
-            'status' => 'required|in:rejected,deleted,moderated,published',
+            'status' => 'required|string|in:rejected,deleted,moderated,published',
         ];
     }
 }

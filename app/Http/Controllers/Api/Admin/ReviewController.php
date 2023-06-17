@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Requests\StatusRequest;
 use App\Http\Resources\Admin\ReviewCollection;
 use App\Http\Resources\Admin\ReviewOneResource;
 use App\Jobs\ReviewPublishedJob;
@@ -133,10 +134,10 @@ class ReviewController extends Controller
 
     /**
      * @param int $id
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param  StatusRequest $request
+     * @return JsonResponse
      */
-    public function setStatus(int $id, Request $request): JsonResponse
+    public function setStatus(int $id, StatusRequest $request): JsonResponse
     {
         $reviewInfo = SkuRating::query()
             ->select(

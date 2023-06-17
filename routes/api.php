@@ -134,6 +134,7 @@ Route::get('/brands/all', [BrandController::class, 'index']);
 
 
 Route::get('/categories/by-code/{code}', [CategoryController::class, 'byCode']);
+Route::get('/categories/all', [CategoryController::class, 'all']);
 Route::get('/categories/nested', [CategoryController::class, 'nested']);
 
 
