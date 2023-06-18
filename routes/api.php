@@ -130,7 +130,8 @@ Route::get('/price-history', [PriceHistoryController::class, 'index']);
 
 Route::get('/brands/by-code/{code}', [BrandController::class, 'byCode']);
 Route::get('/brands/popular', [BrandController::class, 'popular']);
-Route::get('/brands/all', [BrandController::class, 'index']);
+Route::get('/brands/by-letters', [BrandController::class, 'byLetters']);
+Route::get('/brands/all', [BrandController::class, 'all']);
 
 
 Route::get('/categories/by-code/{code}', [CategoryController::class, 'byCode']);

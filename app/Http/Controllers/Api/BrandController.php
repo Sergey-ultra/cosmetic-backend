@@ -5,20 +5,25 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BrandResource;
 use App\Models\Brand;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class BrandController extends Controller
 {
+    public function all(): JsonResponse
+    {
+        $brands = Brand::query()->select('id', 'name')->get();
+        return response()->json(['data' => $brands]);
+    }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function index(Request $request)
+    public function byLetters(): JsonResponse
     {
-        $brands = Brand::select(DB::raw('brands.id as id, brands.name as name, brands.code, countries.name as country'))
+        $brands = Brand::query()
+            ->select(DB::raw('brands.id as id, brands.name as name, brands.code, countries.name as country'))
             ->join('products', 'products.brand_id', '=', 'brands.id')
             ->join('skus', 'skus.product_id', '=', 'products.id')
             ->join('sku_store', 'sku_store.sku_id', '=', 'skus.id')
@@ -48,13 +53,13 @@ class BrandController extends Controller
         return response()->json(['data' => $letters]);
     }
 
-    public function byCode(string $code)
+    public function byCode(string $code): BrandResource
     {
-        return new BrandResource(Brand::where('code', $code)->first());
+        return new BrandResource(Brand::query()->where('code', $code)->first());
     }
 
 
-    public function popular()
+    public function popular(): JsonResponse
     {
         $productsWithSkusQuery = DB::table('products')
             ->selectRaw('count(products.brand_id) AS sku_count, products.brand_id')
