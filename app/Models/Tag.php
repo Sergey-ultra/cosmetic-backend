@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tag extends Model
 {
-    public const TABLE = 'article_tag';
+    public const TABLE = 'tags';
 
     protected $table = self::TABLE;
 
