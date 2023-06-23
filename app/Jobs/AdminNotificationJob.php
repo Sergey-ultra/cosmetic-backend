@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Throwable;
 
 class AdminNotificationJob implements ShouldQueue
 {
@@ -30,6 +31,10 @@ class AdminNotificationJob implements ShouldQueue
      */
     public function handle(TelegramAdminNotificationApiService $telegramBotService): void
     {
-        $telegramBotService->sendMessage(config('telegrambot.admin_user_id'), $this->message);
+        try {
+            $telegramBotService->sendMessage(config('telegrambot.admin_user_id'), $this->message);
+        } catch (Throwable $e) {
+
+        }
     }
 }
