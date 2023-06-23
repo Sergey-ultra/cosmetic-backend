@@ -37,16 +37,17 @@ class UserController extends Controller
 
         $query = User::query()
             ->select([
-                'users.id as id',
-                'users.name as name',
-                'users.email as email',
-                'users.created_at as created_at',
-                'users.service as service',
-                'users.balance',
-                'users.referral_balance',
-                'users.ref',
-                'users.referral_owner',
-                'user_infos.avatar as avatar',
+                sprintf( '%s.id', User::TABLE),
+                sprintf( '%s.name', User::TABLE),
+                sprintf( '%s.email', User::TABLE),
+                sprintf( '%s.avatar', UserInfo::TABLE),
+                sprintf( '%s.role_id', User::TABLE),
+                sprintf( '%s.service', User::TABLE),
+                sprintf( '%s.balance', User::TABLE),
+                sprintf( '%s.referral_balance', User::TABLE),
+                sprintf( '%s.ref', User::TABLE),
+                sprintf( '%s.referral_owner', User::TABLE),
+                sprintf( '%s.created_at', User::TABLE),
             ])
             ->leftJoin(
                 UserInfo::TABLE,

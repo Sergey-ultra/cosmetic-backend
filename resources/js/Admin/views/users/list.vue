@@ -18,6 +18,12 @@
             <img v-if="user.item.avatar" class="image" :src="user.item.avatar" :alt="user.item.avatar">
         </template>
 
+        <template v-slot:role_id="user">
+            <span v-if="availableRoles[user.item.role_id]">
+                {{ availableRoles.filter(el => user.item.role_id === el.id)[0].name }}
+            </span>
+        </template>
+
         <template v-slot:action="user">
             <buttonComponent
                 class="action"
@@ -88,7 +94,7 @@ export default {
                 {title: 'Имя', value: 'name', width: '20%'},
                 {title: 'E-mail', value: 'email', width: '15%'},
                 {title: 'Сервис', value: 'service', width: '15%'},
-                {title: 'Роль', value: 'role', width: '18%', filter: {type: 'select'}},
+                {title: 'Роль', value: 'role_id', width: '18%', filter: {type: 'select'}},
                 {title: 'Дата регистрации', value: 'created_at', width: '10%'},
                 {title: 'Действия', value: 'action', width: '8%'},
             ],
@@ -100,11 +106,10 @@ export default {
         }
     },
     computed: {
-        ...mapState('user', ['tableOptions', 'filterOptions', 'isLoading', 'users', 'total']),
-        ...mapGetters('user', ['availableRoleNames']),
+        ...mapState('user', ['tableOptions', 'filterOptions', 'isLoading', 'users', 'total', 'availableRoles']),
         availableOptions() {
             return {
-                role: this.availableRoleNames
+                role_id: this.availableRoles.map(el => ({ title: el.name, value: el.id })),
             }
         },
         filter: {
@@ -130,7 +135,7 @@ export default {
         if (!this.users.length) {
             this.loadUsers()
         }
-        if (!this.availableRoleNames.length) {
+        if (!this.availableRoles.length) {
             this.loadAvailableRoles()
         }
     },

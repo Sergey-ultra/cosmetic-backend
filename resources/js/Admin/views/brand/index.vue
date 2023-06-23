@@ -99,11 +99,11 @@
             selectedName: null,
         }),
         computed:{
-            ...mapState('brand', ['tableOptions', 'filterOptions', 'isLoading', 'brands', 'total', 'availableCountries']),
-            ...mapGetters('country', ['availableCountryNames']),
+            ...mapState('brand', ['tableOptions', 'filterOptions', 'isLoading', 'brands', 'total']),
+            ...mapState('country', ['allCountries']),
             availableOptions() {
                 return {
-                    country: this.availableCountryNames
+                    country: this.allCountries.map(el => ({ title: el.name, value: el.name})),
                 }
             },
             filter: {
@@ -130,7 +130,7 @@
                 this.loadBrands()
             }
 
-            if (!this.availableCountryNames.length) {
+            if (!this.allCountries.length) {
                 this.loadAllCountries()
             }
         },

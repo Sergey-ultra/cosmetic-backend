@@ -113,11 +113,10 @@
             }
         },
         computed:{
-            ...mapState('article', ['tableOptions', 'filterOptions', 'isLoading', 'articlesWithPagination', 'total']),
-            ...mapGetters('article', ['availableArticleCategoryNames']),
+            ...mapState('article', ['tableOptions', 'filterOptions', 'isLoading', 'articlesWithPagination', 'total', 'articleCategories']),
             availableOptions() {
                 return {
-                    category_name: this.availableArticleCategoryNames
+                    category_name: this.articleCategories.map(el => ({ title: el.name, value: el.name})),
                 }
             },
             filter: {
@@ -143,7 +142,7 @@
             if (!this.articlesWithPagination.length) {
                 this.loadArticlesWithPagination();
             }
-            if (!this.availableArticleCategoryNames.length) {
+            if (!this.articleCategories.length) {
                 this.loadArticleCategories();
             }
         },

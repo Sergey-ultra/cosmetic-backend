@@ -32,11 +32,10 @@ class UserController extends Controller
             'refBalance' => $user->referralBalanceNormal ?? 0,
         ];
 
-        if ((bool)$request->is_expand) {
-            if (isset($info)) {
-                $result['sex'] = $info->sex;
-                $result['birthday_year'] = $info->birthday_year;
-            }
+        if ((bool)$request->input('is_expand')) {
+            $result['sex'] = $info?->sex;
+            $result['birthday_year'] = $info?->birthday_year;
+
             $reviewCount = SkuRating::query()
                 ->join('reviews', 'reviews.sku_rating_id', '=', 'sku_ratings.id')
                 ->where([

@@ -98,10 +98,9 @@
         },
         computed: {
             ...mapState('ingredient', ['tableOptions', 'filterOptions', 'availableActiveIngredientsGroups', 'isLoading', 'ingredients', 'total']),
-            ...mapGetters('ingredient', ['availableActiveIngredientsGroupNames']),
             availableOptions() {
                 return {
-                    active_ingredients_group_name: this.availableActiveIngredientsGroupNames
+                    active_ingredients_group_name: this.availableActiveIngredientsGroups.map(el => ({ title: el.name, value: el.value })),
                 }
             },
             filter: {

@@ -127,7 +127,7 @@ export default {
         ...mapState('video', ['tableOptions', 'filterOptions', 'isLoadingVideos', 'videos', 'total']),
         availableOptions() {
             return {
-                status: ['moderated', 'published', 'rejected', 'deleted']
+                status: ['moderated', 'published', 'rejected', 'deleted'].map(el => ({ title: el, value: el })),
             }
         },
         filter: {

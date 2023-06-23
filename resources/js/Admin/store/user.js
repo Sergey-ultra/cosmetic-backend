@@ -11,21 +11,22 @@ export default {
         loadedUser:{},
         tableOptions: {
             page: 1,
-            perPage: 10,
+            perPage: 50,
             sortBy:'',
             sortDesc: false
         },
         filterOptions: {
-            role: { value: 'null'}
+            role_id: { value: 'null'}
         },
         availableRoles: [],
         masterPassword: '',
         savingBotsStatus: '',
     },
     getters: {
-        availableRoleNames: state => state.availableRoles.map(el => el.name)
+        availableRoleNames: state => state.availableRoles.map(el => el.name),
+        availableRoleIds: state => state.availableRoles.map(el => el.id),
     },
-    mutations:{
+    mutations: {
         setIsLoading: (state, data) => state.isLoading = data,
         setUsers: (state, payload) => {
             state.users = [...payload.data]
@@ -36,14 +37,14 @@ export default {
             state.filterOptions = {...payload}
             state.tableOptions = {
                 page: 1,
-                perPage: 10,
+                perPage: 50,
                 sortBy: '',
                 sortDesc: false
             }
         },
         setTableOptionsToDefault: state => state.tableOptions = {
             page: 1,
-            perPage: 10,
+            perPage: 50,
             sortBy:'',
             sortDesc: false
         },

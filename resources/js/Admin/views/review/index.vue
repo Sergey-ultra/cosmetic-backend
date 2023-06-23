@@ -137,8 +137,8 @@
             ...mapState('review', ['tableOptions', 'filterOptions', 'isLoading', 'reviews', 'total']),
             availableOptions() {
                 return {
-                    review_status: ['moderated', 'published', 'rejected', 'deleted'],
-                    rating : [1, 2, 3, 4, 5]
+                    review_status: ['moderated', 'published', 'rejected', 'deleted'].map(el => ({ title: el, value: el })),
+                    rating : [1, 2, 3, 4, 5].map(el => ({ title: el, value: el })),
                 }
             },
             filter: {
@@ -150,7 +150,7 @@
                     this.loadReviews()
                 }
             },
-            options:{
+            options: {
                 get() {
                     return this.tableOptions
                 },

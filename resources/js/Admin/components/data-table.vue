@@ -80,9 +80,10 @@
                             <option value="null">Выберите</option>
                             <option
                                     v-for="option in availableOptions[header.value]"
-                                    :key="option"
+                                    :key="option.title"
+                                    :value="option.value"
                             >
-                                {{ option }}
+                                {{ option.title }}
                             </option>
                         </select>
                     </th>
