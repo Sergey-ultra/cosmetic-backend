@@ -19,8 +19,8 @@
         </template>
 
         <template v-slot:role_id="user">
-            <span v-if="availableRoles[user.item.role_id]">
-                {{ availableRoles.filter(el => user.item.role_id === el.id)[0].name }}
+            <span>
+                {{ availableRoles.filter(el => user.item.role_id === el.id)[0]?.name }}
             </span>
         </template>
 

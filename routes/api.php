@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ClientMessagesController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\FavoritesController;
 use App\Http\Controllers\Api\FilterController;
@@ -104,6 +105,10 @@ Route::post('/supplier/signin', [App\Http\Controllers\Api\Supplier\AuthControlle
 Route::post('/supplier/signup', [App\Http\Controllers\Api\Supplier\AuthController::class, 'register']);
 Route::post('/supplier/logout', [SupplierAuthController::class, 'logout'])->middleware(['auth:api', 'role:supplier']);
 
+
+
+Route::get('/client-messages', [ClientMessagesController::class, 'index']);
+Route::post('/client-messages', [ClientMessagesController::class, 'store']);
 
 
 Route::post('/add-to-tracking', [TrackingController::class, 'addToTracking']);
