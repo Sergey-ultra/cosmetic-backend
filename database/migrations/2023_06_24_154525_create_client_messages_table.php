@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('author');
             $table->text('message');
+            $table->string('status')->default('moderated');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('client_message');
+        Schema::dropIfExists('client_messages');
     }
 };

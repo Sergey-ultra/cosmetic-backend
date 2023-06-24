@@ -10,5 +10,5 @@ class ClientMessage extends Model
 
     protected $table = self::TABLE;
 
-    protected $fillable = ['author', 'message'];
+    protected $fillable = ['author', 'message', 'status'];
 }
