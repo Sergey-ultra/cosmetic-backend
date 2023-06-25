@@ -7,8 +7,14 @@ namespace App\Services\SkuService;
 
 
 
+use App\Models\Brand;
+use App\Models\Product;
+use App\Services\Parser\Text;
+use App\Services\Parser\Utils;
 use App\Services\TransformImagePathService\TransformImagePathService;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 
 class SkuService implements SkuInterface
@@ -152,8 +158,6 @@ class SkuService implements SkuInterface
     }
 
 
-
-
     public function sort(?string $sort): self
     {
         switch($sort) {
@@ -195,6 +199,33 @@ class SkuService implements SkuInterface
         $paginator->setPath(url()->current());
         $paginator->appends(['per_page' => $perPage]);
         return $paginator;
+    }
+
+    public function createNewSku(array $params): Product
+    {
+        try {
+            DB::beginTransaction();
+            $newProduct = Product::query()->create([
+                'category_id' => $params['category_id'],
+                'brand_id' => $params['brand_id'],
+                'name' => $params['name'],
+                'name_en' => Utils::makeEnglishProductName($params['name'], $params['brandName']),
+                'description' => $params['description'],
+                'code' => Text::makeProductCode($params['brandName'], $params['name']),
+            ]);
+
+            $newProduct->skus()->create([
+                "volume" => $params['volume'],
+                "product_id" => $newProduct->id,
+                'rating' => 5,
+                "images" => $params['images'],
+            ]);
+            DB::commit();
+            return $newProduct;
+        } catch (Throwable $e) {
+            DB::rollback();
+            throw $e;
+        }
     }
 
 }

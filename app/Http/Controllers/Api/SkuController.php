@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SkuRequest;
 use App\Http\Resources\ComparedSkuResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Brand;
@@ -14,6 +15,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 
 class SkuController extends Controller
@@ -25,7 +28,7 @@ class SkuController extends Controller
      *
      * @params \Illuminate\Http\Request $request
      * @params \App\Services\SkuService $skuService
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function mainIndex(Request $request, SkuService $skuService): JsonResponse
     {
@@ -308,5 +311,27 @@ class SkuController extends Controller
             ->get();
 
         return ComparedSkuResource::collection($skus);
+    }
+
+    public function store(SkuRequest $request, SkuService $skuService): JsonResponse
+    {
+        $params = $request->all();
+        $brand = Brand::query()->find($params['brand_id']);
+        $params['brandName'] = $brand->name;
+        try {
+            $newProduct = $skuService->createNewSku($params);
+            return response()->json(['data' => $newProduct]);
+        } catch(Throwable $e) {
+            $message = $e->getMessage();
+            if (23000 === (int)$e->getCode()) {
+                $message = sprintf(
+                    'Товарное предложение с именем %s и брендом %s уже существует',
+                    $params['name'],
+                    $params['brandName']
+                );
+            }
+            $response['error'] = ['message' => $message];
+            return response()->json($response,Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

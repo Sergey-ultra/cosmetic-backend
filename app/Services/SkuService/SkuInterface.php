@@ -4,6 +4,8 @@
 namespace App\Services\SkuService;
 
 
+use App\Models\Product;
+
 interface SkuInterface
 {
     public function setAllSkus(array $array): void;
@@ -17,4 +19,6 @@ interface SkuInterface
     public function sort(string $sort): self;
 
     public function paginate(int $page, int $perPage);
+
+    public function createNewSku(array $params): Product;
 }

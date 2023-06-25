@@ -12,7 +12,7 @@ class ClientMessagesController extends Controller
 {
     public function index(): JsonResponse
     {
-        $result = ClientMessage::query()->get();
+        $result = ClientMessage::query()->where('status', ClientMessage::STATUS_PUBLISHED)->get();
 
         return response()->json(['data' => $result]);
     }

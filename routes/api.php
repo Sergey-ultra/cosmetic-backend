@@ -147,11 +147,12 @@ Route::get('/categories/nested', [CategoryController::class, 'nested']);
 Route::get('/show-compared-skus', [SkuController::class, 'showComparedSkus']);
 Route::get('/skus/by-sku-id/{skuId}', [SkuController::class, 'bySkuId']);
 Route::get('/skus/main', [SkuController::class, 'mainIndex']);
+Route::get('/skus/viewed', [SkuController::class, 'viewed']);
 
 
 Route::get('/suggest', [SearchController::class, 'index']);
 
-Route::get('/skus/viewed', [SkuController::class, 'viewed']);
+
 
 Route::get('/reviews/last', [ReviewController::class, 'last']);
 Route::get('/reviews/by-sku-id/{id}', [ReviewController::class, 'bySkuId']);
@@ -182,7 +183,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/notification/telegram/account/unsubscribe', [TelegramController::class, 'unsubscribe']);
 
 
-
+    Route::post('/skus', [SkuController::class, 'store']);
 
     Route::get('/articles/my', [ArticleController::class, 'my']);
     Route::get('/articles/categories', [ArticleController::class, 'articleCategories']);
