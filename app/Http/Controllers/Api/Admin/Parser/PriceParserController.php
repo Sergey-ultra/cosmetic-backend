@@ -22,7 +22,8 @@ class PriceParserController extends Controller
 
     public function parsePricesByLinkIds(ParsingLinkIdsRequest $request, PriceCrawlerService $priceParser): JsonResponse
     {
-        $links = ParsingLink::select('parsing_links.link', 'price_options.options')
+        $links = ParsingLink::query()
+            ->select('parsing_links.link', 'price_options.options')
             ->join('price_options', 'price_options.store_id', '=','parsing_links.store_id')
             ->whereIn('parsing_links.id', $request->ids)
             ->get()

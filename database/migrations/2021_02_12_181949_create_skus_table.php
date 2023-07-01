@@ -21,6 +21,7 @@ class CreateSkusTable extends Migration
             $table->float('rating')->default(0);
             $table->unsignedInteger('reviews_count')->default(0);
             $table->enum('status', ['moderated', 'published', 'deleted', 'rejected'])->default('published');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

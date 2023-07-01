@@ -8,15 +8,18 @@ use App\Http\Requests\SkuRequest;
 use App\Http\Resources\ComparedSkuResource;
 use App\Http\Resources\ProductResource;
 use App\Jobs\AdminNotificationJob;
+use App\Jobs\SearchLogJob;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Sku;
+use App\Models\UserMessage;
 use App\Repositories\SkuRepository\DTO\SkuDTO;
 use App\Repositories\SkuRepository\SkuRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -36,6 +39,7 @@ class SkuController extends Controller
     {
         $categoryCode = $request->input('category_code');
         $brandCode = $request->input('brand_code');
+        $search = $request->input('search');
 
 
         $result = [];
@@ -60,7 +64,8 @@ class SkuController extends Controller
             $result["brand"] = $brand;
             $mode = 'brand';
             $entityId = $brand->id;
-        } else {
+        } else if ($search) {
+            SearchLogJob::dispatch($search);
             $mode ='search';
         }
 
@@ -217,6 +222,7 @@ class SkuController extends Controller
     public function store(SkuRequest $request, SkuRepository $skuService): JsonResponse
     {
         $brand = Brand::query()->find($request->input('brand_id'));
+
         $skuDto = new SkuDTO(
             $request->input('category_id'),
             $request->input('brand_id'),
@@ -227,10 +233,20 @@ class SkuController extends Controller
             $request->input('images'),
         );
 
-
         try {
             $newSku = $skuService->createNewSku($skuDto);
-            $message = sprintf('Добавлен новый sku c именем %s', $newSku['sku_id']);
+
+            UserMessage::query()->create([
+                'message' => sprintf(
+                    'Объект %s был создан по Вашей заявке. Если Вы еще не написали отзыв по нему, то можете воспользоваться ссылкой: <a href="/product/%s">добавить свой отзыв на "%s"</a>. ',
+                    $newSku['name'],
+                    $newSku['sku_code'],
+                    $newSku['name'],
+                ),
+                'to_user' => Auth::guard('api')->user()->id,
+            ]);
+
+            $message = sprintf('Добавлен новый sku c именем %s', $newSku['name']);
             AdminNotificationJob::dispatch($message);
 
             return response()->json(['data' => $newSku], Response::HTTP_CREATED);

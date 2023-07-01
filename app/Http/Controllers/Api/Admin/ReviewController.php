@@ -61,7 +61,7 @@ class ReviewController extends Controller
         $params['images'] = null;
         if ($request->has('images')) {
             $fileName = 'review_' . $params['id'];
-            $params['images'] = $imageSavingService->imageSave($request->images, self::IMAGES_FOLDER, $fileName);
+            $params['images'] = $imageSavingService->saveImages($request->images, self::IMAGES_FOLDER, $fileName);
         }
 
         $createdReview = Review::create($params);
@@ -104,7 +104,7 @@ class ReviewController extends Controller
 
             $fileName = 'review_' . $params['id'];
 
-            $params['images'] = $imageSavingService->imageSave($request->images, self::IMAGES_FOLDER, $fileName);
+            $params['images'] = $imageSavingService->saveImages($request->images, self::IMAGES_FOLDER, $fileName);
         }
 
 
@@ -119,8 +119,7 @@ class ReviewController extends Controller
     }
 
     /**
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function dynamics(): JsonResponse
     {

@@ -27,6 +27,12 @@
             </div>
         </template>
 
+        <template v-slot:name="product">
+          <router-link :to="`/product/${product.item.url}`">
+              {{ product.item.name }}
+          </router-link>
+        </template>
+
         <template v-slot:is_ingredients_exist="product">
             {{ product.item.is_ingredients_exist === 1 ? 'Да' : 'Нет' }}
         </template>
@@ -179,8 +185,5 @@
 
 <style scoped lang="scss">
     @import './resources/css/admin/table.scss';
-    a {
-        color:#fff;
-        text-decoration: none;
-    }
+
 </style>

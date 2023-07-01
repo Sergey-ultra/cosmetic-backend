@@ -3,10 +3,7 @@
 
 namespace App\Http\Requests;
 
-
-use Illuminate\Foundation\Http\FormRequest;
-
-class ParsingLinkIdsRequest extends FormRequest
+class ParsingLinkIdsRequest extends JsonApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.

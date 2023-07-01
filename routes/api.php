@@ -216,6 +216,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::delete('/favorites/{id}', [FavoritesController::class, 'destroy'])->where(['id' => '[0-9]+']);
 
     Route::get('/me', [UserController::class, 'me']);
+    Route::get('/my-messages', [UserController::class, 'myMessages']);
     Route::post('/users/me', [UserController::class, 'updateMe']);
     Route::post('/users/me/avatar', [UserController::class, 'updateAvatar']);
 

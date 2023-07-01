@@ -12,6 +12,7 @@ use App\Services\Parser\Text;
 use App\Services\Parser\Utils;
 use App\Services\TransformImagePathService\TransformImagePathService;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -100,21 +101,21 @@ class SkuRepository implements ISkuRepository
             ;
 
 
-            $productQuery = $productQuery
+            $productQuery
                 ->joinSub($activeIngredientsQuery,'ingredients', function($join) {
                     $join->on('products.id', '=', 'ingredients.product_id');
                 });
         }
 
-        $productQuery = $productQuery->whereNotNull('sku_store.price');
+        $productQuery->whereNotNull('sku_store.price');
 
 
         if ($this->mode === 'category') {
-            $productQuery = $productQuery->where('products.category_id', $this->entityId);
+            $productQuery->where('products.category_id', $this->entityId);
         } else if ($this->mode === 'brand') {
-            $productQuery = $productQuery->where('products.brand_id', $this->entityId);
+            $productQuery->where('products.brand_id', $this->entityId);
         } else if ($this->mode === 'search' && $search) {
-            $productQuery = $productQuery->where('products.name', 'LIKE', "%$search%");
+            $productQuery->where('products.name', 'LIKE', "%$search%");
 //            $productQuery = $productQuery->whereRaw(
 //                "MATCH(products.name, products.name_en, products.description, products.application) AGAINST(?)",
 //                [$search]
@@ -123,22 +124,22 @@ class SkuRepository implements ISkuRepository
 
 
         if ($brandIds) {
-            $productQuery = $productQuery->whereIn('products.brand_id', $brandIds);
+            $productQuery->whereIn('products.brand_id', $brandIds);
         }
         if ($countryIds) {
-            $productQuery = $productQuery->whereIn('brands.country_id', $countryIds);
+            $productQuery->whereIn('brands.country_id', $countryIds);
         }
         if ($categoryIds) {
-            $productQuery = $productQuery->whereIn('products.category_id', $categoryIds);
+            $productQuery->whereIn('products.category_id', $categoryIds);
         }
         if ($volumes) {
-            $productQuery = $productQuery->whereIn('skus.volume', $volumes);
+            $productQuery->whereIn('skus.volume', $volumes);
         }
         if ($minPrice) {
-            $productQuery = $productQuery->where('sku_store.price', '>', $minPrice);
+            $productQuery->where('sku_store.price', '>', $minPrice);
         }
         if ($maxPrice) {
-            $productQuery = $productQuery->where('sku_store.price', '<', $maxPrice);
+            $productQuery->where('sku_store.price', '<', $maxPrice);
         }
 
         $this->allSkus = $productQuery->get()->toArray();
@@ -319,13 +320,18 @@ class SkuRepository implements ISkuRepository
         return $paginator;
     }
 
+    /**
+     * @param SkuDTO $sku
+     * @return array
+     * @throws Throwable
+     */
     public function createNewSku(SkuDTO $sku): array
     {
         try {
             DB::beginTransaction();
             $newProduct = Product::query()->create([
-                'category_id' => $sku->category_id,
-                'brand_id' => $sku->brand_id,
+                'category_id' => $sku->categoryId,
+                'brand_id' => $sku->brandId,
                 'name' => $sku->name,
                 'name_en' => Utils::makeEnglishProductName($sku->name, $sku->brandName),
                 'description' => $sku->description,
@@ -338,6 +344,7 @@ class SkuRepository implements ISkuRepository
                 'rating' => 5,
                 "images" => $sku->images,
                 'status' => EntityStatus::MODERATED,
+                'user_id' => Auth::guard('api')->user()->id,
             ]);
 
             DB::commit();

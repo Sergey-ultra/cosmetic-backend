@@ -24,6 +24,7 @@ class ProductResource extends JsonResource
             'brand' => $this->brand,
             'name' => $this->name,
             'code' => $this->code,
+            'url' => sprintf('%s-%s', $this->code, $this->id),
             'is_ingredients_exist' => $this->is_ingredients_exist,
             'volume' => $this->volume,
             'images' => $this->images

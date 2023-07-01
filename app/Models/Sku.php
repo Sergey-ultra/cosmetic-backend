@@ -17,7 +17,7 @@ class Sku extends Model
 
     protected $table = self::TABLE;
 
-    protected $fillable = ['product_id', 'images', 'volume', 'rating', 'reviews_count', 'status'];
+    protected $fillable = ['product_id', 'images', 'volume', 'rating', 'reviews_count', 'status', 'user_id'];
 
     protected $casts = [
         'images' => 'array'

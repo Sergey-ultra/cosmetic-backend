@@ -26,7 +26,7 @@ class ImageSavingService implements ImageSavingInterface
     public function __construct(protected CompressImageService $compressImageService)
     {}
 
-    public function imageSave(array $images, string $folder, string $fileName, bool $isCompress = true, array $options = []): array {
+    public function saveImages(array $images, string $folder, string $fileName, bool $isCompress = true, array $options = []): array {
         $imageUrls = [];
         if ($isCompress && !count($options)) {
             $options = $this->compressionOptions;

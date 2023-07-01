@@ -8,6 +8,7 @@ use App\Http\Requests\UserUpdateRequest;
 use App\Models\Country;
 use App\Models\SkuRating;
 use App\Models\UserInfo;
+use App\Models\UserMessage;
 use App\Services\ImageSavingService\ImageSavingService;
 use App\Services\UserLocationService\UserLocationService;
 use Illuminate\Http\JsonResponse;
@@ -30,6 +31,7 @@ class UserController extends Controller
             'avatar' => $info->avatar ??  UserInfo::DEFAULT_AVATAR,
             'refLink' => sprintf('/ref=%s', $user->ref),
             'refBalance' => $user->referralBalanceNormal ?? 0,
+            'unviewed_message_count' => $user->messages()->where('is_viewed', false)->count(),
         ];
 
         if ((bool)$request->input('is_expand')) {
@@ -45,6 +47,27 @@ class UserController extends Controller
                 ->count();
             $result['review_count'] = $reviewCount;
         }
+
+        return response()->json(['data' => $result]);
+    }
+
+    public function myMessages(): JsonResponse
+    {
+        $result = UserMessage::query()
+            ->select(
+                sprintf('%s.id', UserMessage::TABLE),
+                sprintf('%s.message', UserMessage::TABLE),
+                sprintf('%s.from_user', UserMessage::TABLE),
+                sprintf('%s.avatar', UserInfo::TABLE),
+            )
+            ->leftJoin(
+                UserInfo::TABLE,
+                sprintf('%s.user_id', UserInfo::TABLE),
+                '=',
+                sprintf('%s.from_user', UserMessage::TABLE)
+            )
+            ->where(sprintf('%s.to_user', UserMessage::TABLE), Auth::guard('api')->id())
+            ->paginate();
 
         return response()->json(['data' => $result]);
     }
