@@ -7,14 +7,6 @@ use App\Http\Requests\JsonApiRequest;
 class BotsRequest extends JsonApiRequest
 {
     /**
-     * @return bool
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    /**
      * @return array
      */
     public function rules(): array

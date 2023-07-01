@@ -6,11 +6,6 @@ use App\Http\Requests\JsonApiRequest;
 
 class HourCountRequest extends JsonApiRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
         return [
