@@ -30,6 +30,7 @@ class ProductResource extends JsonResource
 //                ? json_decode($this->images, true) : null
             ,
             'created_at' => $this->created_at->format('Y-m-d'),
+            'status' => $this->status,
             'link_count' => $this->link_count
         ];
     }

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services\ArticleService;
+namespace App\Repositories\ArticleRepository;
 
 use Illuminate\Database\Query\Builder;
 
-interface IArticle
+interface IArticleRepository
 {
     public function getAdminArticleList(): Builder;
 }

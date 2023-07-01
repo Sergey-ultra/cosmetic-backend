@@ -43,8 +43,8 @@ class ProductResource extends JsonResource
         }
 
         $prices = $this->skuPrices->pluck('price')->all();
-        $minPrice = min($prices);
-        $maxPrice = max($prices);
+        $minPrice = !empty($prices) ? min($prices) : 0;
+        $maxPrice = !empty($prices) ? max($prices) : 0;
 
         return [
             'id' => $this->sku_id,

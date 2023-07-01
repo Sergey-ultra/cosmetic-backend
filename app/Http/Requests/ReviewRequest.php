@@ -27,7 +27,10 @@ class ReviewRequest extends JsonApiRequest
             'plus' => 'string|min:5',
             'minus' => 'string|min:5',
             'body' => 'required|string|min:5',
-            'sku_id' => 'required|numeric'
+            'sku_id' => 'required|numeric',
+            'images' => 'array',
+            'anonymously' => 'required|in:0,1',
+            'is_recommend' => 'in:0,1',
         ];
     }
 }

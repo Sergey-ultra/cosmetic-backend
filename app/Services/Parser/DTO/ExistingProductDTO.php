@@ -4,7 +4,7 @@ namespace App\Services\Parser\DTO;
 
 class ExistingProductDTO
 {
-  public int $id;
-  public int $brandId;
-  public int $ingredientsCount;
+  public readonly int $id;
+  public readonly int $brandId;
+  public readonly int $ingredientsCount;
 }

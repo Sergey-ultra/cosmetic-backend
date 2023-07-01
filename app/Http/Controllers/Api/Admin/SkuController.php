@@ -44,14 +44,15 @@ class SkuController extends Controller
 
         $query = Sku::query()
             ->select([
-                'skus.id as id',
+                'skus.id',
                 'categories.name as category',
                 'brands.name as brand',
-                'products.name as name',
-                'products.code as code',
-                'skus.volume as volume',
-                'skus.images as images',
-                'skus.created_at as created_at',
+                'products.name',
+                'products.code',
+                'skus.volume',
+                'skus.images',
+                'skus.created_at',
+                'skus.status',
                 'currentPrices.link_count',
                 DB::raw("IF(ip.product_id IS NULL, false, true) AS is_ingredients_exist"),
 

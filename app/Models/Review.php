@@ -11,10 +11,6 @@ class Review extends Model
 {
     public const TABLE = 'reviews';
 
-    public const STATUS_PUBLISHED = 'published';
-
-    public const STATUS_MODERATED = 'moderated';
-
     protected $table = self::TABLE;
 
     protected $fillable = [

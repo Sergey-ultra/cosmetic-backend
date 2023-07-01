@@ -104,6 +104,7 @@
                     {title: 'Кол-во цен', value: 'link_count', width: '5%'},
                     {title: 'Ингред.', value: 'is_ingredients_exist', width: '3%'},
                     {title: 'Объем', value: 'volume', width: '5%', filter: {type: 'input'}},
+                    {title: 'Статус', value: 'status', width: '5%', filter: { type: 'select' }},
                     {title: 'Дата', value: 'created_at', width: '5%'},
                     {title: 'Действия', value: 'action', width: '10%'}
                 ],
@@ -120,7 +121,8 @@
             ...mapGetters('category', ['availableCategoryNames']),
             availableOptions() {
                 return {
-                    category: this.availableCategoryNames
+                    category: this.availableCategoryNames.map(el => ({ title: el, value: el })),
+                    status: ['moderated', 'published', 'rejected', 'deleted'].map(el => ({ title: el, value: el })),
                 }
             },
             filter: {

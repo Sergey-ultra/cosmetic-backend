@@ -11,7 +11,7 @@ class Comment extends Model
     public const TABLE = 'comments';
 
     protected $table = self::TABLE;
-    public const STATUS_PUBLISHED = 'published';
+
     protected $fillable = ['comment', 'review_id', 'user_id', 'reply_id', 'status'];
     protected $casts = [
         'created_at'  => 'date:Y-m-d',

@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
+namespace App\Repositories\SkuRepository;
 
-namespace App\Services\SkuService;
-
-
-
-use App\Models\Brand;
 use App\Models\Product;
+use App\Repositories\SkuRepository\DTO\SkuDTO;
+use App\Repositories\SkuRepository\DTO\SkuListOptionDTO;
+use App\Services\EntityStatus;
 use App\Services\Parser\Text;
 use App\Services\Parser\Utils;
 use App\Services\TransformImagePathService\TransformImagePathService;
@@ -17,27 +16,144 @@ use Illuminate\Support\Facades\DB;
 use Throwable;
 
 
-class SkuService implements SkuInterface
+class SkuRepository implements ISkuRepository
 {
+    public const DEFAULT_PER_PAGE = 24;
     private array $allSkus = [];
     private string $smallImagesFolder;
     private array $resultWithOneSkus = [];
     private array $resultWithSkus = [];
+    private ?int $entityId;
+    private string $mode;
+
+    private SkuListOptionDTO $skuListOptionDto;
 
     public function __construct(private TransformImagePathService $transformImagePathService)
     {}
 
-    public function setAllSkus(array $allSkus): void
+    public function setMode(string $mode, ?int $entityId): self
     {
-        $this->allSkus = $allSkus;
+        $this->mode = $mode;
+        $this->entityId = $entityId;
+        return $this;
     }
+
+    public function getList(SkuListOptionDTO $skuListOptionDto): LengthAwarePaginator
+    {
+        $this->skuListOptionDto = $skuListOptionDto;
+        return $this->getAllSkus()
+            ->groupAllSkusWithPricesToOneSku()
+            ->groupSkusToOneProduct()
+            ->sort()
+            ->paginate();
+    }
+
+    private function getAllSkus(): self
+    {
+        $brandIds = $this->skuListOptionDto->brandIds;
+        $categoryIds = $this->skuListOptionDto->categoryIds;
+        $activeIngredientsGroupIds = $this->skuListOptionDto->activeIngredientsGroupIds;
+        $countryIds = $this->skuListOptionDto->countryIds;
+        $volumes = $this->skuListOptionDto->volumes;
+        $maxPrice = $this->skuListOptionDto->maxPrice;
+        $minPrice = $this->skuListOptionDto->minPrice;
+        $search = $this->skuListOptionDto->search;
+
+
+
+        //$productQuery = Product::with(['skus', 'brand'])->where('category_id' , $category->id);
+        //$products = ProductsWithBrandAndSkuResource::collection($productData)->response()->getData();
+        //$productData = $productData->paginate($perPage);
+        //$products = ProductsWithBrandAndSkuResource::collection($productData)->response()->getData();
+
+        $productQuery = Product::query()->select(
+            'products.id as id',
+            'products.name as name',
+            'products.code as code',
+            'products.category_id as category_id',
+            'categories.name as category',
+            'brands.name as brand',
+            'skus.id as sku_id',
+            'skus.volume as volume',
+            'skus.images as images',
+            'skus.rating as rating',
+            'sku_store.price as price',
+            'links.code as link_code',
+            'stores.name as store_name',
+            'stores.image as store_image',
+            'skus.reviews_count as reviews_count'
+        )
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->join('skus', 'products.id', '=', 'skus.product_id')
+            ->join('sku_store', 'skus.id', '=', 'sku_store.sku_id')
+            ->join('stores', 'sku_store.store_id', '=', 'stores.id')
+            ->join('links', 'sku_store.link_id', '=', 'links.id')
+            ->join('brands', 'products.brand_id', '=', 'brands.id');
+
+
+        if ($activeIngredientsGroupIds) {
+            $activeIngredientsQuery = DB::table('active_ingredients_group_ingredient')
+                ->select('ingredient_product.product_id AS product_id')
+                ->join('ingredient_product', 'ingredient_product.ingredient_id', '=', 'active_ingredients_group_ingredient.ingredient_id')
+                ->whereIn('active_ingredients_group_ingredient.active_ingredients_group_id', $activeIngredientsGroupIds)
+                ->groupBy('ingredient_product.product_id')
+            ;
+
+
+            $productQuery = $productQuery
+                ->joinSub($activeIngredientsQuery,'ingredients', function($join) {
+                    $join->on('products.id', '=', 'ingredients.product_id');
+                });
+        }
+
+        $productQuery = $productQuery->whereNotNull('sku_store.price');
+
+
+        if ($this->mode === 'category') {
+            $productQuery = $productQuery->where('products.category_id', $this->entityId);
+        } else if ($this->mode === 'brand') {
+            $productQuery = $productQuery->where('products.brand_id', $this->entityId);
+        } else if ($this->mode === 'search' && $search) {
+            $productQuery = $productQuery->where('products.name', 'LIKE', "%$search%");
+//            $productQuery = $productQuery->whereRaw(
+//                "MATCH(products.name, products.name_en, products.description, products.application) AGAINST(?)",
+//                [$search]
+//            );
+        }
+
+
+        if ($brandIds) {
+            $productQuery = $productQuery->whereIn('products.brand_id', $brandIds);
+        }
+        if ($countryIds) {
+            $productQuery = $productQuery->whereIn('brands.country_id', $countryIds);
+        }
+        if ($categoryIds) {
+            $productQuery = $productQuery->whereIn('products.category_id', $categoryIds);
+        }
+        if ($volumes) {
+            $productQuery = $productQuery->whereIn('skus.volume', $volumes);
+        }
+        if ($minPrice) {
+            $productQuery = $productQuery->where('sku_store.price', '>', $minPrice);
+        }
+        if ($maxPrice) {
+            $productQuery = $productQuery->where('sku_store.price', '<', $maxPrice);
+        }
+
+        $this->allSkus = $productQuery->get()->toArray();
+
+        return $this;
+    }
+
+
 
     public function setSmallImagesFolder(string $folder): void
     {
         $this->smallImagesFolder = $folder;
     }
 
-    public function groupAllSkusWithPricesToOneSku(): self
+    private function groupAllSkusWithPricesToOneSku(): self
     {
         $resultWithOneSkus = [];
         foreach ($this->allSkus as $price) {
@@ -79,7 +195,7 @@ class SkuService implements SkuInterface
         return $this;
     }
 
-    public function groupSkusToOneProduct(): self
+    private function groupSkusToOneProduct(): self
     {
         $resultWithSkus = [];
 
@@ -158,9 +274,9 @@ class SkuService implements SkuInterface
     }
 
 
-    public function sort(?string $sort): self
+    private function sort(): self
     {
-        switch($sort) {
+        switch($this->skuListOptionDto->sort) {
             case 'price-asc':
                 usort($this->resultWithSkus, function($a, $b) {
                     if ($a['currentSku']['minPrice'] == $b['currentSku']['minPrice']) {
@@ -190,38 +306,51 @@ class SkuService implements SkuInterface
         return $this;
     }
 
-    public function paginate(int $page, int $perPage)
+    public function paginate(): LengthAwarePaginator
     {
-        $offset = max(0, ($page - 1) * $perPage);
+        $perPage = $this->skuListOptionDto->perPage ?? self::DEFAULT_PER_PAGE;
+        $offset = max(0, ($this->skuListOptionDto->page - 1) * $perPage);
+
         $finalArray = array_slice($this->resultWithSkus, $offset, $perPage);
 
-        $paginator = new LengthAwarePaginator($finalArray, count($this->resultWithSkus), $perPage, $page);
+        $paginator = new LengthAwarePaginator($finalArray, count($this->resultWithSkus), $perPage, $this->skuListOptionDto->page);
         $paginator->setPath(url()->current());
         $paginator->appends(['per_page' => $perPage]);
         return $paginator;
     }
 
-    public function createNewSku(array $params): Product
+    public function createNewSku(SkuDTO $sku): array
     {
         try {
             DB::beginTransaction();
             $newProduct = Product::query()->create([
-                'category_id' => $params['category_id'],
-                'brand_id' => $params['brand_id'],
-                'name' => $params['name'],
-                'name_en' => Utils::makeEnglishProductName($params['name'], $params['brandName']),
-                'description' => $params['description'],
-                'code' => Text::makeProductCode($params['brandName'], $params['name']),
+                'category_id' => $sku->category_id,
+                'brand_id' => $sku->brand_id,
+                'name' => $sku->name,
+                'name_en' => Utils::makeEnglishProductName($sku->name, $sku->brandName),
+                'description' => $sku->description,
+                'code' => Text::makeProductCode($sku->brandName, $sku->name),
             ]);
 
-            $newProduct->skus()->create([
-                "volume" => $params['volume'],
+            $newSku = $newProduct->skus()->create([
+                "volume" => $sku->volume,
                 "product_id" => $newProduct->id,
                 'rating' => 5,
-                "images" => $params['images'],
+                "images" => $sku->images,
+                'status' => EntityStatus::MODERATED,
             ]);
+
             DB::commit();
-            return $newProduct;
+            return [
+                'sku_id' => $newSku->id,
+                'name' => $newProduct->name,
+                'sku_code' => sprintf('%s-%s', $newProduct->code, $newSku->id),
+                'volume' => $newSku->volume,
+                'rating' => $newSku->rating,
+                'reviews_count' => 0,
+                'question_count' => 0,
+                'images' => $newSku->images
+            ];
         } catch (Throwable $e) {
             DB::rollback();
             throw $e;

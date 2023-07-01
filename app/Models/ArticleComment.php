@@ -12,8 +12,6 @@ class ArticleComment extends Model
 
     protected $table = self::TABLE;
 
-    public const STATUS_PUBLISHED = 'published';
-
     protected $fillable = ['comment', 'article_id', 'user_id', 'reply_id', 'status'];
 
     protected $casts = [

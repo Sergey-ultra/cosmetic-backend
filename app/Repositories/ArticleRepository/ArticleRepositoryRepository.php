@@ -1,21 +1,22 @@
 <?php
 
-namespace App\Services\ArticleService;
+namespace App\Repositories\ArticleRepository;
 
 
 use App\Models\Article;
 use App\Models\ArticleComment;
 use App\Models\User;
 use App\Models\UserInfo;
-use Illuminate\Database\Eloquent\Model;
+use App\Services\EntityStatus;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
-class ArticleService implements IArticle
+class ArticleRepositoryRepository implements IArticleRepository
 {
     /**
-     * @return \Illuminate\Database\Query\Builder
+     * @return Builder
      */
     public function getAdminArticleList(): Builder
     {
@@ -88,7 +89,7 @@ class ArticleService implements IArticle
                             '=',
                             sprintf('%s.user_id', UserInfo::TABLE)
                         )
-                        ->where(sprintf('%s.status', ArticleComment::TABLE), ArticleComment::STATUS_PUBLISHED)
+                        ->where(sprintf('%s.status', ArticleComment::TABLE), EntityStatus::PUBLISHED)
                         ->orderBy(sprintf('%s.created_at', ArticleComment::TABLE), 'DESC');
                 }])
             ->leftJoinSub($viewsCountSubQuery, 'article_views', function ($join) {
@@ -97,7 +98,7 @@ class ArticleService implements IArticle
             ->join('users', 'articles.user_id', '=', 'users.id')
             ->leftJoin('user_infos', 'users.id', '=', 'user_infos.user_id')
             ->leftJoin('article_categories', 'article_categories.id', '=', 'articles.article_category_id')
-            ->where(['articles.slug' => $slug, 'articles.status' => Article::STATUS_PUBLISHED])
+            ->where(['articles.slug' => $slug, 'articles.status' => EntityStatus::PUBLISHED])
             ->first();
     }
 }

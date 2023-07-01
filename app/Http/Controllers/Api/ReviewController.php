@@ -13,13 +13,13 @@ use App\Http\Resources\ReviewSingleResource;
 use App\Jobs\AdminNotificationJob;
 use App\Jobs\ReviewViewJob;
 use App\Models\Review;
-use App\Models\ReviewView;
 use App\Models\Sku;
 use App\Models\SkuRating;
 use App\Models\SkuVideo;
-use App\Services\ReviewService\IReview;
-use Illuminate\Http\Request;
+use App\Repositories\ReviewRepository\IReviewRepository;
+use App\Services\EntityStatus;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -32,14 +32,14 @@ class ReviewController extends Controller
     public const LAST_LIMIT = 10;
 
     /**
-     * @param IReview $reviewService
+     * @param IReviewRepository $reviewRepository
      * @param Request $request
      * @return ResourceCollection
      */
-    public function my(IReview $reviewService, Request $request): ResourceCollection
+    public function my(IReviewRepository $reviewRepository, Request $request): ResourceCollection
     {
         $perPage = (int)($request->per_page ?? 10);
-        $query = $reviewService
+        $query = $reviewRepository
             ->getReviewWithProductInfoQuery()
             ->where([
                 'sku_ratings.user_id' => Auth::guard('api')->id(),
@@ -52,12 +52,12 @@ class ReviewController extends Controller
     }
 
     /**
-     * @param IReview $reviewService
+     * @param IReviewRepository $reviewRepository
      * @return MyReviewsCollection
      */
-    public function last(IReview $reviewService): MyReviewsCollection
+    public function last(IReviewRepository $reviewRepository): MyReviewsCollection
     {
-        $result = $reviewService
+        $result = $reviewRepository
             ->getReviewWithProductInfoQuery()
             ->orderBy('sku_ratings.created_at', 'DESC')
             ->limit(self::LAST_LIMIT)
@@ -67,16 +67,16 @@ class ReviewController extends Controller
     }
 
     /**
-     * @param  IReview $reviewService
+     * @param  IReviewRepository $reviewRepository
      * @param  int $id
      * @param  Request $request
      * @return ResourceCollection
      */
-    public function bySkuId(IReview $reviewService, Request $request, int $id): ResourceCollection
+    public function bySkuId(IReviewRepository $reviewRepository, Request $request, int $id): ResourceCollection
     {
         $perPage = (int)($request->per_page ?? 10);
 
-        $query = $reviewService
+        $query = $reviewRepository
             ->getReviewWithCommentCountQuery()
             ->where([
                 'sku_ratings.sku_id' => $id,
@@ -89,14 +89,14 @@ class ReviewController extends Controller
     }
 
     /**
-     * @param IReview $reviewService
+     * @param IReviewRepository $reviewRepository
      * @param Request $request
      * @param int $id
      * @return ReviewSingleResource|JsonResponse
      */
-    public function show(IReview $reviewService, Request $request, int $id): ReviewSingleResource|JsonResponse
+    public function show(IReviewRepository $reviewRepository, Request $request, int $id): ReviewSingleResource|JsonResponse
     {
-        $result = $reviewService->getSingleReview($id);
+        $result = $reviewRepository->getSingleReview($id);
 
         if (!$result) {
             return response()->json([], Response::HTTP_NOT_FOUND);
@@ -251,7 +251,7 @@ class ReviewController extends Controller
                 'sku_rating_id' => $currentRating->id
             ],
             [
-                'status' => Review::STATUS_MODERATED,
+                'status' => EntityStatus::MODERATED,
                 'title' => $request->input('title'),
                 'body' => mb_convert_encoding($request->input('body'), "UTF-8", "auto"),
                 'plus' => $request->input('plus'),

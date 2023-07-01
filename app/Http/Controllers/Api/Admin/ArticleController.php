@@ -9,14 +9,13 @@ use App\Http\Resources\Admin\ArticleCollection;
 use App\Http\Resources\Admin\ArticleSingleResource;
 use App\Models\Article;
 use App\Models\ArticleCategory;
-use App\Services\ArticleService\IArticle;
+use App\Repositories\ArticleRepository\IArticleRepository;
 use App\Services\CodeService;
+use App\Services\EntityStatus;
 use App\Services\ImageSavingService\ImageSavingService;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 
@@ -27,15 +26,15 @@ class ArticleController extends Controller
     const IMAGES_FOLDER = 'public/image/articles/';
 
     /**
-     * @param  IArticle $articleService
+     * @param  IArticleRepository $articleRepository
      * @param  Request $request
      * @return ArticleCollection
      */
-    public function index(IArticle $articleService, Request $request): ArticleCollection
+    public function index(IArticleRepository $articleRepository, Request $request): ArticleCollection
     {
         $perPage = (int)($request->per_page ?? 10);
 
-        $query = $articleService->getAdminArticleList();
+        $query = $articleRepository->getAdminArticleList();
 
         $result = $this->prepareModel($request, $query, true)->paginate($perPage);
 
@@ -157,7 +156,7 @@ class ArticleController extends Controller
         if (!$article) {
             return response()->json(['data' => ['status' => false]], 404);
         }
-        $article->update(['status' => Article::STATUS_PUBLISHED]);
+        $article->update(['status' => EntityStatus::PUBLISHED]);
 
         return response()->json(['data' => ['status' => true]]);
     }
@@ -173,7 +172,7 @@ class ArticleController extends Controller
         if (!$article) {
             return response()->json(['data' => ['status' => false]], 404);
         }
-        $article->update(['status' => Article::STATUS_MODERATED]);
+        $article->update(['status' => EntityStatus::MODERATED]);
 
         return response()->json(['data' => ['status' => true]]);
     }

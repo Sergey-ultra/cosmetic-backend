@@ -73,15 +73,16 @@
                                type="checkbox"
                         />
                         <select
-                                v-if="header.filter && header.filter.type === 'select' && availableOptions[header.value].length"
-                                :value="filter[header.value].value"
-                                @input="$emit('update:filter', { ...this.filter, [header.value]:  { value: $event.target.value, type: 'strong' }})"
+                            v-if="header.filter && header.filter.type === 'select' && availableOptions[header.value].length"
+                            :value="filter[header.value].value"
+                            @input="$emit('update:filter', { ...this.filter, [header.value]:  { value: $event.target.value, type: 'strong' }})"
                         >
+                            {{ availableOptions }}
                             <option value="null">Выберите</option>
                             <option
-                                    v-for="option in availableOptions[header.value]"
-                                    :key="option.title"
-                                    :value="option.value"
+                                v-for="option in availableOptions[header.value]"
+                                :key="option.title"
+                                :value="option.value"
                             >
                                 {{ option.title }}
                             </option>
@@ -113,7 +114,7 @@
                     >
                         {{ item[header.value] }}
                     </slot>
-                    <div   v-else class="actions__wrapper">
+                    <div v-else class="actions__wrapper">
                         <slot
                             name="action"
                             :item="item"

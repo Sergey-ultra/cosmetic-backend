@@ -14,8 +14,9 @@ use App\Jobs\ReviewPublishedJob;
 use App\Models\Review;
 use App\Models\Sku;
 use App\Models\SkuRating;
+use App\Repositories\ReviewRepository\IReviewRepository;
+use App\Services\EntityStatus;
 use App\Services\ImageSavingService\ImageSavingService;
-use App\Services\ReviewService\IReview;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,15 +30,15 @@ class ReviewController extends Controller
     const IMAGES_FOLDER = 'public/image/premoderatedReviews/';
 
     /**
-     * @param  IReview $reviewService
+     * @param  IReviewRepository $reviewRepository
      * @param  Request $request
      * @return ReviewCollection
      */
-    public function index(IReview $reviewService, Request $request): ReviewCollection
+    public function index(IReviewRepository $reviewRepository, Request $request): ReviewCollection
     {
         $perPage = (int)($request->per_page ?? 10);
 
-        $query = $reviewService->getAdminReviewListQuery();
+        $query = $reviewRepository->getAdminReviewListQuery();
 
         $result = $this->prepareModel($request, $query, true)->paginate($perPage);
 
@@ -153,20 +154,20 @@ class ReviewController extends Controller
 
 
         if ($request->status === 'deleted') {
-            SkuRating::where('id', $id)->update(['status' => SkuRating::STATUS_DELETED]);
+            SkuRating::query()->where('id', $id)->update(['status' => EntityStatus::DELETED]);
         } else {
-            SkuRating::where('id', $id)->update(['status' => SkuRating::STATUS_PUBLISHED]);
+            SkuRating::query()->where('id', $id)->update(['status' => EntityStatus::PUBLISHED]);
         }
 
         if ($reviewInfo->review_id) {
-            Review::where('id', $reviewInfo->review_id)->update(['status' => $request->status]);
+            Review::query()->where('id', $reviewInfo->review_id)->update(['status' => $request->status]);
 
-            if ($request->status === Review::STATUS_PUBLISHED) {
-                Sku::where('id', $reviewInfo->sku_id)->update(['reviews_count' => DB::raw('reviews_count + 1')]);
+            if ($request->status === EntityStatus::PUBLISHED) {
+                Sku::query()->where('id', $reviewInfo->sku_id)->update(['reviews_count' => DB::raw('reviews_count + 1')]);
 
                 ReviewPublishedJob::dispatch($reviewInfo->user_id, $reviewInfo->review_id);
-            } else if ($reviewInfo->review_status === Review::STATUS_PUBLISHED && $request->status !== Review::STATUS_PUBLISHED) {
-                Sku::where('id', $reviewInfo->sku_id)->update(['reviews_count' => DB::raw('reviews_count - 1')]);
+            } else if ($reviewInfo->review_status === EntityStatus::PUBLISHED && $request->status !== EntityStatus::PUBLISHED) {
+                Sku::query()->where('id', $reviewInfo->sku_id)->update(['reviews_count' => DB::raw('reviews_count - 1')]);
             }
         }
 

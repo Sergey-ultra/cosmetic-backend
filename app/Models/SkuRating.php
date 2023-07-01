@@ -22,10 +22,6 @@ class SkuRating extends Model
         self::RATING_FIVE,
     ];
 
-    public const STATUS_PUBLISHED = 'published';
-
-    public const STATUS_DELETED = 'deleted';
-
     public const TABLE = 'sku_ratings';
 
     protected $table = self::TABLE;

@@ -4,8 +4,11 @@ namespace App\Providers;
 
 
 use App\Configuration;
-use App\Services\ArticleService\ArticleService;
-use App\Services\ArticleService\IArticle;
+use App\Repositories\ArticleRepository\ArticleRepositoryRepository;
+use App\Repositories\ArticleRepository\IArticleRepository;
+use App\Repositories\ReviewRepository\IReviewRepository;
+use App\Repositories\ReviewRepository\ReviewRepository;
+use App\Repositories\SkuRepository\ISkuRepository;
 use App\Services\CompressImageService\CompressImageInterface;
 use App\Services\CompressImageService\CompressImageService;
 use App\Services\ImageLoadingService\ImageLoadingInterface;
@@ -20,8 +23,6 @@ use App\Services\PriceHistoryService\PriceHistoryInterface;
 use App\Services\PriceHistoryService\PriceHistoryService;
 use App\Services\ProxyHttpClientService\ProxyHttpClientInterface;
 use App\Services\ProxyHttpClientService\ProxyHttpClientService;
-use App\Services\ReviewService\IReview;
-use App\Services\ReviewService\ReviewService;
 use App\Services\TreeService\TreeInterface;
 use App\Services\TreeService\TreeService;
 use App\Services\UrlService\IUrlService;
@@ -47,8 +48,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ILinkParser::class, LinkCrawlerParser::class);
         $this->app->singleton(IUrlService::class, UrlService::class);
         $this->app->singleton(ImageLoadingInterface::class, ImageLoadingService::class);
-        $this->app->singleton(IReview::class, ReviewService::class);
-        $this->app->singleton(IArticle::class, ArticleService::class);
+        $this->app->singleton(IReviewRepository::class, ReviewRepository::class);
+        $this->app->singleton(IArticleRepository::class, ArticleRepositoryRepository::class);
+        $this->app->singleton(ISkuRepository::class, ISkuRepository::class);
 
         $this->app->bind(
             PriceCrawlerService::class,

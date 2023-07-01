@@ -20,6 +20,7 @@ class CreateSkusTable extends Migration
             $table->json('images')->nullable();
             $table->float('rating')->default(0);
             $table->unsignedInteger('reviews_count')->default(0);
+            $table->enum('status', ['moderated', 'published', 'deleted', 'rejected'])->default('published');
             $table->timestamps();
             $table->softDeletes();
         });

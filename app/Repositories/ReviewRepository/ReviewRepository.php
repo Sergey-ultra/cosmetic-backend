@@ -1,23 +1,21 @@
 <?php
 
-namespace App\Services\ReviewService;
+namespace App\Repositories\ReviewRepository;
 
-use App\Models\ArticleComment;
 use App\Models\Comment;
 use App\Models\Product;
 use App\Models\Review;
-use App\Models\Like;
 use App\Models\Sku;
 use App\Models\SkuRating;
 use App\Models\User;
 use App\Models\UserInfo;
-use Illuminate\Database\Concerns\BuildsQueries;
+use App\Services\EntityStatus;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
-class ReviewService implements IReview
+class ReviewRepository implements IReviewRepository
 {
     /** @var EloquentBuilder|Builder */
     protected EloquentBuilder|Builder $query;
@@ -132,7 +130,7 @@ class ReviewService implements IReview
             )
             ->where([
                 sprintf('%s.sku_id', SkuRating::TABLE) => $result->sku_id,
-                sprintf('%s.status', Review::TABLE) => Review::STATUS_PUBLISHED,
+                sprintf('%s.status', Review::TABLE) => EntityStatus::PUBLISHED,
             ])
             ->get();
 
@@ -182,7 +180,7 @@ class ReviewService implements IReview
                         '=',
                         sprintf('%s.user_id', UserInfo::TABLE)
                     )
-                    ->where(sprintf('%s.status', Comment::TABLE), Comment::STATUS_PUBLISHED)
+                    ->where(sprintf('%s.status', Comment::TABLE), EntityStatus::PUBLISHED)
                     ->orderBy('created_at', 'DESC');
             }])
             ->where('reviews.id', $id)
@@ -335,7 +333,7 @@ class ReviewService implements IReview
     {
         $commentCountSubQuery = DB::table('comments')
             ->selectRaw('count(review_id) as comments_count, review_id')
-            ->where('status', Comment::STATUS_PUBLISHED)
+            ->where('status', EntityStatus::PUBLISHED)
             ->groupBy('review_id');
 
         $this->query

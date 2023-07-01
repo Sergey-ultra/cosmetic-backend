@@ -16,7 +16,8 @@ export default {
         },
         total: 0,
         filterOptions:{
-            category: { value: 'null' }
+            category: { value: 'null' },
+            status: { value: 'null' }
         }
     },
     mutations:{

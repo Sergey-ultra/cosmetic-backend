@@ -10,17 +10,11 @@ use App\Http\Resources\ArticleWithTagsCollection;
 use App\Jobs\ArticleViewJob;
 use App\Models\Article;
 use App\Models\ArticleCategory;
-use App\Models\ArticleComment;
-use App\Models\ArticleView;
 use App\Models\Tag;
-use App\Models\User;
-use App\Models\UserInfo;
-use App\Services\ArticleService\IArticle;
+use App\Repositories\ArticleRepository\IArticleRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 
 class ArticleController extends Controller
@@ -85,7 +79,7 @@ class ArticleController extends Controller
         return new ArticleWithTagsCollection($result, ['tag' => Tag::where('tag', $tag)->first()]);
     }
 
-    public function byCategoryId(int $categoryId): ArticleWithTagsCollection
+    public function byCategoryId(Request $request, int $categoryId): ArticleWithTagsCollection
     {
         $perPage = (int)($request->per_page ?? 10);
 
@@ -98,9 +92,15 @@ class ArticleController extends Controller
         return new ArticleWithTagsCollection($result, ['category' => ArticleCategory::query()->find($categoryId)]);
     }
 
-    public function show(Request $request, string $slug, IArticle $articleService): ArticleSingleResource
+    /**
+     * @param Request $request
+     * @param string $slug
+     * @param IArticleRepository $articleRepository
+     * @return ArticleSingleResource
+     */
+    public function show(Request $request, string $slug, IArticleRepository $articleRepository): ArticleSingleResource
     {
-        $article = $articleService->getSingleArticleBySlug($slug);
+        $article = $articleRepository->getSingleArticleBySlug($slug);
 
         ArticleViewJob::dispatch($article->id, $request->ip());
 
