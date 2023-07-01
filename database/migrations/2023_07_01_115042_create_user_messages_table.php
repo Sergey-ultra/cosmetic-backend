@@ -15,10 +15,11 @@ return new class extends Migration
     {
         Schema::create('user_messages', function (Blueprint $table) {
             $table->id();
-            $table->text('message');
+            $table->text('message')->nullable();
             $table->unsignedBigInteger('to_user');
             $table->unsignedBigInteger('from_user')->nullable();
-            $table->string('from_user', 200)->nullable();
+            $table->string('type', 200)->nullable();
+            $table->json('data')->nullable();
             $table->boolean('is_viewed')->default(false);
             $table->timestamps();
         });
