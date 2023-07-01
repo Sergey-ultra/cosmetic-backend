@@ -55,22 +55,20 @@
             <thead class="table__thead">
                 <tr>
                     <th
-                            v-for="header in headers"
-                            :style="`width:${header.width}`"
-                            :key="header.value"
-
-
+                        v-for="header in headers"
+                        :style="`width:${header.width}`"
+                        :key="header.value"
                     >
                         <input
-                                v-if="header.filter && header.filter.type === 'input'"
-                                class="table__search"
-                                :value="filter[header.value] ? filter[header.value].value : null"
-                                @input="$emit('update:filter', { ...this.filter, [header.value]:  { value: $event.target.value, type: 'like' }})"
-                                :placeholder="`Поиск по ${header.title}`"
+                            v-if="header.filter && header.filter.type === 'input'"
+                            class="table__search"
+                            :value="filter[header.value] ? filter[header.value].value : null"
+                            @input="$emit('update:filter', { ...this.filter, [header.value]:  { value: $event.target.value, type: 'like' }})"
+                            :placeholder="`Поиск по ${header.title}`"
                         />
                         <input
-                                v-if="header.filter && header.filter.type === 'checkbox'"
-                               type="checkbox"
+                            v-if="header.filter && header.filter.type === 'checkbox'"
+                            type="checkbox"
                         />
                         <select
                             v-if="header.filter && header.filter.type === 'select' && availableOptions[header.value].length"

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('message');
             $table->unsignedBigInteger('to_user');
             $table->unsignedBigInteger('from_user')->nullable();
+            $table->string('from_user', 200)->nullable();
             $table->boolean('is_viewed')->default(false);
             $table->timestamps();
         });

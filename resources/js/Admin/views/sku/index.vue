@@ -21,26 +21,32 @@
             </buttonComponent>
         </template>
 
-        <template v-slot:images="product">
+        <template v-slot:images="{ item }">
             <div class="image__wrapper">
-                <img  v-for="image in product.item.images"  :key="image" class="image" :src="image" :alt="image">
+                <img  v-for="image in item.images"  :key="image" class="image" :src="image" :alt="image">
             </div>
         </template>
 
-        <template v-slot:name="product">
-          <router-link :to="`/product/${product.item.url}`">
-              {{ product.item.name }}
+        <template v-slot:name="{ item }">
+          <router-link :to="`/product/${item.url}`">
+              {{ item.name }}
           </router-link>
         </template>
 
-        <template v-slot:is_ingredients_exist="product">
-            {{ product.item.is_ingredients_exist === 1 ? 'Да' : 'Нет' }}
+        <template v-slot:is_ingredients_exist="{ item }">
+            {{ item.is_ingredients_exist === 1 ? 'Да' : 'Нет' }}
         </template>
 
-        <template v-slot:action="product">
+        <template v-slot:status="{ item }">
+            <span :class="{'status': item.status === 'moderated'}">
+                {{ item.status }}
+            </span>
+        </template>
+
+        <template v-slot:action="{ item }">
             <buttonComponent
                 class="action"
-                @click="showForm(product.item.id)"
+                @click="showForm(item.id)"
                 :color="'green'"
                 :icon="true"
                 :outline="true"
@@ -54,7 +60,7 @@
             </buttonComponent>
             <buttonComponent
                 class="action"
-                @click="showDeleteForm(product.item)"
+                @click="showDeleteForm(item)"
                 :color="'red'"
                 :icon="true"
                 :outline="true"
@@ -105,12 +111,13 @@
                     {title: 'id', value: 'id', width: '5%'},
                     {title: 'Категория', value: 'category', width: '5%', filter: {type: 'select'}},
                     {title: 'Бренд', value: 'brand', width: '7%', filter: {type: 'input'}},
-                    {title: 'Изображение', value: 'images', width: '20%', sort: false},
-                    {title: 'Имя', value: 'name', width: '35%', filter: {type: 'input'}},
+                    {title: 'Изображение', value: 'images', width: '15%', sort: false},
+                    {title: 'Имя', value: 'name', width: '30%', filter: {type: 'input'}},
                     {title: 'Кол-во цен', value: 'link_count', width: '5%'},
                     {title: 'Ингред.', value: 'is_ingredients_exist', width: '3%'},
                     {title: 'Объем', value: 'volume', width: '5%', filter: {type: 'input'}},
                     {title: 'Статус', value: 'status', width: '5%', filter: { type: 'select' }},
+                    {title: 'Юзер', value: 'user_name', width: '5%'},
                     {title: 'Дата', value: 'created_at', width: '5%'},
                     {title: 'Действия', value: 'action', width: '10%'}
                 ],
@@ -185,5 +192,10 @@
 
 <style scoped lang="scss">
     @import './resources/css/admin/table.scss';
-
+    .status {
+        color: white;
+        border-radius: 20px;
+        background-color: red;
+        padding: 5px;
+    }
 </style>

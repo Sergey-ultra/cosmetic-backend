@@ -238,7 +238,7 @@ class SkuController extends Controller
 
             UserMessage::query()->create([
                 'message' => sprintf(
-                    'Объект %s был создан по Вашей заявке. Если Вы еще не написали отзыв по нему, то можете воспользоваться ссылкой: <a href="/product/%s">добавить свой отзыв на "%s"</a>. ',
+                    'Объект %s был создан по Вашей заявке. Если Вы еще не написали отзыв по нему, то можете воспользоваться ссылкой: <a href="/product/%s/add-review">добавить свой отзыв на "%s"</a>. ',
                     $newSku['name'],
                     $newSku['sku_code'],
                     $newSku['name'],

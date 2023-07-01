@@ -10,6 +10,7 @@ use App\Models\Brand;
 use App\Models\Product;
 use App\Models\Sku;
 use App\Models\SkuStore;
+use App\Models\User;
 use App\Repositories\SkuRepository\DTO\SkuDTO;
 use App\Repositories\SkuRepository\SkuRepository;
 use App\Services\ImageSavingService\ImageSavingService;
@@ -26,15 +27,14 @@ class SkuController extends Controller
     use DataProvider;
 
     const IMAGES_FOLDER = 'public/image/sku/';
+
     /**
-     * Display a listing of the resource.
-     *
      * @param Request $request
-     * @return \App\Http\Resources\Admin\ProductCollection
+     * @return ProductCollection
      */
     public function index(Request $request): ProductCollection
     {
-        $perPage =  $request->per_page ?? 10;
+        $perPage = $request->per_page ?? 10;
 
         $ingredientProductSubQuery = DB::table('ingredient_product')
             ->select('product_id')
@@ -56,6 +56,7 @@ class SkuController extends Controller
                 'skus.images',
                 'skus.created_at',
                 'skus.status',
+                'users.name as user_name',
                 'currentPrices.link_count',
                 DB::raw("IF(ip.product_id IS NULL, false, true) AS is_ingredients_exist"),
 
@@ -65,6 +66,7 @@ class SkuController extends Controller
             })
             ->join('products', 'skus.product_id', '=', 'products.id')
             ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
+            ->leftJoin(User::TABLE, sprintf('%s.id', User::TABLE), '=', sprintf('%s.user_id', Sku::TABLE))
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->leftJoinSub($ingredientProductSubQuery, 'ip', function ($join) {
                 $join->on('ip.product_id', '=', 'products.id');
