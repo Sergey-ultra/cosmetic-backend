@@ -237,12 +237,11 @@ class SkuController extends Controller
             $newSku = $skuService->createNewSku($skuDto);
 
             UserMessage::query()->create([
-                'message' => sprintf(
-                    'Объект %s был создан по Вашей заявке. Если Вы еще не написали отзыв по нему, то можете воспользоваться ссылкой: <a href="/product/%s/add-review">добавить свой отзыв на "%s"</a>. ',
-                    $newSku['name'],
-                    $newSku['sku_code'],
-                    $newSku['name'],
-                ),
+                'data' => [
+                    'sku_code' => $newSku['sku_code'],
+                    'name' => $newSku['name'],
+                ],
+                'type' => 'add-sku',
                 'to_user' => Auth::guard('api')->user()->id,
             ]);
 

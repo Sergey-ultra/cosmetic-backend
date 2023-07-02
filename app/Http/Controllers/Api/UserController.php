@@ -53,11 +53,16 @@ class UserController extends Controller
 
     public function myMessages(): JsonResponse
     {
+        $userid = Auth::guard('api')->id();
+
         $result = UserMessage::query()
             ->select(
                 sprintf('%s.id', UserMessage::TABLE),
                 sprintf('%s.message', UserMessage::TABLE),
                 sprintf('%s.from_user', UserMessage::TABLE),
+                sprintf('%s.data', UserMessage::TABLE),
+                sprintf('%s.type', UserMessage::TABLE),
+                sprintf('%s.created_at', UserMessage::TABLE),
                 sprintf('%s.avatar', UserInfo::TABLE),
             )
             ->leftJoin(
@@ -66,8 +71,11 @@ class UserController extends Controller
                 '=',
                 sprintf('%s.from_user', UserMessage::TABLE)
             )
-            ->where(sprintf('%s.to_user', UserMessage::TABLE), Auth::guard('api')->id())
-            ->paginate();
+            ->where(sprintf('%s.to_user', UserMessage::TABLE), $userid)
+            ->orWhere(sprintf('%s.from_user', UserMessage::TABLE), $userid)
+            //->groupBy()
+            ->get();
+        //dd($result->toArray());
 
         return response()->json(['data' => $result]);
     }
