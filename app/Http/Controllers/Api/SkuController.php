@@ -12,7 +12,10 @@ use App\Jobs\SearchLogJob;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Review;
+use App\Models\ReviewView;
 use App\Models\Sku;
+use App\Models\SkuRating;
 use App\Models\UserMessage;
 use App\Repositories\SkuRepository\DTO\SkuDTO;
 use App\Repositories\SkuRepository\SkuRepository;
@@ -78,11 +81,16 @@ class SkuController extends Controller
         return response()->json($result);
     }
 
+    public function popularTenSkus(SkuRepository $skuRepository): JsonResponse
+    {
+        $result = $skuRepository->popularTenSkus();
+        return response()->json(['data' => $result]);
+    }
+
 
     /**
-     *
-     * @params \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @params Request $request
+     * @return JsonResponse
      */
     public function viewed(Request $request): JsonResponse
     {
@@ -117,13 +125,12 @@ class SkuController extends Controller
     }
 
     /**
-     *
      * @params int $skuId
-     * @params \Illuminate\Http\Request $request
-     * @return \App\Http\Resources\ProductResource | \Illuminate\Http\JsonResponse
+     * @params Request $request
+     * @return ProductResource | JsonResponse
      */
 
-    public function bySkuId($skuId, Request $request): ProductResource|JsonResponse
+    public function bySkuId(int $skuId, Request $request): ProductResource|JsonResponse
     {
         if ($request->view === 'compact') {
             $currentSku = Sku::with('product')->find($skuId);

@@ -96,10 +96,10 @@
         <div class="input-group">
             Статья
             <ckeditor
-                    class="form__body"
-                    :editor="editor"
-                    v-model="editedArticle.body"
-                    :config="editorConfig">
+                class="form__body"
+                :editor="editor"
+                v-model="editedArticle.body"
+                :config="editorConfig">
             </ckeditor>
         </div>
 

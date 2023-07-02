@@ -148,6 +148,7 @@ Route::get('/show-compared-skus', [SkuController::class, 'showComparedSkus']);
 Route::get('/skus/by-sku-id/{skuId}', [SkuController::class, 'bySkuId']);
 Route::get('/skus/main', [SkuController::class, 'mainIndex']);
 Route::get('/skus/viewed', [SkuController::class, 'viewed']);
+Route::get('/skus/popular', [SkuController::class, 'popularTenSkus']);
 
 
 Route::get('/suggest', [SearchController::class, 'index']);

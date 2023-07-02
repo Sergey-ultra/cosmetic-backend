@@ -14,4 +14,5 @@ interface ISkuRepository
     public function getList(SkuListOptionDTO $skuListOptionDto): LengthAwarePaginator;
     public function setSmallImagesFolder(string $folder): void;
     public function createNewSku(SkuDTO $sku): array;
+    public function popularTenSkus(): array;
 }

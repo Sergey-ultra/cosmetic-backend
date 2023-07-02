@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace App\Repositories\SkuRepository;
 
 use App\Models\Product;
+use App\Models\Review;
+use App\Models\ReviewView;
+use App\Models\Sku;
+use App\Models\SkuRating;
 use App\Repositories\SkuRepository\DTO\SkuDTO;
 use App\Repositories\SkuRepository\DTO\SkuListOptionDTO;
 use App\Services\EntityStatus;
@@ -147,8 +151,6 @@ class SkuRepository implements ISkuRepository
         return $this;
     }
 
-
-
     public function setSmallImagesFolder(string $folder): void
     {
         $this->smallImagesFolder = $folder;
@@ -274,7 +276,6 @@ class SkuRepository implements ISkuRepository
         return $this;
     }
 
-
     private function sort(): self
     {
         switch($this->skuListOptionDto->sort) {
@@ -307,7 +308,7 @@ class SkuRepository implements ISkuRepository
         return $this;
     }
 
-    public function paginate(): LengthAwarePaginator
+    private function paginate(): LengthAwarePaginator
     {
         $perPage = $this->skuListOptionDto->perPage ?? self::DEFAULT_PER_PAGE;
         $offset = max(0, ($this->skuListOptionDto->page - 1) * $perPage);
@@ -318,6 +319,52 @@ class SkuRepository implements ISkuRepository
         $paginator->setPath(url()->current());
         $paginator->appends(['per_page' => $perPage]);
         return $paginator;
+    }
+
+    /**
+     * @return array
+     */
+    public function popularTenSkus(): array
+    {
+        return Product::query()
+            ->select(
+                sprintf('%s.name', Product::TABLE),
+                sprintf('%s.volume', Sku::TABLE),
+                DB::raw(sprintf('COUNT(%s.sku_id) AS views_count', SkuRating::TABLE))
+            )
+            ->join(
+                Sku::TABLE,
+                sprintf('%s.product_id', Sku::TABLE),
+                '=',
+                sprintf('%s.id', Product::TABLE)
+            )
+            ->join(
+                SkuRating::TABLE,
+                sprintf('%s.sku_id', SkuRating::TABLE),
+                '=',
+                sprintf('%s.id', Sku::TABLE)
+            )
+            ->join(
+                Review::TABLE,
+                sprintf('%s.sku_rating_id', Review::TABLE),
+                '=',
+                sprintf('%s.id', SkuRating::TABLE)
+            )
+            ->join(
+                ReviewView::TABLE,
+                sprintf('%s.review_id', ReviewView::TABLE),
+                '=',
+                sprintf('%s.id', Review::TABLE)
+            )
+            ->groupBy(
+                sprintf('%s.sku_id', SkuRating::TABLE),
+                sprintf('%s.name', Product::TABLE),
+                sprintf('%s.volume', Sku::TABLE),
+            )
+            ->orderBy('views_count', 'DESC')
+            ->limit(10)
+            ->get()
+            ->toArray();
     }
 
     /**
