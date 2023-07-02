@@ -8,12 +8,13 @@ use App\Http\Requests\UserUpdateRequest;
 use App\Models\Country;
 use App\Models\SkuRating;
 use App\Models\UserInfo;
-use App\Models\UserMessage;
+use App\Repositories\UserRepository\UserRepository;
 use App\Services\ImageSavingService\ImageSavingService;
 use App\Services\UserLocationService\UserLocationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 
 class UserController extends Controller
 {
@@ -34,7 +35,7 @@ class UserController extends Controller
             'unviewed_message_count' => $user->messages()->where('is_viewed', false)->count(),
         ];
 
-        if ((bool)$request->input('is_expand')) {
+        if ($request->boolean('is_expand')) {
             $result['sex'] = $info?->sex;
             $result['birthday_year'] = $info?->birthday_year;
 
@@ -51,31 +52,10 @@ class UserController extends Controller
         return response()->json(['data' => $result]);
     }
 
-    public function myMessages(): JsonResponse
+    public function myMessages(UserRepository $userRepository): JsonResponse
     {
         $userid = Auth::guard('api')->id();
-
-        $result = UserMessage::query()
-            ->select(
-                sprintf('%s.id', UserMessage::TABLE),
-                sprintf('%s.message', UserMessage::TABLE),
-                sprintf('%s.from_user', UserMessage::TABLE),
-                sprintf('%s.data', UserMessage::TABLE),
-                sprintf('%s.type', UserMessage::TABLE),
-                sprintf('%s.created_at', UserMessage::TABLE),
-                sprintf('%s.avatar', UserInfo::TABLE),
-            )
-            ->leftJoin(
-                UserInfo::TABLE,
-                sprintf('%s.user_id', UserInfo::TABLE),
-                '=',
-                sprintf('%s.from_user', UserMessage::TABLE)
-            )
-            ->where(sprintf('%s.to_user', UserMessage::TABLE), $userid)
-            ->orWhere(sprintf('%s.from_user', UserMessage::TABLE), $userid)
-            //->groupBy()
-            ->get();
-        //dd($result->toArray());
+        $result = $userRepository->getChatsByUserId($userid);
 
         return response()->json(['data' => $result]);
     }
