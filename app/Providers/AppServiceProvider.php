@@ -21,8 +21,10 @@ use App\Services\Parser\PriceCrawlerService;
 use App\Services\Parser\PriceParsingByCronService;
 use App\Services\PriceHistoryService\PriceHistoryInterface;
 use App\Services\PriceHistoryService\PriceHistoryService;
+use App\Services\ProxyHttpClientService\Proxy6NetService;
 use App\Services\ProxyHttpClientService\ProxyHttpClientInterface;
 use App\Services\ProxyHttpClientService\ProxyHttpClientService;
+use App\Services\ProxyHttpClientService\ProxyServersInterface;
 use App\Services\TreeService\TreeInterface;
 use App\Services\TreeService\TreeService;
 use App\Services\UrlService\IUrlService;
@@ -41,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(TreeInterface::class, TreeService::class);
+        $this->app->singleton(ProxyServersInterface::class, Proxy6NetService::class);
         $this->app->singleton(ProxyHttpClientInterface::class, ProxyHttpClientService::class);
         $this->app->singleton(CompressImageInterface::class, CompressImageService::class);
         $this->app->singleton(VideoSavingInterface::class, VideoSavingService::class);

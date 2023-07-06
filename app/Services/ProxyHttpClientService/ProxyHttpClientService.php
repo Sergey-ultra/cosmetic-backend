@@ -23,7 +23,7 @@ class ProxyHttpClientService implements ProxyHttpClientInterface
 
     protected array $proxyList = [];
 
-    public function __construct(protected Client $httpClient, protected Proxy6NetService $proxyServersService)
+    public function __construct(protected Client $httpClient, protected ProxyServersInterface $proxyServersService)
     {}
 
     public function setRequestsCountBeforeChangingProxy(int $value): void
