@@ -22,12 +22,24 @@ class ReviewResource extends JsonResource
      */
     public function toArray($request)
     {
+
+        $body = array_reduce(
+            $this->body['blocks'],
+            function ($acc, $block) {
+                if ($block['type'] === 'paragraph') {
+                    $acc += $block['data']['text'];
+                }
+                return $acc;
+            },
+            ''
+        );
+
         return [
             'id' => $this->id,
             'comments_count' => $this->comments_count,
             'rating' => $this->rating,
             'title' => $this->title,
-            'body' => Str::substr($this->body, 0, 400) . (Str::length($this->body) > 400 ? '...' : ''),
+            'body' => Str::substr($body, 0, 400) . (Str::length($body) > 400 ? '...' : ''),
             'plus' => $this->plus,
             'minus' => $this->minus,
             'images' => $this->images,

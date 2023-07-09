@@ -17,12 +17,12 @@ class CreateReviewsTable extends Migration
             $table->id();
             $table->foreignId('sku_rating_id')->index();
             $table->string('title', 256);
-            $table->text('body')->nullable();
+            $table->json('body')->nullable();
             $table->text('plus')->nullable();
             $table->text('minus')->nullable();
             $table->tinyInteger('anonymously')->default(0);
             $table->tinyInteger('is_recommend')->default(0);
-            $table->text('images')->nullable();
+            $table->json('images')->nullable();
             $table->string('status')->default('moderated');
             $table->timestamps();
         });
