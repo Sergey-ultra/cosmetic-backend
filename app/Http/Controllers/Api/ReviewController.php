@@ -223,8 +223,6 @@ class ReviewController extends Controller
 
 
 
-
-
     public function updateOrCreate(ReviewRequest $request): JsonResponse
     {
         $skuId = $request->sku_id;
@@ -243,24 +241,26 @@ class ReviewController extends Controller
                     'status' => 'success',
                     'message' => 'Рейтинг не существует'
                 ]
-            ], 404);
+            ], Response::HTTP_NOT_FOUND);
         }
 
-        $review = Review::updateOrCreate(
-            [
-                'sku_rating_id' => $currentRating->id
-            ],
-            [
-                'status' => EntityStatus::MODERATED,
-                'title' => $request->input('title'),
-                'body' => mb_convert_encoding($request->input('body'), "UTF-8", "auto"),
-                'plus' => $request->input('plus'),
-                'minus' => $request->input('minus'),
-                'images' => $request->input('images'),
-                'anonymously' => $request->input('anonymously') ?? 0,
-                'is_recommend' => $request->input('is_recommend') ?? 0,
-            ]
-        );
+        $review = Review::query()
+            ->updateOrCreate(
+                [
+                    'sku_rating_id' => $currentRating->id
+                ],
+                [
+                    'status' => EntityStatus::MODERATED,
+                    'title' => $request->input('title'),
+                    //'body' => mb_convert_encoding($request->input('body'), "UTF-8", "auto"),
+                    'body' => $request->input('body'),
+                    'plus' => $request->input('plus'),
+                    'minus' => $request->input('minus'),
+                    'images' => $request->input('images'),
+                    'anonymously' => $request->input('anonymously') ?? 0,
+                    'is_recommend' => $request->input('is_recommend') ?? 0,
+                ]
+            );
 
         if (request()->ip() !== config('telegrambot.admin_ip')) {
             $message = sprintf("Добавлен/обновлен отзыв с id %d", $review->id);
