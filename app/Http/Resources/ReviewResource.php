@@ -27,7 +27,7 @@ class ReviewResource extends JsonResource
             $this->body['blocks'],
             function ($acc, $block) {
                 if ($block['type'] === 'paragraph') {
-                    $acc += $block['data']['text'];
+                    $acc .= $block['data']['text'];
                 }
                 return $acc;
             },
