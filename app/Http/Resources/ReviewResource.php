@@ -20,19 +20,17 @@ class ReviewResource extends JsonResource
      * @param Request $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
-
-        $body = array_reduce(
-            $this->body['blocks'],
-            function ($acc, $block) {
-                if ($block['type'] === 'paragraph') {
-                    $acc .= $block['data']['text'];
-                }
-                return $acc;
-            },
-            ''
-        );
+        $body = '';
+        $images = [];
+        foreach ($this->body['blocks'] as $block) {
+            if ($block['type'] === 'paragraph') {
+                $body .= $block['data']['text'];
+            } elseif ($block['type'] === 'image') {
+                $images[] = $block['data']['text'];
+            }
+        }
 
         return [
             'id' => $this->id,
@@ -42,7 +40,7 @@ class ReviewResource extends JsonResource
             'body' => Str::substr($body, 0, 400) . (Str::length($body) > 400 ? '...' : ''),
             'plus' => $this->plus,
             'minus' => $this->minus,
-            'images' => $this->images,
+            'images' => $images,
             'created_at' => $this->created_at->toDateString(),
             'user_name' => $this->anonymously === 0
                 ? $this->user_name

@@ -38,7 +38,6 @@ class ReviewSingleResource extends JsonResource
             'minus' => $this->minus,
             'body' => $this->body,
             'is_recommend' => $this->is_recommend,
-            'images' => $this->images,
             'created_at' => $this->created_at->toDateString(),
             'user_name' => $this->anonymously === 0
                 ? $this->user_name

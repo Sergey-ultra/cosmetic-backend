@@ -149,9 +149,14 @@ class ReviewController extends Controller
 
         $info = $reviews->reduce(
             function(array $common, Review $review): array {
-                if ($review->images && count($review->images)) {
-                    foreach ( $review->images as $image) {
-                        $common[] = ['type' => 'image', 'url' => $image];
+                if ($review->body && $review->body['blocks']) {
+                    foreach ($review->body['blocks'] as $block) {
+                        if ($block['type'] === 'image') {
+                            $common[] = [
+                                'type' => 'image',
+                                'url' => $block['data']['text'],
+                            ];
+                        }
                     }
                 }
                 return $common;
@@ -162,9 +167,8 @@ class ReviewController extends Controller
 
         $ratingFilter = $reviews
             ->groupBy('rating')
-            ->map(function ($group) {
-                return count($group);
-            })->all();
+            ->map(fn ($group) => count($group))
+            ->all();
 
         return response()->json(['data'=>
             [
