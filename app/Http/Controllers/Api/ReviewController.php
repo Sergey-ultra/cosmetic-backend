@@ -135,7 +135,7 @@ class ReviewController extends Controller
 
         $reviews = Review::query()
             ->select(
-                'reviews.images',
+                'reviews.body',
                 'sku_ratings.rating'
             )
             ->join('sku_ratings', 'sku_ratings.id', '=', 'reviews.sku_rating_id')
@@ -144,8 +144,6 @@ class ReviewController extends Controller
                 'reviews.status' => 'published'
             ])
             ->get();
-
-
 
         $info = $reviews->reduce(
             function(array $common, Review $review): array {
