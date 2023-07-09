@@ -20,16 +20,33 @@ class MyReviewsResource extends JsonResource
      */
     public function toArray($request)
     {
+        $body = json_decode($this->body, true);
+        $symbolCount = '';
+        $photosCount = 0;
+
+
+        foreach ($body['blocks'] as $block) {
+            if ($block['type'] === 'paragraph') {
+                $symbolCount .= $block['data']['text'];
+            } else if ($block['type'] === 'image' && $block['data']['text']) {
+                $photosCount++;
+            }
+        }
+
+        //$symbolCount = mb_strlen(trim(preg_replace("/[^А-яЁёA-Za-z1-9]/g", "", $symbolCount)));
+
         return [
             'sku_rating_id' => $this->sku_rating_id,
             'rating' => $this->rating,
             'sku_name' => $this->sku_name,
             'product_code' => $this->product_code,
+            'symbol_count' => mb_strlen($symbolCount),
+            'photos_count' => $photosCount,
             'sku_id' => $this->sku_id,
             'volume' => $this->volume,
             'sku_image' => $this->sku_images ? json_decode($this->sku_images, true)[0] : [],
             'review_id' => $this->review_id,
-            'comment' => $this->body,
+            'comment' => $body,
             'plus' => $this->plus,
             'minus' => $this->minus,
             'images' => $this->review_images ? json_decode($this->review_images,true) : [],

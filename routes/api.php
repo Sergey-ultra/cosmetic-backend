@@ -174,6 +174,7 @@ Route::get('/routes/skus-queries', [RouteController::class, 'skusQueries']);
 Route::get('/routes/articles', [RouteController::class, 'articles']);
 Route::get('/routes/categories', [RouteController::class, 'categories']);
 Route::get('/routes/brands', [RouteController::class, 'brands']);
+Route::get('/routes/reviews', [RouteController::class, 'reviews']);
 
 
 Route::group(['middleware' => ['auth:api']], function () {
