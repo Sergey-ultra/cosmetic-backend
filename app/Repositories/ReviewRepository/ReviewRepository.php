@@ -8,6 +8,7 @@ use App\Models\Review;
 use App\Models\Sku;
 use App\Models\SkuRating;
 use App\Models\User;
+use App\Models\UserBalanceAccrual;
 use App\Models\UserInfo;
 use App\Services\EntityStatus;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -69,33 +70,17 @@ class ReviewRepository implements IReviewRepository
      */
     public function getReviewWithProductInfoQuery(): EloquentBuilder
     {
-        $this->query = SkuRating::query()
-            ->select([
-                'sku_ratings.id AS sku_rating_id',
-                'sku_ratings.rating',
-                'sku_ratings.created_at',
-                'reviews.id AS review_id',
-                'reviews.body',
-                'reviews.plus',
-                'reviews.minus',
-                'reviews.anonymously',
-                'reviews.images AS review_images',
-                'reviews.status',
-            ])
-            ->join(Review::TABLE, function ($join) {
-                $join->on(
-                    sprintf('%s.sku_rating_id', Review::TABLE),
-                    '=',
-                    sprintf('%s.id', SkuRating::TABLE)
-                )
-                    ->where('reviews.status', '!=', 'deleted');
-            });
+        return $this->setReviewWithProductInfoQuery()->getQuery();
+    }
 
-        return $this
-            ->addViewsCountSubQuery()
-            ->addProductInfoQuery()
-            ->addUserQuery()
-            ->addUserAdditionalInfoQuery()
+    /**
+     * @return EloquentBuilder
+     */
+    public function getMyReviewsQuery(): EloquentBuilder
+    {
+        return $this->setReviewWithProductInfoQuery()
+            ->addBalanceAccruals()
+            ->addLikesCountSubQuery()
             ->getQuery();
     }
 
@@ -137,13 +122,51 @@ class ReviewRepository implements IReviewRepository
 
         $allReviews = $reviewsWithSameSku->count();
 
-        $recommendReviewsPercent = (int)round((100 * $reviewsWithSameSku->where('is_recommend', 1)->count()) / $allReviews);
+        if ($allReviews > 0) {
+            $recommendReviewsPercent = (int)round((100 * $reviewsWithSameSku->where('is_recommend', 1)->count()) / $allReviews);
+        }
 
-        $result->recommend_reviews_percent = $recommendReviewsPercent;
+
+
+        $result->recommend_reviews_percent = $recommendReviewsPercent ?? 0;
         $result->reviews_count = $allReviews;
         $result->rating_percentage = $this->getRatingsPercentageWithSameSku($result->sku_id);
 
         return $result;
+    }
+
+    /**
+     * @return self
+     */
+    protected function setReviewWithProductInfoQuery(): self
+    {
+        $this->query = SkuRating::query()
+            ->select([
+                'sku_ratings.id AS sku_rating_id',
+                'sku_ratings.rating',
+                'sku_ratings.created_at',
+                'reviews.id AS review_id',
+                'reviews.body',
+                'reviews.plus',
+                'reviews.minus',
+                'reviews.anonymously',
+                'reviews.images AS review_images',
+                'reviews.status',
+            ])
+            ->join(Review::TABLE, function ($join) {
+                $join->on(
+                    sprintf('%s.sku_rating_id', Review::TABLE),
+                    '=',
+                    sprintf('%s.id', SkuRating::TABLE)
+                )
+                    ->where('reviews.status', '!=', 'deleted');
+            });
+
+        return $this
+            ->addViewsCountSubQuery()
+            ->addProductInfoQuery()
+            ->addUserQuery()
+            ->addUserAdditionalInfoQuery();
     }
 
     protected function getSingleReviewRawModel(int $id): Model|null
@@ -366,6 +389,33 @@ class ReviewRepository implements IReviewRepository
         return $this;
     }
 
+    protected function addBalanceAccruals(): self
+    {
+        $sumViewsAccrualsSubQuery = DB::table(UserBalanceAccrual::TABLE)
+            ->select([
+                DB::raw('sum(accrual) as sum'),
+                'review_id',
+            ])
+            ->where('type', UserBalanceAccrual::VIEW_TYPE)
+            ->groupBy('review_id');
+
+        $this->query
+            ->addSelect([
+                DB::raw('IF(balance.sum IS NOT NULL, balance.sum, 0) AS balance'),
+                DB::raw('IF(bonus.accrual IS NOT NULL, bonus.accrual, 0) AS bonus'),
+            ])
+            ->leftJoinSub($sumViewsAccrualsSubQuery, 'balance', function ($join) {
+                $join->on(sprintf('%s.id', Review::TABLE), '=', 'balance.review_id');
+            })
+            ->leftJoin(sprintf('%s AS bonus', UserBalanceAccrual::TABLE), function ($join) {
+                $join->on(sprintf('%s.id', Review::TABLE), '=', 'bonus.review_id')
+                    ->where('bonus.type', UserBalanceAccrual::VIEW_BONUS)
+                ;
+            });
+
+        return $this;
+    }
+
     protected function addLikesCountSubQuery(): self
     {
         $viewsCountSubQuery = DB::table('likes')
@@ -381,7 +431,7 @@ class ReviewRepository implements IReviewRepository
             ->leftJoinSub($viewsCountSubQuery, 'likes', function ($join) {
                 $join
                     ->on(sprintf('%s.id', Review::TABLE), '=', 'likes.likeable_id')
-                    ->where('likes.likeable_id', Review::class);
+                    ->where('likes.likeable_type', Review::class);
             });
 
         return $this;

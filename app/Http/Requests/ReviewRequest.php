@@ -12,6 +12,17 @@ class ReviewRequest extends JsonApiRequest
      */
     public function rules(): array
     {
+        if ($this->boolean('asDraft')) {
+            return [
+                'title' => 'nullable|string|max:256',
+                'plus' => 'nullable|string',
+                'minus' => 'nullable|string',
+                'sku_id' => 'required|numeric',
+                'images' => 'array',
+                'anonymously' => 'nullable|in:0,1',
+                'is_recommend' => 'nullable|in:0,1',
+            ];
+        }
         return [
             'title' => 'string|min:5|max:256',
             'plus' => 'string|min:5',

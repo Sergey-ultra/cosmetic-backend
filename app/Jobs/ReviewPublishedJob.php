@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\ReviewView;
 use App\Models\User;
 use App\Models\UserBalanceAccrual;
 use Illuminate\Bus\Queueable;
@@ -12,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 
-class ReviewPublishedJob  implements ShouldQueue
+class ReviewPublishedJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

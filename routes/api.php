@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\FavoritesController;
 use App\Http\Controllers\Api\FilterController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\MainController;
 use App\Http\Controllers\Api\PriceHistoryController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\RouteController;
@@ -65,7 +66,8 @@ use App\Http\Controllers\Api\Admin\Parser\PriceParserController;
 use App\Http\Controllers\Api\Admin\Parser\ProductOptionController;
 use App\Http\Controllers\Api\Admin\Parser\ProductParserController;
 use App\Http\Controllers\Api\Admin\Parser\Old\ParserControllerProxy;
-use App\Models\Sku;
+
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -127,6 +129,8 @@ Route::get('/articles/by-category-id/{id}', [ArticleController::class, 'byCatego
 Route::get('/articles/by-slug/{slug}', [ArticleController::class, 'show']);
 
 
+
+Route::get('/main/statistics', [MainController::class, 'index']);
 
 Route::get('/banner', [BannerController::class, 'index']);
 Route::get('/filter', [FilterController::class, 'index']);
@@ -203,6 +207,9 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 
     Route::get('/reviews/my', [ReviewController::class, 'my']);
+    Route::get('/reviews/my-drafts', [ReviewController::class, 'myDrafts']);
+    Route::get('/reviews/my-moderated', [ReviewController::class, 'myModeratedReviews']);
+    Route::get('/reviews/my-rejected', [ReviewController::class, 'myRejectedReviews']);
     Route::post('/review/check-existing-review', [ReviewController::class, 'checkExistingReview']);
     Route::post('/reviews', [ReviewController::class, 'updateOrCreate']);
     Route::post('/reviews/add-video', [SkuVideoController::class, 'addOrUpdateVideoWithBase64Data']);

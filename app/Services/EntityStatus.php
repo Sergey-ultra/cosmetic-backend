@@ -8,4 +8,5 @@ enum EntityStatus: string
    case DELETED = 'deleted';
    case MODERATED = 'moderated';
    case REJECTED = 'rejected';
+   case DRAFT = 'draft';
 }

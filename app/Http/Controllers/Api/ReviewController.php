@@ -40,13 +40,59 @@ class ReviewController extends Controller
     {
         $perPage = (int)($request->per_page ?? 10);
         $query = $reviewRepository
-            ->getReviewWithProductInfoQuery()
+            ->getMyReviewsQuery()
             ->where([
-                'sku_ratings.user_id' => Auth::guard('api')->id(),
-                'sku_ratings.status' => 'published'
+                sprintf('%s.user_id', SkuRating::TABLE) => Auth::guard('api')->id(),
+                sprintf('%s.status',SkuRating::TABLE) => EntityStatus::PUBLISHED,
+                sprintf('%s.status',Review::TABLE) => EntityStatus::PUBLISHED,
             ]);
 
         $result = $this->prepareModel($request, $query)->paginate($perPage);
+
+        return new MyReviewsCollection($result);
+    }
+
+    public function myDrafts(IReviewRepository $reviewRepository, Request $request): ResourceCollection
+    {
+        $query = $reviewRepository
+            ->getReviewWithProductInfoQuery()
+            ->where([
+                sprintf('%s.user_id', SkuRating::TABLE) => Auth::guard('api')->id(),
+                sprintf('%s.status',SkuRating::TABLE) => EntityStatus::PUBLISHED,
+                sprintf('%s.status',Review::TABLE) => EntityStatus::DRAFT,
+            ]);
+
+        $result = $this->prepareModel($request, $query)->get();
+
+        return new MyReviewsCollection($result);
+    }
+
+    public function myModeratedReviews(IReviewRepository $reviewRepository, Request $request): ResourceCollection
+    {
+        $query = $reviewRepository
+            ->getReviewWithProductInfoQuery()
+            ->where([
+                sprintf('%s.user_id', SkuRating::TABLE) => Auth::guard('api')->id(),
+                sprintf('%s.status',SkuRating::TABLE) => EntityStatus::PUBLISHED,
+                sprintf('%s.status',Review::TABLE) => EntityStatus::MODERATED,
+            ]);
+
+        $result = $this->prepareModel($request, $query)->get();
+
+        return new MyReviewsCollection($result);
+    }
+
+    public function myRejectedReviews(IReviewRepository $reviewRepository, Request $request): ResourceCollection
+    {
+        $query = $reviewRepository
+            ->getReviewWithProductInfoQuery()
+            ->where([
+                sprintf('%s.user_id', SkuRating::TABLE) => Auth::guard('api')->id(),
+                sprintf('%s.status',SkuRating::TABLE) => EntityStatus::PUBLISHED,
+                sprintf('%s.status',Review::TABLE) => EntityStatus::REJECTED,
+            ]);
+
+        $result = $this->prepareModel($request, $query)->get();
 
         return new MyReviewsCollection($result);
     }
@@ -246,13 +292,18 @@ class ReviewController extends Controller
             ], Response::HTTP_NOT_FOUND);
         }
 
+        $status = $request->boolean('asDraft')
+            ? EntityStatus::DRAFT
+            : EntityStatus::MODERATED;
+
         $review = Review::query()
             ->updateOrCreate(
                 [
-                    'sku_rating_id' => $currentRating->id
+                    'sku_rating_id' => $currentRating->id,
+                    'status' => $status,
                 ],
                 [
-                    'status' => EntityStatus::MODERATED,
+                    'status' => $status,
                     'title' => $request->input('title'),
                     //'body' => mb_convert_encoding($request->input('body'), "UTF-8", "auto"),
                     'body' => $request->input('body'),

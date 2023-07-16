@@ -153,10 +153,12 @@ class ReviewController extends Controller
 
 
         if ($request->status === 'deleted') {
-            SkuRating::query()->where('id', $id)->update(['status' => EntityStatus::DELETED]);
+            $skuRatingUpdatedStatus = EntityStatus::DELETED;
         } else {
-            SkuRating::query()->where('id', $id)->update(['status' => EntityStatus::PUBLISHED]);
+            $skuRatingUpdatedStatus = EntityStatus::PUBLISHED;
         }
+
+        SkuRating::query()->where('id', $id)->update(['status' => $skuRatingUpdatedStatus]);
 
         if ($reviewInfo->review_id) {
             Review::query()->where('id', $reviewInfo->review_id)->update(['status' => $request->status]);
