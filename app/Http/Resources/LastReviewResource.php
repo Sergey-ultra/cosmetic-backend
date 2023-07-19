@@ -1,23 +1,12 @@
 <?php
 
-declare(strict_types=1);
-
-
 namespace App\Http\Resources;
-
 
 use App\Models\UserInfo;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MyReviewsResource extends JsonResource
+class LastReviewResource extends JsonResource
 {
-
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
     public function toArray($request)
     {
         $body = json_decode($this->body, true);
@@ -34,7 +23,14 @@ class MyReviewsResource extends JsonResource
         }
 
         //$symbolCount = mb_strlen(trim(preg_replace("/[^А-яЁёA-Za-z1-9]/g", "", $symbolCount)));
-
+        $createdAt = null;
+        if ($this->created_at) {
+            if (now()->toDateString() === $this->created_at->toDateString()) {
+                $createdAt = sprintf('Сегодня %s', $this->created_at->toTimeString());
+            } else {
+                $createdAt = $this->created_at->toDateString();
+            }
+        }
         return [
             'sku_rating_id' => $this->sku_rating_id,
             'rating' => $this->rating,
@@ -57,7 +53,7 @@ class MyReviewsResource extends JsonResource
             'minus' => $this->minus,
             //'images' => $this->review_images ? json_decode($this->review_images,true) : [],
             'status' => $this->status,
-            'created_at' => $this->created_at ? $this->created_at->toDateString() : null,
+            'created_at' => $createdAt,
             'user_name' =>
                 isset($this->review_id)
                     ? ($this->anonymously === 0 ? $this->user_name : 'Имя скрыто')

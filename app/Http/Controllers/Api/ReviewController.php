@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
 use App\Http\Requests\ReviewRequest;
+use App\Http\Resources\LastReviewsCollection;
 use App\Http\Resources\MyReviewsCollection;
 use App\Http\Resources\ReviewCollection;
 use App\Http\Resources\ReviewSingleResource;
@@ -99,9 +100,9 @@ class ReviewController extends Controller
 
     /**
      * @param IReviewRepository $reviewRepository
-     * @return MyReviewsCollection
+     * @return LastReviewsCollection
      */
-    public function last(IReviewRepository $reviewRepository): MyReviewsCollection
+    public function last(IReviewRepository $reviewRepository): LastReviewsCollection
     {
         $result = $reviewRepository
             ->getReviewWithProductInfoQuery()
@@ -109,7 +110,7 @@ class ReviewController extends Controller
             ->limit(self::LAST_LIMIT)
             ->get();
 
-        return new MyReviewsCollection($result);
+        return new LastReviewsCollection($result);
     }
 
     /**

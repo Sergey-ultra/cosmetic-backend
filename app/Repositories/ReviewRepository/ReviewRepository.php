@@ -84,6 +84,24 @@ class ReviewRepository implements IReviewRepository
             ->getQuery();
     }
 
+//    public function getLastReviews()
+//    {
+//        return $this->setReviewWithProductInfoQuery()->getQuery();
+//        $reviewsWithSameSku = SkuRating::query()
+//            ->select(sprintf('%s.is_recommend', Review::TABLE))
+//            ->join(
+//                Review::TABLE,
+//                sprintf('%s.sku_rating_id', Review::TABLE),
+//                '=',
+//                sprintf('%s.id', SkuRating::TABLE)
+//            )
+//            ->where([
+//                sprintf('%s.sku_id', SkuRating::TABLE) => $result->sku_id,
+//                sprintf('%s.status', Review::TABLE) => EntityStatus::PUBLISHED,
+//            ])
+//            ->get();
+//    }
+
     /**
      * @return EloquentBuilder
      */
@@ -146,6 +164,7 @@ class ReviewRepository implements IReviewRepository
                 'sku_ratings.rating',
                 'sku_ratings.created_at',
                 'reviews.id AS review_id',
+                'reviews.title',
                 'reviews.body',
                 'reviews.plus',
                 'reviews.minus',
