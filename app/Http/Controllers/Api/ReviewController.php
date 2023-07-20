@@ -106,6 +106,7 @@ class ReviewController extends Controller
     {
         $result = $reviewRepository
             ->getReviewWithProductInfoQuery()
+            ->where(sprintf('%s.status', Review::TABLE), EntityStatus::PUBLISHED)
             ->orderBy('sku_ratings.created_at', 'DESC')
             ->limit(self::LAST_LIMIT)
             ->get();

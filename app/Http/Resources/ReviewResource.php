@@ -42,9 +42,9 @@ class ReviewResource extends JsonResource
             'minus' => $this->minus,
             'images' => $images,
             'created_at' => $this->created_at->toDateString(),
+            'user_id' => $this->user_id,
             'user_name' => $this->user_name,
             'user_avatar' => $this->avatar ??  UserInfo::DEFAULT_AVATAR,
-
         ];
     }
 }

@@ -100,8 +100,8 @@ Route::group(['prefix' => '/admin'], function () {
     Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth:api', 'role:admin']);
 });
 
+Route::get('/users/best', [UserController::class, 'bestUsers']);
 Route::post('/users/update-telegram-user', [TelegramController::class, 'updateTelegramUser']);
-
 
 Route::post('/supplier/signin', [App\Http\Controllers\Api\Supplier\AuthController::class, 'login']);
 Route::post('/supplier/signup', [App\Http\Controllers\Api\Supplier\AuthController::class, 'register']);

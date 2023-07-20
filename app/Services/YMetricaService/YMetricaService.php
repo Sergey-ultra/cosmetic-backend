@@ -30,7 +30,7 @@ class YMetricaService implements IYMetrica
             [
                 "header" => [
                     "Content-Type: application/x-yametrika+json",
-                    sprintf("Authorization: Bearer %s", config('yandex-metrica.o_auth_token')),
+                    sprintf("Authorization: OAuth %s", config('yandex-metrica.o_auth_token')),
                 ],
             ]
         );

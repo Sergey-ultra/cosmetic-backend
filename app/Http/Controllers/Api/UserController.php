@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AvatarRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\Country;
+use App\Models\Review;
 use App\Models\SkuRating;
+use App\Models\User;
 use App\Models\UserInfo;
 use App\Repositories\UserRepository\UserRepository;
 use App\Services\ImageSavingService\ImageSavingService;
@@ -14,6 +16,7 @@ use App\Services\UserLocationService\UserLocationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 class UserController extends Controller
@@ -86,6 +89,45 @@ class UserController extends Controller
         ]);
 
         return response()->json(['data' => ['status' => true]]);
+    }
+
+    public function bestUsers(): JsonResponse
+    {
+        $result = User::query()
+            ->select(
+                sprintf('%s.id', User::TABLE),
+                sprintf('%s.name', User::TABLE),
+                sprintf('%s.avatar', UserInfo::TABLE),
+                DB::raw(sprintf('count(%s.id) AS review_count', Review::TABLE)),
+            )
+            ->join(
+                UserInfo::TABLE,
+                sprintf('%s.user_id', UserInfo::TABLE),
+                '=',
+                sprintf('%s.id', User::TABLE)
+            )
+            ->join(
+                SkuRating::TABLE,
+                sprintf('%s.user_id', SkuRating::TABLE),
+                '=',
+                sprintf('%s.id', User::TABLE)
+            )
+            ->join(
+                Review::TABLE,
+                sprintf('%s.sku_rating_id', Review::TABLE),
+                '=',
+                sprintf('%s.id', SkuRating::TABLE)
+            )
+            ->groupBy(
+                sprintf('%s.id', User::TABLE),
+                sprintf('%s.name', User::TABLE),
+                sprintf('%s.avatar', UserInfo::TABLE),
+            )
+            ->orderBy('review_count', 'DESC')
+            ->limit(10)
+            ->get();
+
+        return response()->json(['data' => $result]);
     }
 
 

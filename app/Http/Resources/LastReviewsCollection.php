@@ -10,7 +10,6 @@ class LastReviewsCollection extends ResourceCollection
     {
         return [
             'data' => $this->collection->transform(function ($item) {
-
                 return new LastReviewResource($item);
             })
         ];

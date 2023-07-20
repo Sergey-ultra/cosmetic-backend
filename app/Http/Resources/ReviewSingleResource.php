@@ -39,6 +39,7 @@ class ReviewSingleResource extends JsonResource
             'body' => $this->body,
             'is_recommend' => $this->is_recommend,
             'created_at' => $this->created_at->toDateString(),
+            'user_id' => $this->user_id,
             'user_name' => $this->user_name,
             'user_avatar' => $this->avatar ?? UserInfo::DEFAULT_AVATAR,
             'user_review_count' => $this->user_review_count,

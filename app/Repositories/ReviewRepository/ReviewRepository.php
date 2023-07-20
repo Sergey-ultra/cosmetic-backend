@@ -307,7 +307,10 @@ class ReviewRepository implements IReviewRepository
     protected function addUserQuery(): self
     {
         $this->query
-            ->addSelect(sprintf('%s.name AS user_name', User::TABLE))
+            ->addSelect(
+                sprintf('%s.name AS user_name', User::TABLE),
+                sprintf('%s.id AS user_id', User::TABLE),
+            )
             ->join(
                 User::TABLE,
                 sprintf('%s.id', User::TABLE),
