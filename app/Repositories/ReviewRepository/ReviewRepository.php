@@ -44,7 +44,6 @@ class ReviewRepository implements IReviewRepository
                 'reviews.body',
                 'reviews.minus',
                 'reviews.plus',
-                'reviews.anonymously',
                 'reviews.images',
                 'reviews.created_at',
                 'reviews.status AS review_status'
@@ -168,7 +167,6 @@ class ReviewRepository implements IReviewRepository
                 'reviews.body',
                 'reviews.plus',
                 'reviews.minus',
-                'reviews.anonymously',
                 'reviews.images AS review_images',
                 'reviews.status',
             ])
@@ -287,7 +285,6 @@ class ReviewRepository implements IReviewRepository
                 'reviews.minus',
                 'reviews.images',
                 'reviews.created_at AS created_at',
-                'reviews.anonymously',
                 'reviews.is_recommend',
             ])
             ->join(

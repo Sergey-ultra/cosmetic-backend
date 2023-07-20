@@ -188,7 +188,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/notification/telegram/account', [TelegramController::class, 'account']);
     Route::post('/notification/telegram/account/unsubscribe', [TelegramController::class, 'unsubscribe']);
 
-
+    Route::get('/skus/my', [SkuController::class, 'mySkus']);
     Route::post('/skus', [SkuController::class, 'store']);
 
     Route::get('/articles/my', [ArticleController::class, 'my']);

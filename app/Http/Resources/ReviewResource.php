@@ -42,12 +42,9 @@ class ReviewResource extends JsonResource
             'minus' => $this->minus,
             'images' => $images,
             'created_at' => $this->created_at->toDateString(),
-            'user_name' => $this->anonymously === 0
-                ? $this->user_name
-                : 'Имя скрыто',
-            'user_avatar' => $this->anonymously === 0
-                ? $this->avatar ??  UserInfo::DEFAULT_AVATAR
-                :  UserInfo::DEFAULT_AVATAR,
+            'user_name' => $this->user_name,
+            'user_avatar' => $this->avatar ??  UserInfo::DEFAULT_AVATAR,
+
         ];
     }
 }

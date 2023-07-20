@@ -32,7 +32,6 @@ class ReviewResource extends JsonResource
             'user' => $this->user_name,
             'review_id' => $this->review_id,
             'title' => $this->title,
-            'anonymously' => $this->anonymously ?? null,
             'images' => $this->images
                 ? json_decode($this->images, true)
                 : [],

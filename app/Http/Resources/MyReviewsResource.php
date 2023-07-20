@@ -58,14 +58,8 @@ class MyReviewsResource extends JsonResource
             //'images' => $this->review_images ? json_decode($this->review_images,true) : [],
             'status' => $this->status,
             'created_at' => $this->created_at ? $this->created_at->toDateString() : null,
-            'user_name' =>
-                isset($this->review_id)
-                    ? ($this->anonymously === 0 ? $this->user_name : 'Имя скрыто')
-                    : $this->user_name,
-            'user_avatar' =>
-                isset($this->review_id)
-                    ? $this->anonymously === 0 ? $this->avatar : UserInfo::DEFAULT_AVATAR
-                    : $this->avatar
+            'user_name' => $this->user_name,
+            'user_avatar' => $this->avatar ?? UserInfo::DEFAULT_AVATAR,
         ];
     }
 }

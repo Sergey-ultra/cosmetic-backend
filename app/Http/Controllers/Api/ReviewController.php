@@ -311,7 +311,7 @@ class ReviewController extends Controller
                     'plus' => $request->input('plus'),
                     'minus' => $request->input('minus'),
                     'images' => $request->input('images'),
-                    'anonymously' => $request->input('anonymously') ?? 0,
+                    'anonymously' => 0,
                     'is_recommend' => $request->input('is_recommend') ?? 0,
                 ]
             );

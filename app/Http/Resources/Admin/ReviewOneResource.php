@@ -25,7 +25,6 @@ class ReviewOneResource extends JsonResource
             'minus' => $this->minus,
             'images' => $this->images,
             'status' => $this->status,
-            'anonymously' => $this->anonymously
         ];
     }
 }

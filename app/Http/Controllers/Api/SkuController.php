@@ -87,6 +87,28 @@ class SkuController extends Controller
         return response()->json(['data' => $result]);
     }
 
+    public function mySkus(): JsonResponse
+    {
+        $userId = Auth::guard('api')->id();
+        $result = Sku::query()
+            ->select(
+                sprintf('%s.id', Sku::TABLE),
+                sprintf('%s.volume', Sku::TABLE),
+                sprintf('%s.name', Product::TABLE),
+                sprintf('%s.code AS product_code', Product::TABLE),
+            )
+            ->join(
+                Product::TABLE,
+                sprintf('%s.product_id', Sku::TABLE),
+                '=',
+                sprintf('%s.id', Product::TABLE)
+            )
+            ->where('user_id', $userId)
+            ->get();
+
+        return response()->json(['data' => $result]);
+    }
+
 
     /**
      * @params Request $request
@@ -96,17 +118,18 @@ class SkuController extends Controller
     {
         $ids = $request->ids;
 
-        $result = Product::select(
-            'skus.id as id',
-            'products.name as name',
-            'products.code as code',
-            'brands.name as brand',
-            'skus.volume as volume',
-            'skus.images as image',
-            'skus.rating as rating',
-            'skus.reviews_count as reviews_count',
-            DB::raw('MIN(sku_store.price) as min_price')
-        )
+        $result = Product::query()
+            ->select(
+                'skus.id as id',
+                'products.name as name',
+                'products.code as code',
+                'brands.name as brand',
+                'skus.volume as volume',
+                'skus.images as image',
+                'skus.rating as rating',
+                'skus.reviews_count as reviews_count',
+                DB::raw('MIN(sku_store.price) as min_price')
+            )
             ->join('skus', 'products.id', '=', 'skus.product_id')
             ->join('sku_store', 'skus.id', '=', 'sku_store.sku_id')
             ->join('links', 'sku_store.link_id', '=', 'links.id')

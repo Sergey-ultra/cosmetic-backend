@@ -18,8 +18,6 @@ class ReviewRequest extends JsonApiRequest
                 'plus' => 'nullable|string',
                 'minus' => 'nullable|string',
                 'sku_id' => 'required|numeric',
-                'images' => 'array',
-                'anonymously' => 'nullable|in:0,1',
                 'is_recommend' => 'nullable|in:0,1',
             ];
         }
@@ -29,8 +27,6 @@ class ReviewRequest extends JsonApiRequest
             'minus' => 'string|min:5',
             'body' => 'required',
             'sku_id' => 'required|numeric',
-            'images' => 'array',
-            'anonymously' => 'nullable|in:0,1',
             'is_recommend' => 'nullable|in:0,1',
         ];
     }
