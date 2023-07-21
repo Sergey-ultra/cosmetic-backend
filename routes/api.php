@@ -143,7 +143,7 @@ Route::get('/brands/all', [BrandController::class, 'all']);
 
 Route::get('/categories/by-code/{code}', [CategoryController::class, 'byCode']);
 Route::get('/categories/all', [CategoryController::class, 'all']);
-Route::get('/categories/nested', [CategoryController::class, 'nested']);
+Route::get('/categories/popular-categories', [CategoryController::class, 'popularCategories']);
 
 
 Route::get('/show-compared-skus', [SkuController::class, 'showComparedSkus']);
