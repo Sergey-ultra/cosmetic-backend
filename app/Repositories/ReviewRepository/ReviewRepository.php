@@ -137,7 +137,7 @@ class ReviewRepository implements IReviewRepository
                 sprintf('%s.minus', Review::TABLE),
                 sprintf('%s.status', Review::TABLE),
             ])
-            ->where('status', '!=', 'deleted');
+            ->where( sprintf('%s.status', Review::TABLE), '!=', 'deleted');
 
 
         return $this
