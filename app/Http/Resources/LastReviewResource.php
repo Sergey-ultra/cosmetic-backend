@@ -9,7 +9,9 @@ class LastReviewResource extends JsonResource
 {
     public function toArray($request)
     {
-        $body = json_decode($this->body, true);
+        if (is_string($this->body)) {
+            $body = json_decode($this->body, true);
+        }
         $symbolCount = '';
         $photosCount = 0;
 
