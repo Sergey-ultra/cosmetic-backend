@@ -11,10 +11,27 @@ class Review extends Model
 {
     public const TABLE = 'reviews';
 
+    public const RATING_ONE = 1;
+    public const RATING_TWO = 2;
+    public const RATING_THREE = 3;
+    public const RATING_FOUR = 4;
+    public const RATING_FIVE = 5;
+
+    public const RATINGS = [
+        self::RATING_ONE,
+        self::RATING_TWO,
+        self::RATING_THREE,
+        self::RATING_FOUR,
+        self::RATING_FIVE,
+    ];
+
+
     protected $table = self::TABLE;
 
     protected $fillable = [
-        'sku_rating_id',
+        'sku_id',
+        'user_id',
+        'rating',
         'title',
         'plus',
         'minus',
@@ -22,21 +39,13 @@ class Review extends Model
         'anonymously',
         'is_recommend',
         'images',
-        'status'
+        'status',
     ];
 
     protected $casts = [
         'images' => 'array',
         'body' => 'array',
     ];
-
-    /**
-     * @return BelongsTo
-     */
-    public function rating(): BelongsTo
-    {
-        return $this->belongsTo(SkuRating::class);
-    }
 
     /**
      * @return HasMany

@@ -7,7 +7,6 @@ use App\Http\Requests\AvatarRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\Country;
 use App\Models\Review;
-use App\Models\SkuRating;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Repositories\UserRepository\UserRepository;
@@ -42,12 +41,8 @@ class UserController extends Controller
             $result['sex'] = $info?->sex;
             $result['birthday_year'] = $info?->birthday_year;
 
-            $reviewCount = SkuRating::query()
-                ->join('reviews', 'reviews.sku_rating_id', '=', 'sku_ratings.id')
-                ->where([
-                    ['sku_ratings.user_id', $user->id],
-                    ['reviews.status', 'published']
-                ])
+            $reviewCount = Review::query()
+                ->where(['user_id' => $user->id, 'status' => 'published'])
                 ->count();
             $result['review_count'] = $reviewCount;
         }
@@ -107,16 +102,10 @@ class UserController extends Controller
                 sprintf('%s.id', User::TABLE)
             )
             ->join(
-                SkuRating::TABLE,
-                sprintf('%s.user_id', SkuRating::TABLE),
+                Review::TABLE,
+                sprintf('%s.user_id', Review::TABLE),
                 '=',
                 sprintf('%s.id', User::TABLE)
-            )
-            ->join(
-                Review::TABLE,
-                sprintf('%s.sku_rating_id', Review::TABLE),
-                '=',
-                sprintf('%s.id', SkuRating::TABLE)
             )
             ->groupBy(
                 sprintf('%s.id', User::TABLE),

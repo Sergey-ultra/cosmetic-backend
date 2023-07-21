@@ -13,17 +13,16 @@ use App\Http\Resources\ReviewCollection;
 use App\Http\Resources\ReviewSingleResource;
 use App\Jobs\AdminNotificationJob;
 use App\Jobs\ReviewViewJob;
+use App\Jobs\UpdateSkuRatingJob;
 use App\Models\Review;
 use App\Models\Sku;
-use App\Models\SkuRating;
 use App\Models\SkuVideo;
 use App\Repositories\ReviewRepository\IReviewRepository;
 use App\Services\EntityStatus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;;
 use Symfony\Component\HttpFoundation\Response;
 
 class ReviewController extends Controller
@@ -43,8 +42,8 @@ class ReviewController extends Controller
         $query = $reviewRepository
             ->getMyReviewsQuery()
             ->where([
-                sprintf('%s.user_id', SkuRating::TABLE) => Auth::guard('api')->id(),
-                sprintf('%s.status',SkuRating::TABLE) => EntityStatus::PUBLISHED,
+                sprintf('%s.user_id', Review::TABLE) => Auth::guard('api')->id(),
+                sprintf('%s.status',Review::TABLE) => EntityStatus::PUBLISHED,
                 sprintf('%s.status',Review::TABLE) => EntityStatus::PUBLISHED,
             ]);
 
@@ -58,8 +57,7 @@ class ReviewController extends Controller
         $query = $reviewRepository
             ->getReviewWithProductInfoQuery()
             ->where([
-                sprintf('%s.user_id', SkuRating::TABLE) => Auth::guard('api')->id(),
-                sprintf('%s.status',SkuRating::TABLE) => EntityStatus::PUBLISHED,
+                sprintf('%s.user_id', Review::TABLE) => Auth::guard('api')->id(),
                 sprintf('%s.status',Review::TABLE) => EntityStatus::DRAFT,
             ]);
 
@@ -73,8 +71,7 @@ class ReviewController extends Controller
         $query = $reviewRepository
             ->getReviewWithProductInfoQuery()
             ->where([
-                sprintf('%s.user_id', SkuRating::TABLE) => Auth::guard('api')->id(),
-                sprintf('%s.status',SkuRating::TABLE) => EntityStatus::PUBLISHED,
+                sprintf('%s.user_id', Review::TABLE) => Auth::guard('api')->id(),
                 sprintf('%s.status',Review::TABLE) => EntityStatus::MODERATED,
             ]);
 
@@ -88,8 +85,7 @@ class ReviewController extends Controller
         $query = $reviewRepository
             ->getReviewWithProductInfoQuery()
             ->where([
-                sprintf('%s.user_id', SkuRating::TABLE) => Auth::guard('api')->id(),
-                sprintf('%s.status',SkuRating::TABLE) => EntityStatus::PUBLISHED,
+                sprintf('%s.user_id', Review::TABLE) => Auth::guard('api')->id(),
                 sprintf('%s.status',Review::TABLE) => EntityStatus::REJECTED,
             ]);
 
@@ -276,16 +272,9 @@ class ReviewController extends Controller
     public function updateOrCreate(ReviewRequest $request): JsonResponse
     {
         $skuId = $request->sku_id;
-
-        $currentRating = SkuRating::query()->where([
-            'sku_id' => $skuId,
-            'user_id' => Auth::guard('api')->user()->id
-        ])->first();
-
-
         $currentSku = Sku::find($skuId);
 
-        if (!$currentRating || !$currentSku) {
+        if (!$currentSku) {
             return response()->json([
                 'data' => [
                     'status' => 'success',
@@ -301,7 +290,7 @@ class ReviewController extends Controller
         $review = Review::query()
             ->updateOrCreate(
                 [
-                    'sku_rating_id' => $currentRating->id,
+                    'user_id' => Auth::guard('api')->id(),
                     'status' => $status,
                 ],
                 [
@@ -335,25 +324,17 @@ class ReviewController extends Controller
      *
      * @param  int  $id
      */
-    public function destroy(int $id)
+    public function destroy(int $id): void
     {
-        $reviewInfo = SkuRating::select(
-            'reviews.id AS review_id',
-            'reviews.status AS review_status',
-            'skus.id AS sku_id'
-        )
-            ->join('skus', 'skus.id', '=', 'sku_ratings.sku_id')
-            ->leftJoin('reviews', 'sku_ratings.id', '=', 'reviews.sku_rating_id')
-            ->where('sku_ratings.id', $id)
-            ->first();
+        $review = Review::query()->select('status', 'sku_id')->find($id);
 
-        SkuRating::where('id', $id)->update(['status' => 'deleted']);
-        if ($reviewInfo->review_id) {
-            if ($reviewInfo->review_status === 'published') {
-                Sku::where('id', $reviewInfo->sku_id)->update(['reviews_count' => DB::raw('reviews_count - 1')]);
+        if ($review) {
+            if ($review->status === EntityStatus::PUBLISHED) {
+                $currentSku = Sku::query()->find($review->sku_id);
+                UpdateSkuRatingJob::dispatch($currentSku, 'minus');
             }
 
-            Review::where('id', $reviewInfo->review_id)->update(['status' => 'deleted']);
+            $review->update(['status' => 'deleted']);
         }
     }
 }

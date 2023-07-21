@@ -20,7 +20,6 @@ use App\Http\Controllers\Api\RouteController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\SkuController;
 use App\Http\Controllers\Api\QuestionController;
-use App\Http\Controllers\Api\RatingController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SkuVideoController;
 use App\Http\Controllers\Api\AuthSocialController;
@@ -45,7 +44,6 @@ use App\Http\Controllers\Api\Admin\StoreController as AdminStoreController;
 use App\Http\Controllers\Api\Admin\IngredientController as AdminIngredientController;
 use App\Http\Controllers\Api\Admin\CountryController as AdminCountryController;
 use App\Http\Controllers\Api\Admin\BrandController as AdminBrandController;
-use App\Http\Controllers\Api\Admin\RatingController as AdminRatingController;
 use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Api\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
@@ -170,8 +168,7 @@ Route::get('/comments', [CommentController::class, 'byReviewId']);
 
 Route::get('/questions', [QuestionController::class, 'bySkuId']);
 
-Route::post('/rating/check-user-rating', [RatingController::class, 'checkUserRating']);
-Route::post('/rating/create-or-update', [RatingController::class, 'createOrUpdate']);
+
 Route::post('/files', [FileController::class, 'storeAsForm']);
 
 Route::get('/routes/skus-queries', [RouteController::class, 'skusQueries']);
@@ -342,7 +339,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 
         Route::get('/trackings', [AdminTrackingController::class, 'index']);
         Route::get('/trackings/dynamics', [AdminTrackingController::class, 'dynamics']);
-        Route::get('/rating/dynamic', [AdminRatingController::class, 'dynamic']);
+        Route::get('/rating/dynamic', [AdminReviewController::class, 'dynamic']);
         Route::get('/visit-statistics', [VisitStaticticsController::class, 'index']);
 
         Route::get('/links/by-store', [LinkClickController::class, 'clicksByStore']);

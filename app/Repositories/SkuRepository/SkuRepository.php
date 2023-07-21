@@ -8,7 +8,6 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\ReviewView;
 use App\Models\Sku;
-use App\Models\SkuRating;
 use App\Repositories\SkuRepository\DTO\SkuDTO;
 use App\Repositories\SkuRepository\DTO\SkuListOptionDTO;
 use App\Services\EntityStatus;
@@ -330,7 +329,7 @@ class SkuRepository implements ISkuRepository
             ->select(
                 sprintf('%s.name', Product::TABLE),
                 sprintf('%s.volume', Sku::TABLE),
-                DB::raw(sprintf('COUNT(%s.sku_id) AS views_count', SkuRating::TABLE))
+                DB::raw(sprintf('COUNT(%s.sku_id) AS views_count', Review::TABLE))
             )
             ->join(
                 Sku::TABLE,
@@ -339,16 +338,10 @@ class SkuRepository implements ISkuRepository
                 sprintf('%s.id', Product::TABLE)
             )
             ->join(
-                SkuRating::TABLE,
-                sprintf('%s.sku_id', SkuRating::TABLE),
+                Review::TABLE,
+                sprintf('%s.sku_id', Review::TABLE),
                 '=',
                 sprintf('%s.id', Sku::TABLE)
-            )
-            ->join(
-                Review::TABLE,
-                sprintf('%s.sku_rating_id', Review::TABLE),
-                '=',
-                sprintf('%s.id', SkuRating::TABLE)
             )
             ->join(
                 ReviewView::TABLE,
@@ -357,7 +350,7 @@ class SkuRepository implements ISkuRepository
                 sprintf('%s.id', Review::TABLE)
             )
             ->groupBy(
-                sprintf('%s.sku_id', SkuRating::TABLE),
+                sprintf('%s.sku_id', Review::TABLE),
                 sprintf('%s.name', Product::TABLE),
                 sprintf('%s.volume', Sku::TABLE),
             )

@@ -12,7 +12,6 @@ use App\Models\Comment;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\Sku;
-use App\Models\SkuRating;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -51,14 +50,8 @@ class CommentController extends Controller
                 sprintf('%s.id', Review::TABLE)
             )
             ->join(
-                SkuRating::TABLE,
-                sprintf('%s.sku_rating_id', Review::TABLE),
-                '=',
-                sprintf('%s.id', SkuRating::TABLE)
-            )
-            ->join(
                 Sku::TABLE,
-                sprintf('%s.sku_id', SkuRating::TABLE),
+                sprintf('%s.sku_id', Review::TABLE),
                 '=',
                 sprintf('%s.id', Sku::TABLE)
             )

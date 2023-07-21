@@ -11,9 +11,9 @@ use App\Http\Requests\StatusRequest;
 use App\Http\Resources\Admin\ReviewCollection;
 use App\Http\Resources\Admin\ReviewOneResource;
 use App\Jobs\ReviewPublishedJob;
+use App\Jobs\UpdateSkuRatingJob;
 use App\Models\Review;
 use App\Models\Sku;
-use App\Models\SkuRating;
 use App\Repositories\ReviewRepository\IReviewRepository;
 use App\Services\EntityStatus;
 use App\Services\ImageSavingService\ImageSavingService;
@@ -139,39 +139,39 @@ class ReviewController extends Controller
      */
     public function setStatus(int $id, StatusRequest $request): JsonResponse
     {
-        $reviewInfo = SkuRating::query()
-            ->select(
-                'reviews.id AS review_id',
-                'reviews.status AS review_status',
-                'skus.id AS sku_id',
-                'sku_ratings.user_id'
-            )
-            ->join('skus', 'skus.id', '=', 'sku_ratings.sku_id')
-            ->leftJoin('reviews', 'sku_ratings.id', '=', 'reviews.sku_rating_id')
-            ->where('sku_ratings.id', $id)
-            ->first();
+        $status = $request->input('status');
+        $review = Review::query()
+            ->select('id', 'status', 'sku_id', 'user_id')
+            ->find($id);
 
 
-        if ($request->status === 'deleted') {
-            $skuRatingUpdatedStatus = EntityStatus::DELETED;
-        } else {
-            $skuRatingUpdatedStatus = EntityStatus::PUBLISHED;
-        }
+        if ($review) {
+            Review::query()->where('id', $review->id)->update(['status' => $status]);
+            $currentSku = Sku::query()->where('id', $review->sku_id)->update(['reviews_count' => DB::raw('reviews_count + 1')]);
 
-        SkuRating::query()->where('id', $id)->update(['status' => $skuRatingUpdatedStatus]);
-
-        if ($reviewInfo->review_id) {
-            Review::query()->where('id', $reviewInfo->review_id)->update(['status' => $request->status]);
-
-            if ($request->status === EntityStatus::PUBLISHED) {
-                Sku::query()->where('id', $reviewInfo->sku_id)->update(['reviews_count' => DB::raw('reviews_count + 1')]);
-
-                ReviewPublishedJob::dispatch($reviewInfo->user_id, $reviewInfo->review_id);
-            } else if ($reviewInfo->review_status === EntityStatus::PUBLISHED && $request->status !== EntityStatus::PUBLISHED) {
-                Sku::query()->where('id', $reviewInfo->sku_id)->update(['reviews_count' => DB::raw('reviews_count - 1')]);
+            if ($status === EntityStatus::PUBLISHED) {
+                ReviewPublishedJob::dispatch($review->user_id, $review->id);
+                UpdateSkuRatingJob::dispatch($currentSku, 'plus');
+            } else if ($review->status === EntityStatus::PUBLISHED) {
+                UpdateSkuRatingJob::dispatch($currentSku, 'minus');
             }
         }
 
         return response()->json(['data' => ['status' => 'success']]);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function dynamic(): JsonResponse
+    {
+        $result = DB::table('reviews')
+            ->select(DB::raw("count(id) AS count, DATE(created_at) AS date"))
+            ->where('user_id', '<>', 1)
+            ->groupBy(DB::raw('WEEK(created_at)'))
+            ->orderBy('date')
+            ->get();
+
+        return response()->json(['data'=> $result]);
     }
 }

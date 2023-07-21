@@ -12,8 +12,6 @@ use App\Models\ParsingLink;
 use App\Models\PriceHistory;
 use App\Models\Product;
 use App\Models\Sku;
-use App\Models\SkuRating;
-use App\Models\SkuStore;
 use Illuminate\Support\Facades\DB;
 
 class ProductInsertService extends ProductInsertReturnArrayService
@@ -156,12 +154,6 @@ class ProductInsertService extends ProductInsertReturnArrayService
                         ]);
 
                         $skuId = $insertedSku->id;
-
-                        SkuRating::query()->create([
-                            'sku_id' => $skuId,
-                            'rating' => 5,
-                            'user_name' => 'Robot.Smart-Beautiful'
-                        ]);
                     }
 // пока не нужно писать в таблицу актуальных цен
 
