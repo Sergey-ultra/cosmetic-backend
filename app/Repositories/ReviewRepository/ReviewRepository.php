@@ -127,7 +127,16 @@ class ReviewRepository implements IReviewRepository
     protected function setReviewWithProductInfoQuery(): self
     {
         $this->query = Review::query()
-            ->select(['rating', 'created_at', 'id AS review_id', 'title', 'body', 'plus', 'minus', 'status'])
+            ->select([
+                sprintf('%s.rating', Review::TABLE),
+                sprintf('%s.created_at', Review::TABLE),
+                sprintf('%s.id AS review_id', Review::TABLE),
+                sprintf('%s.title', Review::TABLE),
+                sprintf('%s.body', Review::TABLE),
+                sprintf('%s.plus', Review::TABLE),
+                sprintf('%s.minus', Review::TABLE),
+                sprintf('%s.status', Review::TABLE),
+            ])
             ->where('status', '!=', 'deleted');
 
 
