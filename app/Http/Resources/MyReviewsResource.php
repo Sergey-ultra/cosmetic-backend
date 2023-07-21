@@ -36,7 +36,6 @@ class MyReviewsResource extends JsonResource
         //$symbolCount = mb_strlen(trim(preg_replace("/[^А-яЁёA-Za-z1-9]/g", "", $symbolCount)));
 
         return [
-            'sku_rating_id' => $this->sku_rating_id,
             'rating' => $this->rating,
             'sku_name' => $this->sku_name,
             'common_rating' => $this->common_rating,

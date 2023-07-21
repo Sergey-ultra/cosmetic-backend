@@ -32,7 +32,6 @@ class LastReviewResource extends JsonResource
             }
         }
         return [
-            'sku_rating_id' => $this->sku_rating_id,
             'rating' => $this->rating,
             'sku_name' => $this->sku_name,
             'common_rating' => $this->common_rating,
@@ -45,7 +44,7 @@ class LastReviewResource extends JsonResource
             'likes_count' => $this->likes_count ?? 0,
             'sku_id' => $this->sku_id,
             'volume' => $this->volume,
-            'sku_image' => $this->sku_images ? json_decode($this->sku_images, true)[0] : [],
+            'sku_image' => $this->sku_images && is_array($this->sku_images) ? json_decode($this->sku_images, true)[0] : [],
             'review_id' => $this->review_id,
             'comment' => $body,
             'title' => $this->title,

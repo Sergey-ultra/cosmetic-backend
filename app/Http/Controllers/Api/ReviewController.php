@@ -123,7 +123,7 @@ class ReviewController extends Controller
         $query = $reviewRepository
             ->getReviewWithCommentCountQuery()
             ->where([
-                'sku_ratings.sku_id' => $id,
+                'reviews.sku_id' => $id,
                 'reviews.status' => 'published'
             ]);
 
@@ -178,14 +178,10 @@ class ReviewController extends Controller
 
 
         $reviews = Review::query()
-            ->select(
-                'reviews.body',
-                'sku_ratings.rating'
-            )
-            ->join('sku_ratings', 'sku_ratings.id', '=', 'reviews.sku_rating_id')
+            ->select('body', 'rating')
             ->where([
-                'sku_ratings.sku_id' => $id,
-                'reviews.status' => 'published'
+                'sku_id' => $id,
+                'status' => EntityStatus::PUBLISHED
             ])
             ->get();
 
@@ -228,41 +224,30 @@ class ReviewController extends Controller
      */
     public function checkExistingReview(Request $request): JsonResponse
     {
-        $conditions[] = ['sku_ratings.sku_id', '=', $request->sku_id];
+        $conditions[] = ['reviews.sku_id', '=', $request->sku_id];
 
         $user = Auth::guard('api')->user();
         if (isset($user)) {
-           $conditions[] = ['sku_ratings.user_id' , '=', $user->id];
-        } else {
-            $conditions[] = ['sku_ratings.ip_address', '=', $request->ip()];
+            $conditions[] = ['reviews.user_id', '=', $user->id];
         }
-        //$conditions[] = ['reviews.status', '<>', 'deleted'];
 
         $existingReview = Review::query()
             ->select([
-                'sku_ratings.rating',
-                'reviews.id',
-                'reviews.title',
-                'reviews.body',
-                'reviews.plus',
-                'reviews.minus',
-                'reviews.images',
-                'reviews.status',
-                'reviews.anonymously',
-                'reviews.is_recommend',
+                'rating',
+                'id',
+                'title',
+                'body',
+                'plus',
+                'minus',
+                'images',
+                'status',
+                'anonymously',
+                'is_recommend',
             ])
-            ->rightJoin('sku_ratings', function ($join) {
-                $join->on('reviews.sku_rating_id', '=', 'sku_ratings.id')
-                    ->where('reviews.status', '!=', 'deleted');
-            })
+
+            ->where('status', '!=', 'deleted')
             ->where($conditions)
             ->first();
-
-//        if ($existingUserRating && $existingUserRating->availableReview) {
-//            $review = $existingUserRating->availableReview;
-//        } else {
-//            $review = null;
-//        }
 
         return response()->json(['data'=> $existingReview]);
     }

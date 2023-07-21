@@ -19,8 +19,7 @@ class ReviewResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'sku_rating_id' => $this->sku_rating_id,
-            'rating_status' => $this->rating_status,
+            'status' => $this->status,
             'product_name' => $this->sku_name,
             'product_link' => "/product/{$this->product_code}-{$this->sku_id}",
             'sku_image' => $this->sku_images

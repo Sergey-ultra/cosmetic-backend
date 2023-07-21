@@ -68,8 +68,6 @@ class CommentController extends Controller
                 'comments.status',
             ])
             ->join('reviews', 'comments.review_id', '=', 'reviews.id')
-            //->join('sku_ratings', 'reviews.sku_rating_id', '=', 'sku_ratings.id')
-            //->join('skus', 'sku_ratings.sku_id', '=', 'skus.id')
             //->join('products', 'skus.product_id', '=', 'products.id')
             ->where('comments.user_id', Auth::id())
             ->where('comments.status', '<>', 'deleted')
