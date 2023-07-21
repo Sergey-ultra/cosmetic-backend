@@ -20,7 +20,11 @@ class MyReviewsResource extends JsonResource
      */
     public function toArray($request)
     {
-        $body = json_decode($this->body, true);
+        if (is_string($this->body)) {
+            $body = json_decode($this->body, true);
+        } else {
+            $body = $this->body;
+        }
         $symbolCount = '';
         $photosCount = 0;
 
