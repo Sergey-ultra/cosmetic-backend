@@ -48,7 +48,9 @@ class LastReviewResource extends JsonResource
             'likes_count' => $this->likes_count ?? 0,
             'sku_id' => $this->sku_id,
             'volume' => $this->volume,
-            'sku_image' => $this->sku_images && is_array($this->sku_images) ? json_decode($this->sku_images, true)[0] : [],
+            'sku_image' => $this->sku_images && is_string($this->sku_images)
+                ? json_decode($this->sku_images, true)[0]
+                : [],
             'review_id' => $this->review_id,
             'comment' => $body,
             'title' => $this->title,
