@@ -19,6 +19,7 @@ class Product extends Model
         'name',
         'name_en',
         'code',
+        'user_id',
         'description',
         'application',
         'purpose',

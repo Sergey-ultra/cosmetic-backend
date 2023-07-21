@@ -55,11 +55,10 @@ class CategoryController extends Controller
             $params['image'] = $imageSavingService->saveOneImage($request->image, self::IMAGES_FOLDER, $request->name, false);
         }
 
-        Category::create($params);
+        $created = Category::query()->create($params);
 
         return response()->json([
-            'status'=> true,
-            'message' =>'Категория успешно создана'
+            'data'=> $created
         ], Response::HTTP_CREATED);
     }
 
@@ -73,7 +72,7 @@ class CategoryController extends Controller
     {
         $category = Category::find($id);
 
-        $category['skus'] = $category->products->map->skus->flatten();
+        //$category['skus'] = $category->products->map->skus->flatten();
         return response()->json(['data' => $category]);
     }
 

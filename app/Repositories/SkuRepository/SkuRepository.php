@@ -367,6 +367,7 @@ class SkuRepository implements ISkuRepository
      */
     public function createNewSku(SkuDTO $sku): array
     {
+        $userId = Auth::guard('api')->user()->id;
         try {
             DB::beginTransaction();
             $newProduct = Product::query()->create([
@@ -376,6 +377,7 @@ class SkuRepository implements ISkuRepository
                 'name_en' => Utils::makeEnglishProductName($sku->name, $sku->brandName),
                 'description' => $sku->description,
                 'code' => Text::makeProductCode($sku->brandName, $sku->name),
+                'user_id' => $userId,
             ]);
 
             $newSku = $newProduct->skus()->create([
@@ -384,7 +386,7 @@ class SkuRepository implements ISkuRepository
                 'rating' => 5,
                 "images" => $sku->images,
                 'status' => EntityStatus::MODERATED,
-                'user_id' => Auth::guard('api')->user()->id,
+                'user_id' => $userId,
             ]);
 
             DB::commit();

@@ -6,20 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Sku;
+use App\Services\TreeService\TreeInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
-
 class CategoryController extends Controller
 {
-    public function all(): JsonResponse
+    public function all(TreeInterface $treeService): JsonResponse
     {
-        $result = Category::query()
-            ->select(['id', 'name', 'parent_id'])
-            ->get();
+        $categories = Category::query()
+            ->select(['id', 'name', 'code', 'parent_id'])
+            ->get()
+            ->toArray();
+
+        $result = $treeService->buildTree($categories, 'parent_id');
 
         return response()->json(['data' =>  $result ]);
     }
+
     public function popularCategories(): JsonResponse
     {
         $result = Category::query()

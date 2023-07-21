@@ -38,8 +38,7 @@ class SkuController extends Controller
 
         $ingredientProductSubQuery = DB::table('ingredient_product')
             ->select('product_id')
-            ->groupBy('product_id')
-        ;
+            ->groupBy('product_id');
 
         $currentPricesCountSubQuery = DB::table(SkuStore::TABLE)
             ->select('sku_id', DB::raw('count(sku_id) AS link_count'))

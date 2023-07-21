@@ -10,6 +10,7 @@ use App\Models\Review;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Repositories\UserRepository\UserRepository;
+use App\Services\EntityStatus;
 use App\Services\ImageSavingService\ImageSavingService;
 use App\Services\UserLocationService\UserLocationService;
 use Illuminate\Http\JsonResponse;
@@ -107,6 +108,7 @@ class UserController extends Controller
                 '=',
                 sprintf('%s.id', User::TABLE)
             )
+            ->where(sprintf('%s.status', Review::TABLE), EntityStatus::PUBLISHED)
             ->groupBy(
                 sprintf('%s.id', User::TABLE),
                 sprintf('%s.name', User::TABLE),

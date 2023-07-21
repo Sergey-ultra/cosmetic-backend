@@ -18,6 +18,7 @@ class CreateProductsTable extends Migration
             $table->bigIncrements('id');
             $table->foreignId('category_id');
             $table->foreignId('brand_id');
+            $table->foreignId('user_id')->nullable();
             $table->string('name');
             $table->string('name_en')->nullable();
             $table->string('code')->unique();
