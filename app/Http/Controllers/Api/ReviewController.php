@@ -123,8 +123,8 @@ class ReviewController extends Controller
         $query = $reviewRepository
             ->getReviewWithCommentCountQuery()
             ->where([
-                'reviews.sku_id' => $id,
-                'reviews.status' => 'published'
+                sprintf('%s.sku_id', Review::TABLE) => $id,
+                sprintf('%s.status', Review::TABLE) => EntityStatus::PUBLISHED
             ]);
 
         $result = $this->prepareModel($request, $query)->paginate($perPage);

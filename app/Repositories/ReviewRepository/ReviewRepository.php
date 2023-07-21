@@ -231,16 +231,16 @@ class ReviewRepository implements IReviewRepository
     {
         $this->query = Review::query()
             ->select([
-                'id',
-                'rating',
-                'user_id',
-                'title',
-                'body',
-                'plus',
-                'minus',
-                'images',
-                'created_at',
-                'is_recommend',
+                sprintf('%s.id', Review::TABLE),
+                sprintf('%s.rating', Review::TABLE),
+                sprintf('%s.user_id', Review::TABLE),
+                sprintf('%s.title', Review::TABLE),
+                sprintf('%s.body', Review::TABLE),
+                sprintf('%s.plus', Review::TABLE),
+                sprintf('%s.minus', Review::TABLE),
+                sprintf('%s.images', Review::TABLE),
+                sprintf('%s.created_at', Review::TABLE),
+                sprintf('%s.is_recommend', Review::TABLE),
             ]);
 
         $this
