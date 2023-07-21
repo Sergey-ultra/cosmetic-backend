@@ -11,6 +11,8 @@ class LastReviewResource extends JsonResource
     {
         if (is_string($this->body)) {
             $body = json_decode($this->body, true);
+        } else {
+            $body = $this->body;
         }
         $symbolCount = '';
         $photosCount = 0;
