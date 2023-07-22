@@ -100,7 +100,7 @@ class SkuController extends Controller
                 '=',
                 sprintf('%s.id', Product::TABLE)
             )
-            ->where('user_id', $userId)
+            ->where(sprintf('%s.user_id', Sku::TABLE), $userId)
             ->get();
 
         return response()->json(['data' => $result]);

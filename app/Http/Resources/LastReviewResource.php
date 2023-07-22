@@ -36,32 +36,33 @@ class LastReviewResource extends JsonResource
             }
         }
         return [
+            'id' => $this->id,
             'rating' => $this->rating,
-            'sku_name' => $this->sku_name,
-            'common_rating' => $this->common_rating,
-            'product_code' => $this->product_code,
             'symbol_count' => mb_strlen($symbolCount),
             'photos_count' => $photosCount,
             'views_count' => $this->views_count ?? 0,
-            'balance' => $this->balance ? $this->balance / 1000 : 0,
-            'bonus' => $this->bonus ? $this->bonus / 1000 : 0,
             'likes_count' => $this->likes_count ?? 0,
-            'sku_id' => $this->sku_id,
-            'volume' => $this->volume,
-            'sku_image' => $this->sku_images && is_string($this->sku_images)
-                ? json_decode($this->sku_images, true)[0]
-                : [],
-            'review_id' => $this->review_id,
-            'comment' => $body,
             'title' => $this->title,
             'plus' => $this->plus,
             'minus' => $this->minus,
-            //'images' => $this->review_images ? json_decode($this->review_images,true) : [],
             'status' => $this->status,
             'created_at' => $createdAt,
-            'user_id' => $this->user_id,
-            'user_name' => $this->user_name,
-            'user_avatar' => $this->avatar ?? UserInfo::DEFAULT_AVATAR,
+            'sku' => [
+                'id' => $this->sku_id,
+                'name' => $this->sku_name,
+                'rating' => $this->common_rating,
+                'reviews_count' => $this->sku_reviews_count,
+                'product_code' => $this->product_code,
+                'volume' => $this->volume,
+                'image' => $this->sku_images && is_string($this->sku_images)
+                    ? json_decode($this->sku_images, true)[0]
+                    : [],
+            ],
+            'user' => [
+                'id' => $this->user_id,
+                'name' => $this->user_name,
+                'avatar' => $this->avatar ?? UserInfo::DEFAULT_AVATAR,
+            ],
         ];
     }
 }

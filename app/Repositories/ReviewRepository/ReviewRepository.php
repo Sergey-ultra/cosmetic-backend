@@ -129,7 +129,7 @@ class ReviewRepository implements IReviewRepository
             ->select([
                 sprintf('%s.rating', Review::TABLE),
                 sprintf('%s.created_at', Review::TABLE),
-                sprintf('%s.id AS review_id', Review::TABLE),
+                sprintf('%s.id', Review::TABLE),
                 sprintf('%s.title', Review::TABLE),
                 sprintf('%s.body', Review::TABLE),
                 sprintf('%s.plus', Review::TABLE),
@@ -299,6 +299,7 @@ class ReviewRepository implements IReviewRepository
                 'skus.volume',
                 'skus.rating AS common_rating',
                 'skus.images AS sku_images',
+                'skus.reviews_count AS sku_reviews_count'
             )
             ->join(
                 Sku::TABLE,
