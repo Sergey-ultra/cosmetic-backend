@@ -30,9 +30,6 @@ class ReviewResource extends JsonResource
             'user' => $this->user_name,
             'review_id' => $this->review_id,
             'title' => $this->title,
-            'images' => $this->images
-                ? json_decode($this->images, true)
-                : [],
             'review_status' => $this->review_status,
             'created_at' => (new Carbon($this->created_at))->format('Y-m-d'),
         ];
