@@ -42,6 +42,7 @@ class LastReviewResource extends JsonResource
             'photos_count' => $photosCount,
             'views_count' => $this->views_count ?? 0,
             'likes_count' => $this->likes_count ?? 0,
+            'is_recommend_percentage' => round(100 * $this->is_recommend_percentage, 2),
             'title' => $this->title,
             'plus' => $this->plus,
             'minus' => $this->minus,

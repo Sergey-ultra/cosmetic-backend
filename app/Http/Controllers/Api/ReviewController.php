@@ -101,7 +101,7 @@ class ReviewController extends Controller
     public function last(IReviewRepository $reviewRepository): LastReviewsCollection
     {
         $result = $reviewRepository
-            ->getReviewWithProductInfoQuery()
+            ->getLastReviewQuery()
             ->where(sprintf('%s.status', Review::TABLE), EntityStatus::PUBLISHED)
             ->orderBy(sprintf('%s.created_at', Review::TABLE), 'DESC')
             ->limit(self::LAST_LIMIT)
@@ -124,7 +124,7 @@ class ReviewController extends Controller
             ->getReviewWithCommentCountQuery()
             ->where([
                 sprintf('%s.sku_id', Review::TABLE) => $id,
-                sprintf('%s.status', Review::TABLE) => EntityStatus::PUBLISHED
+                sprintf('%s.status', Review::TABLE) => EntityStatus::PUBLISHED,
             ]);
 
         $result = $this->prepareModel($request, $query)->paginate($perPage);

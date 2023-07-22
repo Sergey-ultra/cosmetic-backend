@@ -73,6 +73,16 @@ class ReviewRepository implements IReviewRepository
             ->getQuery();
     }
 
+    /**
+     * @return EloquentBuilder
+     */
+    public function getLastReviewQuery(): EloquentBuilder
+    {
+        return $this->setReviewWithProductInfoQuery()
+            ->addIsRecommendPercentageQuery()
+            ->getQuery();
+    }
+
 
 
     /**
@@ -95,12 +105,11 @@ class ReviewRepository implements IReviewRepository
     {
         $result = $this->getSingleReviewRawModel($id);
 
-
         $reviewsWithSameSku = Review::query()
             ->select('is_recommend')
             ->where([
-               'sku_id'  => $result->sku_id,
-               'status'  => EntityStatus::PUBLISHED,
+               'sku_id' => $result->sku_id,
+               'status' => EntityStatus::PUBLISHED,
             ])
             ->get();
 
@@ -136,7 +145,7 @@ class ReviewRepository implements IReviewRepository
                 sprintf('%s.minus', Review::TABLE),
                 sprintf('%s.status', Review::TABLE),
             ])
-            ->where( sprintf('%s.status', Review::TABLE), '!=', 'deleted');
+            ->where(sprintf('%s.status', Review::TABLE), '!=', 'deleted');
 
 
         return $this
@@ -293,13 +302,13 @@ class ReviewRepository implements IReviewRepository
     {
         $this->query
             ->addSelect(
-                'skus.id AS sku_id',
-                'products.name AS sku_name',
-                'products.code AS product_code',
-                'skus.volume',
-                'skus.rating AS common_rating',
-                'skus.images AS sku_images',
-                'skus.reviews_count AS sku_reviews_count'
+                sprintf('%s.id AS sku_id', Sku::TABLE),
+                sprintf('%s.volume', Sku::TABLE),
+                sprintf('%s.rating AS common_rating', Sku::TABLE),
+                sprintf('%s.images AS sku_images', Sku::TABLE),
+                sprintf('%s.reviews_count AS sku_reviews_count', Sku::TABLE),
+                sprintf('%s.name AS sku_name', Product::TABLE),
+                sprintf('%s.code AS product_code', Product::TABLE),
             )
             ->join(
                 Sku::TABLE,
@@ -313,6 +322,26 @@ class ReviewRepository implements IReviewRepository
                 '=',
                 sprintf('%s.id', Product::TABLE)
             );
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function addIsRecommendPercentageQuery(): self
+    {
+        $isRecommendCountSubQuery = DB::table(Review::TABLE)
+            ->selectRaw('count(sku_id) as is_recommend_count, sku_id')
+            ->where('status', EntityStatus::PUBLISHED)
+            ->where('is_recommend', 1)
+            ->groupBy('sku_id');
+
+        $this->query
+            ->addSelect(DB::raw(sprintf('is_recommend.is_recommend_count / %s.reviews_count AS is_recommend_percentage', Sku::TABLE)))
+            ->leftJoinSub($isRecommendCountSubQuery, 'is_recommend', function ($join) {
+                $join->on(sprintf('%s.id', Sku::TABLE), '=', 'is_recommend.sku_id');
+            });
 
         return $this;
     }
