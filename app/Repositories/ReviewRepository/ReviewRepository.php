@@ -430,7 +430,7 @@ class ReviewRepository implements IReviewRepository
      */
     protected function addUserIsNotNullCondition(): self
     {
-        $this->query->whereNotNull('user_id');
+        $this->query->whereNotNull(sprintf('%s.user_id', Review::TABLE));
 
         return $this;
     }
