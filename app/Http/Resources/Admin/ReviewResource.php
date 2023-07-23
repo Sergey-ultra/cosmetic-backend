@@ -19,6 +19,7 @@ class ReviewResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'id' => $this->id,
             'product_name' => $this->sku_name,
             'product_link' => "/product/{$this->product_code}-{$this->sku_id}",
             'sku_image' => $this->sku_images
@@ -28,7 +29,6 @@ class ReviewResource extends JsonResource
             'views_count' => $this->views_count,
             'likes_count' => $this->likes_count,
             'user' => $this->user_name,
-            'review_id' => $this->review_id,
             'title' => $this->title,
             'review_status' => $this->review_status,
             'created_at' => (new Carbon($this->created_at))->format('Y-m-d'),
