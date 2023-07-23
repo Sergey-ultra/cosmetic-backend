@@ -441,7 +441,7 @@ class ReviewRepository implements IReviewRepository
     protected function addUserReviewCountSubQuery(): self
     {
         $userReviewCountSubQuery = DB::table(Review::TABLE)
-            ->selectRaw('count(sku_rating_id) as count, user_id')
+            ->selectRaw('count(user_id) as count, user_id')
             ->groupBy('user_id');
 
         $this->query
