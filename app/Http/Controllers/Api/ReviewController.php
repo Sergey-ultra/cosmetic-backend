@@ -44,7 +44,6 @@ class ReviewController extends Controller
             ->where([
                 sprintf('%s.user_id', Review::TABLE) => Auth::guard('api')->id(),
                 sprintf('%s.status',Review::TABLE) => EntityStatus::PUBLISHED,
-                sprintf('%s.status',Review::TABLE) => EntityStatus::PUBLISHED,
             ]);
 
         $result = $this->prepareModel($request, $query)->paginate($perPage);
@@ -256,14 +255,14 @@ class ReviewController extends Controller
 
     public function updateOrCreate(ReviewRequest $request): JsonResponse
     {
-        $skuId = $request->sku_id;
-        $currentSku = Sku::find($skuId);
+        $skuId = $request->input('sku_id');
+        $currentSku = Sku::query()->find($skuId);
 
         if (!$currentSku) {
             return response()->json([
                 'data' => [
                     'status' => 'success',
-                    'message' => 'Рейтинг не существует'
+                    'message' => 'sku не существует'
                 ]
             ], Response::HTTP_NOT_FOUND);
         }
@@ -277,6 +276,7 @@ class ReviewController extends Controller
                 [
                     'user_id' => Auth::guard('api')->id(),
                     'status' => $status,
+                    'sku_id' => $skuId,
                 ],
                 [
                     'status' => $status,
@@ -286,7 +286,6 @@ class ReviewController extends Controller
                     'plus' => $request->input('plus'),
                     'minus' => $request->input('minus'),
                     'images' => $request->input('images'),
-                    'anonymously' => 0,
                     'is_recommend' => $request->input('is_recommend') ?? 0,
                 ]
             );

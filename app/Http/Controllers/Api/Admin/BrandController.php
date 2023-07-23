@@ -94,14 +94,9 @@ class BrandController extends Controller
         }
         $params['code'] = Text::makeCode($params['name']);
 
-        $newBrand = Brand::create($params);
+        $newBrand = Brand::query()->create($params);
 
-        return response()->json(['data' =>
-            [
-                'status'=> 'success',
-                'data' => $newBrand
-            ]
-        ], Response::HTTP_CREATED);
+        return response()->json(['data' => $newBrand], Response::HTTP_CREATED);
     }
 
 

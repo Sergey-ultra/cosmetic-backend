@@ -20,6 +20,7 @@ class CreateBrandsTable extends Migration
             $table->text('image')->nullable();
             $table->text('description')->nullable();
             $table->unsignedInteger('country_id')->nullable();
+            $table->unsignedInteger('user_id')->index();
             $table->timestamps();
         });
     }

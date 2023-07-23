@@ -36,14 +36,11 @@ class Review extends Model
         'plus',
         'minus',
         'body',
-        'anonymously',
         'is_recommend',
-        'images',
         'status',
     ];
 
     protected $casts = [
-        'images' => 'array',
         'body' => 'array',
     ];
 

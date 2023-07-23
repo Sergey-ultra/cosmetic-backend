@@ -188,6 +188,9 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/skus/my', [SkuController::class, 'mySkus']);
     Route::post('/skus', [SkuController::class, 'store']);
 
+
+    Route::post('/brands', [BrandController::class, 'store']);
+
     Route::get('/articles/my', [ArticleController::class, 'my']);
     Route::get('/articles/categories', [ArticleController::class, 'articleCategories']);
     Route::get('/articles/tags', [ArticleController::class, 'tags']);
