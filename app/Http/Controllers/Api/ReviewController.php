@@ -318,6 +318,14 @@ class ReviewController extends Controller
         if (!$existing) {
             response()->json([], Response::HTTP_NOT_FOUND);
         }
+
+        $currentSku = Sku::query()->find($request->input('sku_id'));
+
+        if (!$currentSku) {
+            response()->json([], Response::HTTP_NOT_FOUND);
+        }
+
+
         $updated = $existing->update([
             'status' => EntityStatus::MODERATED,
             'rating' => $request->input('rating'),
@@ -327,6 +335,8 @@ class ReviewController extends Controller
             'minus' => $request->input('minus'),
             'is_recommend' => $request->input('is_recommend') ?? 0,
         ]);
+
+        UpdateSkuRatingJob::dispatch($currentSku, 'minus');
 
         return response()->json([
             'data' => [
