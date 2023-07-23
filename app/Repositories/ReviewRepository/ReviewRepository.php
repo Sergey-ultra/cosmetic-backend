@@ -246,7 +246,6 @@ class ReviewRepository implements IReviewRepository
                 sprintf('%s.body', Review::TABLE),
                 sprintf('%s.plus', Review::TABLE),
                 sprintf('%s.minus', Review::TABLE),
-                sprintf('%s.images', Review::TABLE),
                 sprintf('%s.created_at', Review::TABLE),
                 sprintf('%s.is_recommend', Review::TABLE),
             ]);
