@@ -212,6 +212,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/reviews/my-rejected', [ReviewController::class, 'myRejectedReviews']);
     Route::post('/review/check-existing-review', [ReviewController::class, 'checkExistingReview']);
     Route::post('/reviews', [ReviewController::class, 'updateOrCreate']);
+    Route::put('/reviews/{id}', [ReviewController::class, 'updatePublished']);
     Route::post('/reviews/add-video', [SkuVideoController::class, 'addOrUpdateVideoWithBase64Data']);
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->where(['id' => '[0-9]+']);
 

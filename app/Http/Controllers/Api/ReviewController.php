@@ -223,30 +223,38 @@ class ReviewController extends Controller
      */
     public function checkExistingReview(Request $request): JsonResponse
     {
-        $conditions[] = ['reviews.sku_id', '=', $request->sku_id];
+        $query = Review::query()
+            ->select(['rating', 'id', 'title', 'body', 'plus', 'minus', 'status', 'is_recommend', 'sku_id'])
+            ->where([
+                'sku_id' => $request->input('sku_id'),
+                'user_id' => Auth::guard('api')->id(),
+            ]);
 
-        $user = Auth::guard('api')->user();
-        if (isset($user)) {
-            $conditions[] = ['reviews.user_id', '=', $user->id];
+        $existingReview = $query->where('status', EntityStatus::PUBLISHED)->first();
+
+
+        if (!$existingReview) {
+            $existingReview = Review::query()
+                ->select(['rating', 'id', 'title', 'body', 'plus', 'minus', 'status', 'is_recommend', 'sku_id'])
+                ->where([
+                    'sku_id' => $request->input('sku_id'),
+                    'user_id' => Auth::guard('api')->id(),
+                ])
+                ->where('status', EntityStatus::MODERATED)
+                ->first();
+
         }
 
-        $existingReview = Review::query()
-            ->select([
-                'rating',
-                'id',
-                'title',
-                'body',
-                'plus',
-                'minus',
-                'images',
-                'status',
-                'anonymously',
-                'is_recommend',
-            ])
-
-            ->where('status', '!=', 'deleted')
-            ->where($conditions)
-            ->first();
+        if (!$existingReview) {
+            $existingReview = Review::query()
+                ->select(['rating', 'id', 'title', 'body', 'plus', 'minus', 'status', 'is_recommend', 'sku_id'])
+                ->where([
+                    'sku_id' => $request->input('sku_id'),
+                    'user_id' => Auth::guard('api')->id(),
+                ])
+                ->where('status', EntityStatus::DRAFT)
+                ->first();
+        }
 
         return response()->json(['data'=> $existingReview]);
     }
@@ -269,7 +277,8 @@ class ReviewController extends Controller
 
         $status = $request->boolean('asDraft')
             ? EntityStatus::DRAFT
-            : EntityStatus::MODERATED;
+            : $request->input('status');
+
 
         $review = Review::query()
             ->updateOrCreate(
@@ -279,13 +288,12 @@ class ReviewController extends Controller
                     'sku_id' => $skuId,
                 ],
                 [
-                    'status' => $status,
+                    'rating' => $request->input('rating'),
                     'title' => $request->input('title'),
                     //'body' => mb_convert_encoding($request->input('body'), "UTF-8", "auto"),
                     'body' => $request->input('body'),
                     'plus' => $request->input('plus'),
                     'minus' => $request->input('minus'),
-                    'images' => $request->input('images'),
                     'is_recommend' => $request->input('is_recommend') ?? 0,
                 ]
             );
@@ -299,6 +307,31 @@ class ReviewController extends Controller
             'data' => [
                 'status' => 'success',
                 'data' => $review,
+            ]
+        ]);
+    }
+
+    public function updatePublished(int $id, ReviewRequest $request): JsonResponse
+    {
+        $existing = Review::query()->find($id);
+
+        if (!$existing) {
+            response()->json([], Response::HTTP_NOT_FOUND);
+        }
+        $updated = $existing->update([
+            'status' => EntityStatus::MODERATED,
+            'rating' => $request->input('rating'),
+            'title' => $request->input('title'),
+            'body' => $request->input('body'),
+            'plus' => $request->input('plus'),
+            'minus' => $request->input('minus'),
+            'is_recommend' => $request->input('is_recommend') ?? 0,
+        ]);
+
+        return response()->json([
+            'data' => [
+                'status' => 'success',
+                'data' => $updated,
             ]
         ]);
     }
