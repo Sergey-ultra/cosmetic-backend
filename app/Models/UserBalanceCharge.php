@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserBalanceCharge extends Model
 {
+    public const STATUS_PROCESSED = 'processed';
+
     public const TABLE = 'user_balance_charge';
 
     protected $table = self::TABLE;

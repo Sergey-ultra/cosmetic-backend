@@ -45,7 +45,7 @@ class UserController extends Controller
             'ref_link' => sprintf('/ref=%s', $user->ref),
             'ref_balance' => $user->referralBalanceNormal ?? 0,
             'is_first_charge' => $user->moneyCharges()->count() === 0,
-            'number_of_invited_authors' => 0,
+            'number_of_invited_authors' => User::query()->where('referral_owner', $user->id)->count(),
             'unviewed_message_count' => $user->messages()->where('is_viewed', false)->count(),
         ];
 
@@ -165,6 +165,7 @@ class UserController extends Controller
             ->get()
             ->map(function(UserBalanceCharge $item) {
                 return [
+                    'id' => $item->id,
                     'ordered_amount' => $item->ordered_amount,
                     'amount' => $item->amount,
                     'payment_date' => $item->payment_date,
@@ -202,6 +203,7 @@ class UserController extends Controller
             'wallet_id' => $wallet->id,
             'ordered_amount' => $amount,
             'amount' => $amount,
+            'status' => UserBalanceCharge::STATUS_PROCESSED,
         ]);
 
 
@@ -211,8 +213,18 @@ class UserController extends Controller
         $to = $wallet->identifier;
         $type = $wallet->type;
 
+        $result = [
+            'id' => $newCharge->id,
+            'ordered_amount' => $newCharge->ordered_amount,
+            'amount' => $newCharge->amount,
+            'payment_date' => $newCharge->payment_date,
+            'status' => $newCharge->status,
+            'created' => $newCharge->created_at->format('Y-m-d'),
+            'wallet' => $newCharge->wallet->identifier,
+        ];
+
         //UserChargeMoneyJob::dispatch($amount, $to, $type, $label);
-        return response()->json(['data' => $newCharge], Response::HTTP_CREATED);
+        return response()->json(['data' => $result], Response::HTTP_CREATED);
     }
 
 
