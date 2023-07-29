@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Models\User;
 use App\Models\UserBalanceAccrual;
-use App\Models\UserCharge;
+use App\Models\UserBalanceCharge;
 use App\Models\UserWallet;
 use App\Services\PaymentService\PaymentStaticFactory;
 use Illuminate\Bus\Queueable;

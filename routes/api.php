@@ -229,6 +229,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/my-messages', [UserController::class, 'myMessages']);
     Route::post('/users/me', [UserController::class, 'updateMe']);
     Route::post('/users/me/avatar', [UserController::class, 'updateAvatar']);
+    Route::get('/users/charges', [UserController::class, 'getUserCharges']);
     Route::get('/users/wallets', [UserController::class, 'wallets']);
     Route::post('/users/wallets', [UserController::class, 'storeWallet']);
     Route::post('/users/charge-money', [UserController::class, 'charge']);

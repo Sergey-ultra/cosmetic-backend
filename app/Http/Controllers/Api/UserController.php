@@ -11,13 +11,14 @@ use App\Jobs\UserChargeMoneyJob;
 use App\Models\Country;
 use App\Models\Review;
 use App\Models\User;
-use App\Models\UserCharge;
+use App\Models\UserBalanceCharge;
 use App\Models\UserInfo;
 use App\Models\UserWallet;
 use App\Repositories\UserRepository\UserRepository;
 use App\Services\EntityStatus;
 use App\Services\ImageSavingService\ImageSavingService;
 use App\Services\UserLocationService\UserLocationService;
+use http\Exception\InvalidArgumentException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,7 +44,8 @@ class UserController extends Controller
             'avatar' => $info->avatar ??  UserInfo::DEFAULT_AVATAR,
             'ref_link' => sprintf('/ref=%s', $user->ref),
             'ref_balance' => $user->referralBalanceNormal ?? 0,
-            'is_first_charge' => false,
+            'is_first_charge' => $user->moneyCharges()->count() === 0,
+            'number_of_invited_authors' => 0,
             'unviewed_message_count' => $user->messages()->where('is_viewed', false)->count(),
         ];
 
@@ -52,7 +54,7 @@ class UserController extends Controller
             $result['birthday_year'] = $info?->birthday_year;
 
             $reviewCount = Review::query()
-                ->where(['user_id' => $user->id, 'status' => 'published'])
+                ->where(['user_id' => $user->id, 'status' => EntityStatus::PUBLISHED])
                 ->count();
             $result['review_count'] = $reviewCount;
         }
@@ -155,6 +157,28 @@ class UserController extends Controller
         ], Response::HTTP_CREATED);
     }
 
+    public function getUserCharges(): JsonResponse
+    {
+        $result = UserBalanceCharge::query()
+            ->with('wallet')
+            ->where('user_id', Auth::guard('api')->id())
+            ->get()
+            ->map(function(UserBalanceCharge $item) {
+                return [
+                    'ordered_amount' => $item->ordered_amount,
+                    'amount' => $item->amount,
+                    'payment_date' => $item->payment_date,
+                    'status' => $item->status,
+                    'created' => $item->created_at->format('Y-m-d'),
+                    'wallet' => $item->wallet->identifier,
+                ];
+            })
+            ->all();
+
+        return response()->json(['data' => $result]);
+
+    }
+
     public function charge(ChargeRequest $request): JsonResponse
     {
         $user = Auth::guard('api')->user();
@@ -172,7 +196,7 @@ class UserController extends Controller
         }
 
         $label = Str::uuid()->toString();
-        UserCharge::query()->create([
+        $newCharge = UserBalanceCharge::query()->create([
             'uuid' => $label,
             'user_id' => $wallet->user_id,
             'wallet_id' => $wallet->id,
@@ -187,8 +211,8 @@ class UserController extends Controller
         $to = $wallet->identifier;
         $type = $wallet->type;
 
-        UserChargeMoneyJob::dispatch($amount, $to, $type, $label);
-        return response()->json(['data' => ['status' => $request]]);
+        //UserChargeMoneyJob::dispatch($amount, $to, $type, $label);
+        return response()->json(['data' => $newCharge], Response::HTTP_CREATED);
     }
 
 

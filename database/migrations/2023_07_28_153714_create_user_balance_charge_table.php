@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('user_charge', function (Blueprint $table) {
+        Schema::create('user_balance_charge', function (Blueprint $table) {
             $table->id();
             $table->uuid();
             $table->foreignId('user_id');
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_charge');
+        Schema::dropIfExists('user_balance_charge');
     }
 };

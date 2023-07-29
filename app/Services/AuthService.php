@@ -50,7 +50,7 @@ class AuthService
      */
     public function saveUser(string $email, string $name, string $password, int $role = User::ROLE_CLIENT, ?string $ref = null): ?User
     {
-        if (User::query()->where(['email' => $email, 'service' => NULL])->first()) {
+        if (User::query()->where(['email' => $email, 'service' => null])->first()) {
             return null;
         }
 

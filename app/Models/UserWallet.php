@@ -15,7 +15,6 @@ class UserWallet extends Model
 
     protected $casts = [
         'user_id' => 'integer',
-        'identifier' => 'integer',
     ];
 
     public function user(): BelongsTo
