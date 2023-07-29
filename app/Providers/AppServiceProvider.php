@@ -19,6 +19,8 @@ use App\Services\Parser\LinkCrawlerParser;
 use App\Services\Parser\PriceBulkInsertService;
 use App\Services\Parser\PriceCrawlerService;
 use App\Services\Parser\PriceParsingByCronService;
+use App\Services\PaymentService\IPayment;
+use App\Services\PaymentService\YooMoneyService;
 use App\Services\PriceHistoryService\PriceHistoryInterface;
 use App\Services\PriceHistoryService\PriceHistoryService;
 use App\Services\ProxyHttpClientService\Proxy6NetService;
@@ -54,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(IReviewRepository::class, ReviewRepository::class);
         $this->app->singleton(IArticleRepository::class, ArticleRepositoryRepository::class);
         $this->app->singleton(ISkuRepository::class, ISkuRepository::class);
+        $this->app->singleton(IPayment::class, YooMoneyService::class);
 
         $this->app->bind(
             PriceCrawlerService::class,

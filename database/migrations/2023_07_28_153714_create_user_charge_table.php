@@ -13,13 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('user_balance_accruals', function (Blueprint $table) {
+        Schema::create('user_charge', function (Blueprint $table) {
             $table->id();
+            $table->uuid();
             $table->foreignId('user_id');
-            $table->foreignId('review_id');
-            $table->unsignedInteger('accrual');
-            $table->enum('type', ['views, bonus']);
-            $table->date('date');
+            $table->foreignId('wallet_id');
+            $table->unsignedInteger('ordered_amount');
+            $table->unsignedInteger('amount');
+            $table->string('payment_id', 255);
+            $table->timestamp('payment_date')->nullable();
+            $table->string('status')->default('processed');
             $table->timestamps();
         });
     }
@@ -31,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_balance_accruals');
+        Schema::dropIfExists('user_charge');
     }
 };

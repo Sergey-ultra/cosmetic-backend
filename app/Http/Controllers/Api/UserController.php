@@ -4,11 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AvatarRequest;
+use App\Http\Requests\ChargeRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Http\Requests\WalletRequest;
+use App\Jobs\UserChargeMoneyJob;
 use App\Models\Country;
 use App\Models\Review;
 use App\Models\User;
+use App\Models\UserCharge;
 use App\Models\UserInfo;
+use App\Models\UserWallet;
 use App\Repositories\UserRepository\UserRepository;
 use App\Services\EntityStatus;
 use App\Services\ImageSavingService\ImageSavingService;
@@ -17,10 +22,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class UserController extends Controller
 {
+    public const DEFAULT_WALLET_TYPE = 'yoomoney';
     public const IMAGES_FOLDER = 'public/image/avatar/';
     public function me(Request $request): JsonResponse
     {
@@ -33,8 +41,9 @@ class UserController extends Controller
             'name' => $user->name,
             'balance' => $user->balanceNormal ?? 0,
             'avatar' => $info->avatar ??  UserInfo::DEFAULT_AVATAR,
-            'refLink' => sprintf('/ref=%s', $user->ref),
-            'refBalance' => $user->referralBalanceNormal ?? 0,
+            'ref_link' => sprintf('/ref=%s', $user->ref),
+            'ref_balance' => $user->referralBalanceNormal ?? 0,
+            'is_first_charge' => false,
             'unviewed_message_count' => $user->messages()->where('is_viewed', false)->count(),
         ];
 
@@ -119,6 +128,67 @@ class UserController extends Controller
             ->get();
 
         return response()->json(['data' => $result]);
+    }
+
+    public function wallets(): JsonResponse
+    {
+        $wallets = UserWallet::query()
+            ->select('id', 'identifier AS name')
+            ->where('user_id', Auth::guard('api')->id())
+            ->get();
+
+        return response()->json(['data' => $wallets]);
+    }
+
+    public function storeWallet(WalletRequest $request):JsonResponse
+    {
+        $newWallet = UserWallet::query()->create([
+            'identifier' => $request->input('to'),
+            'type' => self::DEFAULT_WALLET_TYPE,
+            'user_id' => Auth::guard('api')->id(),
+        ]);
+
+        return response()->json(['data' => [
+            'id' => $newWallet->id,
+            'name' => $newWallet->identifier,
+            ]
+        ], Response::HTTP_CREATED);
+    }
+
+    public function charge(ChargeRequest $request): JsonResponse
+    {
+        $user = Auth::guard('api')->user();
+
+        $amount = $request->input('amount');
+        if ($amount > $user->balanceNormal) {
+            return response()->json(['message' => 'Сумма превышает баланс'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $walletId = $request->input('wallet_id');
+        $wallet = UserWallet::query()->find($walletId);
+
+        if (!$wallet) {
+            return response()->json([], Response::HTTP_NOT_FOUND);
+        }
+
+        $label = Str::uuid()->toString();
+        UserCharge::query()->create([
+            'uuid' => $label,
+            'user_id' => $wallet->user_id,
+            'wallet_id' => $wallet->id,
+            'ordered_amount' => $amount,
+            'amount' => $amount,
+        ]);
+
+
+        $user->balance -= $amount * 1000;
+        $user->save();
+
+        $to = $wallet->identifier;
+        $type = $wallet->type;
+
+        UserChargeMoneyJob::dispatch($amount, $to, $type, $label);
+        return response()->json(['data' => ['status' => $request]]);
     }
 
 

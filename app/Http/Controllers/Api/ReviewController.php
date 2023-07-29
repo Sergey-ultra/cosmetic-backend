@@ -336,6 +336,11 @@ class ReviewController extends Controller
             'is_recommend' => $request->input('is_recommend') ?? 0,
         ]);
 
+        if (request()->ip() !== config('telegrambot.admin_ip')) {
+            $message = sprintf("Добавлен/обновлен отзыв с id %d", $updated->id);
+            AdminNotificationJob::dispatch($message);
+        }
+
         UpdateSkuRatingJob::dispatch($currentSku, 'minus');
 
         return response()->json([

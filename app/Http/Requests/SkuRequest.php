@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-class SkuRequest extends  JsonApiRequest
+class SkuRequest extends JsonApiRequest
 {
     public function rules(): array
     {

@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('user_messages', function (Blueprint $table) {
             $table->id();
             $table->text('message')->nullable();
-            $table->unsignedBigInteger('to_user')->nullable();
-            $table->unsignedBigInteger('from_user')->nullable();
+            $table->foreignId('to_user')->nullable();
+            $table->foreignId('from_user')->nullable();
             $table->string('type', 200)->nullable();
             $table->json('data')->nullable();
             $table->boolean('is_viewed')->default(false);
