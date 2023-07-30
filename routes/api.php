@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\FilterController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\MainController;
+use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\PriceHistoryController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\RouteController;
@@ -114,7 +115,7 @@ Route::post('/client-messages', [ClientMessagesController::class, 'store']);
 Route::post('/add-to-tracking', [TrackingController::class, 'addToTracking']);
 Route::post('/supplier/register', [AuthController::class, 'register']);
 Route::post('/supplier/login', [AuthController::class, 'login']);
-Route::post('/subscription', [SubscriptionController::class, 'store']);
+//Route::post('/subscription', [SubscriptionController::class, 'store']);
 
 Route::get('/my-location', [UserController::class, 'getMyLocation']);
 Route::get('/location-list', [LocationController::class, 'index']);
@@ -226,7 +227,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::delete('/favorites/{id}', [FavoritesController::class, 'destroy'])->where(['id' => '[0-9]+']);
 
     Route::get('/me', [UserController::class, 'me']);
-    Route::get('/my-messages', [UserController::class, 'myMessages']);
+
     Route::post('/users/me', [UserController::class, 'updateMe']);
     Route::post('/users/me/avatar', [UserController::class, 'updateAvatar']);
     Route::get('/users/charges', [UserController::class, 'getUserCharges']);
@@ -234,7 +235,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/users/wallets', [UserController::class, 'storeWallet']);
     Route::post('/users/charge-money', [UserController::class, 'charge']);
 
-
+    Route::get('/my-chats', [MessageController::class, 'myMessages']);
     //доступ только у админа
     Route::group([
         'middleware' => ['role:admin'],

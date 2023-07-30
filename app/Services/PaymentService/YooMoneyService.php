@@ -3,6 +3,7 @@
 namespace App\Services\PaymentService;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\ResponseInterface;
 
 class YooMoneyService implements IPayment
@@ -14,7 +15,7 @@ class YooMoneyService implements IPayment
         $prepareResponse = $this->requestPayment($to, $amount, $label);
 
         if ($prepareResponse['status'] === 'success') {
-             $processResponse = $this->processPayment($prepareResponse['request_id']);
+            $processResponse = $this->processPayment($prepareResponse['request_id']);
         }
     }
 
@@ -29,7 +30,7 @@ class YooMoneyService implements IPayment
                     "Content-Type: application/x-www-form-urlencoded",
                     "Content-Length: 234",
                 ],
-                'body' => [
+                'form_params' => [
                     'pattern_id' => 'p2p',
                     'to' => $to,
                     'identifier_type' => 'phone',
@@ -54,7 +55,7 @@ class YooMoneyService implements IPayment
                     "Content-Type: application/x-www-form-urlencoded",
                     "Content-Length: 234",
                 ],
-                'body' => [
+                'form_params' => [
                     'request_id' => $requestId,
                 ],
             ]

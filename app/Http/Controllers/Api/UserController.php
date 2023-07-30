@@ -18,7 +18,6 @@ use App\Repositories\UserRepository\UserRepository;
 use App\Services\EntityStatus;
 use App\Services\ImageSavingService\ImageSavingService;
 use App\Services\UserLocationService\UserLocationService;
-use http\Exception\InvalidArgumentException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -62,13 +61,7 @@ class UserController extends Controller
         return response()->json(['data' => $result]);
     }
 
-    public function myMessages(UserRepository $userRepository): JsonResponse
-    {
-        $userid = Auth::guard('api')->id();
-        $result = $userRepository->getChatsByUserId($userid);
 
-        return response()->json(['data' => $result]);
-    }
 
     public function updateMe(UserUpdateRequest $request): JsonResponse
     {
@@ -210,8 +203,7 @@ class UserController extends Controller
         $user->balance -= $amount * 1000;
         $user->save();
 
-        $to = $wallet->identifier;
-        $type = $wallet->type;
+
 
         $result = [
             'id' => $newCharge->id,
@@ -222,8 +214,12 @@ class UserController extends Controller
             'created' => $newCharge->created_at->format('Y-m-d'),
             'wallet' => $newCharge->wallet->identifier,
         ];
+        $to = $wallet->identifier;
+        $type = $wallet->type;
+        $to = (int)preg_replace('/[^0-9]/', '', $to);
 
-        //UserChargeMoneyJob::dispatch($amount, $to, $type, $label);
+        UserChargeMoneyJob::dispatch($amount, $to, $type, $label);
+
         return response()->json(['data' => $result], Response::HTTP_CREATED);
     }
 
