@@ -27,8 +27,13 @@ class UpdateSkuRatingJob implements ShouldQueue
             $newCommonRating = ($this->currentSku->rating * $reviewCount + $this->currentSku->rating) / ($reviewCount + 1);
             $reviewsCount = $this->currentSku->reviews_count + 1;
         } else if ($this->type === 'minus') {
-            $newCommonRating = ($this->currentSku->rating * $reviewCount - $this->currentSku->rating) / ($reviewCount - 1);
-            $reviewsCount = $this->currentSku->reviews_count - 1;
+            if ($reviewCount - 1 === 0) {
+                $reviewsCount = 0;
+                $newCommonRating = 5;
+            } else {
+                $newCommonRating = ($this->currentSku->rating * $reviewCount - $this->currentSku->rating) / ($reviewCount - 1);
+                $reviewsCount = $this->currentSku->reviews_count - 1;
+            }
         }
 
 
