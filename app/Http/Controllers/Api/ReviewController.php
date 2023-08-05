@@ -337,7 +337,7 @@ class ReviewController extends Controller
         ]);
 
         if (request()->ip() !== config('telegrambot.admin_ip')) {
-            $message = sprintf("Добавлен/обновлен отзыв с id %d", $updated->id);
+            $message = sprintf("Добавлен/обновлен отзыв с id %d", $existing->id);
             AdminNotificationJob::dispatch($message);
         }
 
