@@ -14,7 +14,7 @@ use App\Models\User;
 use App\Models\UserBalanceCharge;
 use App\Models\UserInfo;
 use App\Models\UserWallet;
-use App\Repositories\UserRepository\UserRepository;
+use App\Repositories\MessageRepository\MessageRepository;
 use App\Services\EntityStatus;
 use App\Services\ImageSavingService\ImageSavingService;
 use App\Services\UserLocationService\UserLocationService;

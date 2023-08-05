@@ -235,7 +235,10 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/users/wallets', [UserController::class, 'storeWallet']);
     Route::post('/users/charge-money', [UserController::class, 'charge']);
 
-    Route::get('/my-chats', [MessageController::class, 'myMessages']);
+    Route::get('/chats', [MessageController::class, 'myMessages']);
+    Route::get('/chats/{id}', [MessageController::class, 'chat']);
+    Route::post('/messages', [MessageController::class, 'sendMessage'])->middleware( 'throttle:3,10');
+
     //доступ только у админа
     Route::group([
         'middleware' => ['role:admin'],

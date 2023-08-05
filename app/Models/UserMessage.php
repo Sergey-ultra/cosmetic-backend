@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserMessage extends Model
 {
@@ -19,5 +20,10 @@ class UserMessage extends Model
         'data' => 'array',
         'created_at' => 'date:Y-m-d',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class,  'from_user', 'id');
+    }
 
 }
