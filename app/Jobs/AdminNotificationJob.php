@@ -34,7 +34,7 @@ class AdminNotificationJob implements ShouldQueue
         try {
             $telegramBotService->sendMessage(config('telegrambot.admin_user_id'), $this->message);
         } catch (Throwable $e) {
-
+            logger()->error($e);
         }
     }
 }
