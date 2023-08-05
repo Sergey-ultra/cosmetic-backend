@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MessageRequest;
+use App\Jobs\AdminNotificationJob;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Models\UserMessage;
 use App\Repositories\MessageRepository\MessageRepository;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -68,6 +70,11 @@ class MessageController extends Controller
         }
 
         $new = UserMessage::query()->create($params);
+
+        if ($new->type === 'feedback' && app()->environment(['production'])) {
+            $message = sprintf("Добавлено новое сообщение в техподдержку с id %d", $new->id);
+            AdminNotificationJob::dispatch($message);
+        }
 
         $new->load('user.info');
 
