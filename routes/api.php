@@ -110,8 +110,6 @@ Route::post('/supplier/logout', [SupplierAuthController::class, 'logout'])->midd
 
 
 Route::get('/faq/menu', [FAQController::class, 'menu']);
-Route::get('/faq/{code}', [FAQController::class, 'byCode'])
-    ->where(['code' => "^menu"]);
 
 
 Route::get('/client-messages', [ClientMessagesController::class, 'index']);

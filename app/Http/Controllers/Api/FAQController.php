@@ -28,9 +28,4 @@ class FAQController extends Controller
         ];
         return response()->json(['data' => $result]);
     }
-
-    public function byCode(string $code)
-    {
-
-    }
 }
