@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ClientMessagesController extends Controller
 {
+    //Раздел о нас
     public function index(): JsonResponse
     {
         $result = ClientMessage::query()->where('status', EntityStatus::PUBLISHED)->get();

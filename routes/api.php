@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ClientMessagesController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\FAQController;
 use App\Http\Controllers\Api\FavoritesController;
 use App\Http\Controllers\Api\FilterController;
 use App\Http\Controllers\Api\FileController;
@@ -106,6 +107,11 @@ Route::post('/supplier/signin', [App\Http\Controllers\Api\Supplier\AuthControlle
 Route::post('/supplier/signup', [App\Http\Controllers\Api\Supplier\AuthController::class, 'register']);
 Route::post('/supplier/logout', [SupplierAuthController::class, 'logout'])->middleware(['auth:api', 'role:supplier']);
 
+
+
+Route::get('/faq/menu', [FAQController::class, 'menu']);
+Route::get('/faq/{code}', [FAQController::class, 'byCode'])
+    ->where(['code' => "^menu"]);
 
 
 Route::get('/client-messages', [ClientMessagesController::class, 'index']);
