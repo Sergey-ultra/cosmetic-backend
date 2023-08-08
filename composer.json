@@ -20,7 +20,8 @@
         "mailjet/laravel-mailjet": "^3.0",
         "pbmedia/laravel-ffmpeg": "*",
         "predis/predis": "^2.0",
-        "socialiteproviders/instagram": "^4.1",
+        "socialiteproviders/instagram": "^5.0",
+        "socialiteproviders/mailru": "^4.1",
         "socialiteproviders/vkontakte": "^4.2",
         "symfony/css-selector": "5.4",
         "symfony/dom-crawler": "^6.0"

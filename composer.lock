@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e17a58a330cbfa30c73fb37cd2a2b436",
+    "content-hash": "0153f430652ca60a7dd0671e2235c840",
     "packages": [
         {
             "name": "brick/math",
@@ -4716,21 +4716,21 @@
         },
         {
             "name": "socialiteproviders/instagram",
-            "version": "4.1.0",
+            "version": "5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SocialiteProviders/Instagram.git",
-                "reference": "3d9c3d95eff84389a1b92f832b58dd765c24c5e5"
+                "reference": "c3ef6b6b268de6abf36cc3253b5c6a87255a3564"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SocialiteProviders/Instagram/zipball/3d9c3d95eff84389a1b92f832b58dd765c24c5e5",
-                "reference": "3d9c3d95eff84389a1b92f832b58dd765c24c5e5",
+                "url": "https://api.github.com/repos/SocialiteProviders/Instagram/zipball/c3ef6b6b268de6abf36cc3253b5c6a87255a3564",
+                "reference": "c3ef6b6b268de6abf36cc3253b5c6a87255a3564",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": "^7.2 || ^8.0",
+                "php": "^7.4 || ^8.0",
                 "socialiteproviders/manager": "~4.0"
             },
             "type": "library",
@@ -4750,10 +4750,69 @@
                 }
             ],
             "description": "Instagram OAuth2 Provider for Laravel Socialite",
+            "keywords": [
+                "instagram",
+                "laravel",
+                "oauth",
+                "provider",
+                "socialite"
+            ],
             "support": {
-                "source": "https://github.com/SocialiteProviders/Instagram/tree/4.1.0"
+                "docs": "https://socialiteproviders.com/instagram",
+                "issues": "https://github.com/socialiteproviders/providers/issues",
+                "source": "https://github.com/socialiteproviders/providers"
             },
-            "time": "2020-12-01T23:10:59+00:00"
+            "time": "2023-01-03T22:48:33+00:00"
+        },
+        {
+            "name": "socialiteproviders/mailru",
+            "version": "4.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/SocialiteProviders/Mailru.git",
+                "reference": "10ede8420956e81e040b68a6c7658fa45e1d1a14"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/SocialiteProviders/Mailru/zipball/10ede8420956e81e040b68a6c7658fa45e1d1a14",
+                "reference": "10ede8420956e81e040b68a6c7658fa45e1d1a14",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.4 || ^8.0",
+                "socialiteproviders/manager": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SocialiteProviders\\Mailru\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sergey Panteleev",
+                    "email": "sergey@php.net"
+                }
+            ],
+            "description": "Mail.ru OAuth2 Provider for Laravel Socialite",
+            "keywords": [
+                "laravel",
+                "mailru",
+                "oauth",
+                "provider",
+                "socialite"
+            ],
+            "support": {
+                "docs": "https://socialiteproviders.com/mailru",
+                "issues": "https://github.com/socialiteproviders/providers/issues",
+                "source": "https://github.com/socialiteproviders/providers"
+            },
+            "time": "2022-05-23T00:23:23+00:00"
         },
         {
             "name": "socialiteproviders/manager",
@@ -10332,7 +10391,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.0.2",
+        "php": "^8.1",
         "ext-curl": "*",
         "ext-fileinfo": "*",
         "ext-imagick": "*",

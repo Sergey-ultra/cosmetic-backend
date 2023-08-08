@@ -16,7 +16,7 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AuthSocialController extends Controller
 {
-    public const AVAILABLE_SERVICES = ['google', 'vkontakte'];
+    public const AVAILABLE_SERVICES = ['google', 'vkontakte', 'facebook', 'instagram', 'mailru'];
 
     /**
      * @param string $service
