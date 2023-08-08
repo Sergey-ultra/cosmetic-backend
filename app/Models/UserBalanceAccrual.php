@@ -16,7 +16,7 @@ class UserBalanceAccrual extends Model
     public const REVIEW_COST = 85;
     public const REFERRAL_COST = 85;
 
-    public const REVIEW_BONUS_COST = 13580;
+    public const REVIEW_BONUS_COST = 25500;
 
 
     protected $table = self::TABLE;
