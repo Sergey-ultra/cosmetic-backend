@@ -89,7 +89,7 @@ class AuthController extends Controller
                 'message' => 'Необходимо подтверждение email',
                 'isRequiredEmailVerification' => true,
                 'email' => $request->email
-            ], Response::HTTP_UNAUTHORIZED);
+            ]);
         }
 
         if ($request->has('asAdmin') && !$user->hasAnyRole(['admin', 'moderator'])) {
