@@ -51,7 +51,8 @@ class ReviewRepository implements IReviewRepository
             ->addUserQuery()
             ->addProductInfoQuery()
             ->addUserIsNotNullCondition()
-            ->getQuery();
+            ->getQuery()
+            ->orderByDesc(sprintf('%s.created_at', Review::TABLE));
     }
 
     /**
