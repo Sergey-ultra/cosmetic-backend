@@ -277,7 +277,7 @@ class ReviewController extends Controller
 
         $status = $request->boolean('asDraft')
             ? EntityStatus::DRAFT
-            : $request->input('status');
+            : EntityStatus::MODERATED;
 
 
         $review = Review::query()
@@ -366,7 +366,7 @@ class ReviewController extends Controller
                 UpdateSkuRatingJob::dispatch($currentSku, 'minus');
             }
 
-            $review->update(['status' => 'deleted']);
+            $review->update(['status' => EntityStatus::DELETED]);
         }
     }
 }
