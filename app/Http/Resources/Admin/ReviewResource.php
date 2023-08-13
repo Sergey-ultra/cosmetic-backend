@@ -16,7 +16,7 @@ class ReviewResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             'id' => $this->id,
@@ -25,6 +25,7 @@ class ReviewResource extends JsonResource
             'sku_image' => $this->sku_images
                 ? json_decode($this->sku_images, true)[0]
                 : null,
+            'sku_status' => $this->sku_status,
             'rating' => $this->rating,
             'views_count' => $this->views_count,
             'likes_count' => $this->likes_count,

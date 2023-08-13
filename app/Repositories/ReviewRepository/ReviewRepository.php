@@ -307,6 +307,7 @@ class ReviewRepository implements IReviewRepository
                 sprintf('%s.rating AS common_rating', Sku::TABLE),
                 sprintf('%s.images AS sku_images', Sku::TABLE),
                 sprintf('%s.reviews_count AS sku_reviews_count', Sku::TABLE),
+                sprintf('%s.status AS sku_status', Sku::TABLE),
                 sprintf('%s.name AS sku_name', Product::TABLE),
                 sprintf('%s.code AS product_code', Product::TABLE),
             )
