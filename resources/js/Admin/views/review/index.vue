@@ -16,7 +16,7 @@
         </template>
 
         <template v-slot:product_name="review">
-            <a :href="review.item.product_link" class="flex">
+            <a :href="review.item.product_link" :class="{'moderated': review.item.sku_status === 'moderated'}" class="flex">
                 <img class="image" :src="review.item.sku_image">
                 <span>{{ review.item.product_name }}</span>
             </a>
@@ -185,5 +185,8 @@
     @import './resources/css/admin/table.scss';
     .flex {
         display:flex;
+    }
+    .moderated {
+        color: red;
     }
 </style>

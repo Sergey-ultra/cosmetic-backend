@@ -16,6 +16,7 @@ use App\Models\Sku;
 use App\Models\UserMessage;
 use App\Repositories\SkuRepository\DTO\SkuDTO;
 use App\Repositories\SkuRepository\SkuRepository;
+use App\Services\EntityStatus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -101,6 +102,7 @@ class SkuController extends Controller
                 sprintf('%s.id', Product::TABLE)
             )
             ->where(sprintf('%s.user_id', Sku::TABLE), $userId)
+            ->whereNot(sprintf('%s.status', Sku::TABLE), EntityStatus::PUBLISHED)
             ->get();
 
         return response()->json(['data' => $result]);
