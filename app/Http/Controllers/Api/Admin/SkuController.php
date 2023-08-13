@@ -168,11 +168,19 @@ class SkuController extends Controller
         if (!$sku) {
             return response()->json([
                 'status'=> true,
-                'message' =>'Not found'
-            ], 404);
+                'message' =>'Sku not found'
+            ], Response::HTTP_NOT_FOUND);
         }
-        $brand = Brand::find($request->brand_id);
-        $code = Text::makeProductCode($request->name, $brand->name);
+        $brand = Brand::query()->find($request->input('brand_id'));
+
+        if (!$brand) {
+            return response()->json([
+                'status'=> true,
+                'message' =>'Brand not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $code = Text::makeProductCode($request->input('name'), $brand->name);
 
 
         $imageUrls = [];
@@ -184,7 +192,7 @@ class SkuController extends Controller
 
         $sku->update([
             'volume' => $request->volume,
-            'images' => json_encode($imageUrls)
+            'images' => $imageUrls,
         ]);
 
 
