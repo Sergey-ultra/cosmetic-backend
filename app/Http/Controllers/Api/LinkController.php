@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\AdminNotificationJob;
 use App\Models\Link;
 use App\Models\LinkClick;
 use Illuminate\Http\JsonResponse;
