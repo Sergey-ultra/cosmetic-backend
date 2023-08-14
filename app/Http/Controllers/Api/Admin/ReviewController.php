@@ -124,7 +124,7 @@ class ReviewController extends Controller
     public function dynamics(): JsonResponse
     {
         $result = DB::table('reviews')
-            ->select(DB::raw("count(sku_rating_id) AS count, DATE(created_at) AS date "))
+            ->select(DB::raw("count(sku_id) AS count, DATE(created_at) AS date "))
             ->groupBy(DB::raw('WEEK(created_at)'))
             ->orderBy(DB::raw('WEEK(created_at)'))
             ->get();
@@ -147,15 +147,17 @@ class ReviewController extends Controller
 
 
         if ($review) {
-            Review::query()->where('id', $review->id)->update(['status' => $status]);
+            $review->update(['status' => $status]);
 
-            if ($status === EntityStatus::PUBLISHED) {
-                if ($review->sku->user_id === $review->user_id && $review->sku->status !== EntityStatus::PUBLISHED) {
-                    $review->sku->update(['status' => EntityStatus::PUBLISHED]);
+            if ($status === 'published') {
+                if ($review->sku->user_id === $review->user_id && $review->sku->status !== 'published') {
+
+                    $review->sku->update(['status' => 'published']);
                 }
+
                 ReviewPublishedJob::dispatch($review->user_id, $review->id);
                 UpdateSkuRatingJob::dispatch($review->sku, 'plus');
-            } else if ($review->status === EntityStatus::PUBLISHED) {
+            } else if ($review->status === 'published') {
                 UpdateSkuRatingJob::dispatch($review->sku, 'minus');
             }
         }

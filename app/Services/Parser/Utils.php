@@ -80,12 +80,11 @@ class Utils
             }
 
             if ($currentName) {
-                $dto = new ExistingProductDTO();
-                $dto->id = $product['id'];
-                $dto->brandId = $product['brand_id'];
-                $dto->ingredientsCount = count($product['ingredient_ids']);
-
-                $idsAndName[$currentName][] = $dto;
+                $idsAndName[$currentName][] = new ExistingProductDTO(
+                    $product['id'],
+                    $product['brand_id'],
+                    count($product['ingredient_ids'])
+                );
             }
         }
 
@@ -93,16 +92,17 @@ class Utils
     }
 
 
-    public static function makeEnglishProductName($string, $brandName = "")
+    public static function makeEnglishProductName(string $string, string $brandName = ""): string
     {
         $string = preg_replace("#$brandName#", '', $string );
         $string = preg_replace('#[^a-zA-Z0-9\'\s+%.-]#', '', $string);
+        $string = preg_replace('#%#', ' ', $string );
         $string = preg_replace('#\s+#', ' ', $string );
         $string = trim(preg_replace('#\s+-#', '', $string));
         return  trim(trim($string, '.'));
     }
 
-    public static function knownLanguage($string)
+    public static function knownLanguage(string $string): string
     {
         preg_match_all( '/[а-яё]/ui', $string, $rusMatches);
         if (count($rusMatches[0]) / mb_strlen($string) > 0.5) {
