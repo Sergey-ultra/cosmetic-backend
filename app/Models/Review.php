@@ -59,4 +59,12 @@ class Review extends Model
     {
         return $this->morphMany(Like::class, 'likeable');
     }
+
+    /**
+     * @return HasMany
+     */
+    public function sku(): HasMany
+    {
+        return $this->hasMany(Sku::class);
+    }
 }

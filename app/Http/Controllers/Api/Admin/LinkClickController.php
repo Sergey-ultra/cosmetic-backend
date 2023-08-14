@@ -11,7 +11,7 @@ class LinkClickController extends Controller
 {
    public function index(): JsonResponse
    {
-       $result = LinkClick::select(DB::raw("count(id) as count,  DATE(created_at) AS date"))
+       $result = LinkClick::query()->select(DB::raw("count(id) as count,  DATE(created_at) AS date"))
            ->groupBy(DB::raw('WEEK(created_at)'))
            ->get();
 

@@ -141,19 +141,22 @@ class ReviewController extends Controller
     {
         $status = $request->input('status');
         $review = Review::query()
+            ->with('sku')
             ->select('id', 'status', 'sku_id', 'user_id')
             ->find($id);
 
 
         if ($review) {
             Review::query()->where('id', $review->id)->update(['status' => $status]);
-            $currentSku = Sku::query()->where('id', $review->sku_id)->update(['reviews_count' => DB::raw('reviews_count + 1')]);
 
             if ($status === EntityStatus::PUBLISHED) {
+                if ($review->sku->user_id === $review->user_id && $review->sku->status !== EntityStatus::PUBLISHED) {
+                    $review->sku->update(['status' => EntityStatus::PUBLISHED]);
+                }
                 ReviewPublishedJob::dispatch($review->user_id, $review->id);
-                UpdateSkuRatingJob::dispatch($currentSku, 'plus');
+                UpdateSkuRatingJob::dispatch($review->sku, 'plus');
             } else if ($review->status === EntityStatus::PUBLISHED) {
-                UpdateSkuRatingJob::dispatch($currentSku, 'minus');
+                UpdateSkuRatingJob::dispatch($review->sku, 'minus');
             }
         }
 
