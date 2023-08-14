@@ -60,11 +60,12 @@ class Review extends Model
         return $this->morphMany(Like::class, 'likeable');
     }
 
+
     /**
-     * @return HasMany
+     * @return BelongsTo
      */
-    public function sku(): HasMany
+    public function sku(): BelongsTo
     {
-        return $this->hasMany(Sku::class);
+        return $this->belongsTo(Sku::class);
     }
 }
