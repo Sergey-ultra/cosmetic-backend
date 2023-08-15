@@ -56,7 +56,7 @@ class FileController extends Controller
                 $savedName = $originalName;
             }
 
-            $realFilePath = $file->storeAs($savedFolder, $savedName);
+            $realFilePath = $file->storeAs($savedFolder, $file->hasName($savedName));
 
             $savedFile['saved_name'] = $savedName;
 
