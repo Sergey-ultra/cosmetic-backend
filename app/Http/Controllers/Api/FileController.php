@@ -49,14 +49,13 @@ class FileController extends Controller
 
 
         foreach ($request->file('files') as $file) {
-
-            $originalName = $file->getClientOriginalName();
-
             if (!$savedName) {
-                $savedName = $originalName;
+                $savedName = $file->getClientOriginalName();
             }
 
-            $realFilePath = $file->storeAs($savedFolder, $file->hasName($savedName));
+            $savedName = $file->hashName(pathinfo($savedName, PATHINFO_FILENAME));
+
+            $realFilePath = $file->storeAs($savedFolder, $savedName);
 
             $savedFile['saved_name'] = $savedName;
 
@@ -92,7 +91,6 @@ class FileController extends Controller
         }
 
         return response()->json(['data' => $savedFiles]);
-
     }
 
     public function destroy($imageCode)
