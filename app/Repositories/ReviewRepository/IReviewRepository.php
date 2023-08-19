@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 interface IReviewRepository
 {
     public function getAdminReviewListQuery(): \Illuminate\Database\Query\Builder;
-
     public function getLastReviewQuery(): EloquentBuilder;
     public function getReviewWithProductInfoQuery(): Builder;
     public function getReviewWithCommentCountQuery(): Builder;

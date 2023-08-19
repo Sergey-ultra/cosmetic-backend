@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
 use App\Http\Requests\ReviewRequest;
 use App\Http\Resources\LastReviewsCollection;
+use App\Http\Resources\MyRejectedReviewsCollection;
 use App\Http\Resources\MyReviewsCollection;
 use App\Http\Resources\ReviewCollection;
 use App\Http\Resources\ReviewSingleResource;
@@ -79,10 +80,11 @@ class ReviewController extends Controller
         return new MyReviewsCollection($result);
     }
 
-    public function myRejectedReviews(IReviewRepository $reviewRepository, Request $request): ResourceCollection
+    public function myRejectedReviews(IReviewRepository $reviewRepository, Request $request): MyRejectedReviewsCollection
     {
         $query = $reviewRepository
             ->getReviewWithProductInfoQuery()
+            ->with('rejectedReasons')
             ->where([
                 sprintf('%s.user_id', Review::TABLE) => Auth::guard('api')->id(),
                 sprintf('%s.status',Review::TABLE) => EntityStatus::REJECTED,
@@ -90,7 +92,7 @@ class ReviewController extends Controller
 
         $result = $this->prepareModel($request, $query)->get();
 
-        return new MyReviewsCollection($result);
+        return new MyRejectedReviewsCollection($result);
     }
 
     /**
