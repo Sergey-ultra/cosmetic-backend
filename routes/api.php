@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\RejectedReasonController;
 use App\Http\Controllers\Api\Admin\SettingController;
 use App\Http\Controllers\Api\ArticleCommentController;
 use App\Http\Controllers\Api\ArticleController;
@@ -331,7 +332,11 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/suppliers', [SupplierController::class, 'index']);
         Route::post('/suppliers/set-status/{id}', [SupplierController::class, 'setStatus'])->where(['id' => '[0-9]+']);
 
+
+
+        Route::get('/rejected-reasons', [RejectedReasonController::class, 'index']);
         Route::post('/reviews/set-status/{id}', [AdminReviewController::class, 'setStatus'])->where(['id' => '[0-9]+']);
+        Route::post('/reviews/reject/{id}', [AdminReviewController::class, 'reject'])->where(['id' => '[0-9]+']);
         Route::get('/reviews/dynamics', [AdminReviewController::class, 'dynamics']);
         Route::apiResource('/reviews', AdminReviewController::class);
 

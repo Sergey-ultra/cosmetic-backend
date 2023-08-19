@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Requests\RejectReviewRequest;
 use App\Http\Requests\StatusRequest;
 use App\Http\Resources\Admin\ReviewCollection;
 use App\Http\Resources\Admin\ReviewOneResource;
@@ -139,7 +140,6 @@ class ReviewController extends Controller
      */
     public function setStatus(int $id, StatusRequest $request): JsonResponse
     {
-        $status = $request->input('status');
         $review = Review::query()
             ->with('sku')
             ->select('id', 'status', 'sku_id', 'user_id')
@@ -147,6 +147,7 @@ class ReviewController extends Controller
 
 
         if ($review) {
+            $status = $request->input('status');
             $review->update(['status' => $status]);
 
             if ($status === 'published') {
@@ -160,6 +161,28 @@ class ReviewController extends Controller
             } else if ($review->status === 'published') {
                 UpdateSkuRatingJob::dispatch($review->sku, 'minus');
             }
+        }
+
+        return response()->json(['data' => ['status' => 'success']]);
+    }
+
+    public function reject(int $id, RejectReviewRequest $request): JsonResponse
+    {
+        $review = Review::query()
+            ->select('id', 'status', 'sku_id', 'user_id')
+            ->find($id);
+
+        if (!$review) {
+            return response()->json(['message' => 'NotFound'], Response::HTTP_NOT_FOUND);
+        }
+
+
+        $reasonIds = $request->input('reason_ids');
+        $review->update(['status' => 'rejected']);
+        $review->rejectedReasons()->sync($reasonIds);
+
+        if ($review->status === 'published') {
+            UpdateSkuRatingJob::dispatch($review->sku, 'minus');
         }
 
         return response()->json(['data' => ['status' => 'success']]);

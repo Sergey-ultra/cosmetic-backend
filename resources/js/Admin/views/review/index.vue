@@ -49,8 +49,8 @@
                     <template v-slot:moderated v-if="review.item.review_status !== 'moderated'">
                         <div class="dropdown__inner">
                             <button
-                                    class="dropdown__value"
-                                    @click="setReviewStatus({ id: review.item.id, status: 'moderated' })"
+                                class="dropdown__value"
+                                @click="setReviewStatus({ id: review.item.id, status: 'moderated' })"
                             >
                                 <span>Поставить на модерацию</span>
                             </button>
@@ -59,19 +59,18 @@
                     <template v-slot:rejected  v-if="review.item.review_status !== 'rejected'">
                         <div class="dropdown__inner">
                             <button
-                                    class="dropdown__value"
-                                    @click="setReviewStatus({ id: review.item.id, status: 'rejected' })"
+                                class="dropdown__value"
+                                @click="showRejectModal(review.item.id)"
                             >
                                 <span>Отклонить</span>
                             </button>
                         </div>
                     </template>
-                    <template v-slot:deleted
-                              v-if="review.item.rating_status !== 'deleted' && review.item.review_status !== 'deleted'">
+                    <template v-slot:deleted v-if="review.item.rating_status !== 'deleted' && review.item.review_status !== 'deleted'">
                         <div class="dropdown__inner">
                             <button
-                                    class="dropdown__value"
-                                    @click="setReviewStatus({ id: review.item.id, status: 'deleted' })"
+                                class="dropdown__value"
+                                @click="setReviewStatus({ id: review.item.id, status: 'deleted' })"
                             >
                                 <span>Удалить</span>
                             </button>
@@ -89,9 +88,14 @@
     </data-table>
 
     <review-form
-            :selectedReviewId="selectedReviewId"
-            v-model:isShowForm="isShowForm"
-            v-if="isShowForm"
+        :selectedReviewId="selectedReviewId"
+        v-model:isShowForm="isShowForm"
+        v-if="isShowForm"/>
+
+    <rejectedForm
+        v-model:isShowRejectModal="isShowRejectModal"
+        v-if="isShowRejectModal"
+        :rejectedReviewId="rejectedReviewId"
     />
 </template>
 
@@ -102,6 +106,7 @@
     import dropMenu from '../../components/drop-menu.vue'
     import {mapActions, mapMutations, mapState} from "vuex";
     import buttonComponent from "../../components/button-component.vue";
+    import rejectedForm from "./rejected-form.vue";
 
     export default {
         name: "review",
@@ -110,7 +115,8 @@
             modal,
             buttonComponent,
             reviewForm,
-            dropMenu
+            dropMenu,
+            rejectedForm,
         },
         data: () => ({
             headers: [
@@ -128,6 +134,8 @@
             isShowForm: false,
             selectedReviewId: null,
             selectedName: null,
+            isShowRejectModal: false,
+            rejectedReviewId: null,
         }),
         computed:{
             ...mapState('review', ['tableOptions', 'filterOptions', 'isLoading', 'reviews', 'total']),
@@ -165,7 +173,7 @@
 
         },
         methods: {
-            ...mapActions('review', ['reloadReviews', 'loadReviews', 'setReviewStatus']),
+            ...mapActions('review', ['reloadReviews', 'loadReviews', 'setReviewStatus', 'reject']),
             ...mapMutations('review', ['setTableOptions', 'setFilterOptions']),
             getActionsOptions(reviewId) {
                 if (reviewId !== null) {
@@ -176,6 +184,10 @@
             showForm(id) {
                 this.isShowForm = true
                 this.selectedReviewId = id
+            },
+            showRejectModal(reviewId) {
+                this.isShowRejectModal = true;
+                this.rejectedReviewId = reviewId;
             },
         }
     }

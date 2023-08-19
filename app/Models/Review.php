@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -67,5 +68,10 @@ class Review extends Model
     public function sku(): BelongsTo
     {
         return $this->belongsTo(Sku::class);
+    }
+
+    public function rejectedReasons(): BelongsToMany
+    {
+        return $this->belongsToMany(RejectedReason::class, 'review_reason', 'reason_id', 'review_id');
     }
 }

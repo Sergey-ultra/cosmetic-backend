@@ -15,11 +15,12 @@ class ReviewOneResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             'id' => $this->id,
             'rating' => $this->rating,
+            'title' => $this->title,
             'comment' => $this->comment,
             'plus' => $this->plus,
             'minus' => $this->minus,
