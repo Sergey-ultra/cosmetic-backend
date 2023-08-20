@@ -28,6 +28,7 @@ import tag from './tag'
 import articleComment from './article-comment'
 import video from './video'
 import settings from './settings'
+import message from './message'
 
 
 
@@ -62,7 +63,8 @@ export default createStore({
         tag,
         articleComment,
         video,
-        settings
+        settings,
+        message,
     }
 })
 

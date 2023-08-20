@@ -53,6 +53,7 @@ use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\Admin\TrackingController as AdminTrackingController;
 use App\Http\Controllers\Api\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Api\Admin\SkuVideoController as AdminSkuVideoController;
+use App\Http\Controllers\Api\Admin\MessageController as AdminMessageController;
 
 
 use App\Http\Controllers\Api\Admin\VisitStaticticsController;
@@ -357,6 +358,10 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/users/master-password', [AdminUserController::class, 'getMasterPassword']);
         Route::post('/users/save-bots', [AdminUserController::class, 'saveBots']);
         Route::apiResource('/users', AdminUserController::class);
+
+        Route::get('/my-messages', [AdminMessageController::class, 'adminMessage']);
+        Route::post('/messages', [AdminMessageController::class,'sendMessage'])->middleware( 'throttle:3,10');
+        Route::get('/chats/{id}', [AdminMessageController::class, 'chat']);
 
         Route::get('/trackings', [AdminTrackingController::class, 'index']);
         Route::get('/trackings/dynamics', [AdminTrackingController::class, 'dynamics']);

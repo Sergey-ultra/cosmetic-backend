@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class MessageRepository
 {
     const TECHNICAL_SUPPORT = 'Техническая поддержка';
-    public function getLastTechSupportMessagesByUserId(int $myUserId): array
+    public function getLastTechSupportMessagesByUserId(?int $myUserId): array
     {
         return $this->getMessageQuery()
             ->whereIn(sprintf('%s.id', UserMessage::TABLE), function ($query) use ($myUserId) {

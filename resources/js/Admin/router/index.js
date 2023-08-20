@@ -143,6 +143,12 @@ const constantRoutes = [
         component:() => import('../views/tracking/index.vue'),
         meta: {title: 'Отслеживаемые'}
     },
+    {
+        path:'/admin/messages',
+        name:'messages',
+        component:() => import('../views/message/index.vue'),
+        meta: {title: 'Сообщения'}
+    },
 ]
 
 
