@@ -61,3 +61,9 @@ const sendMessage = async() => {
     }
 };
 </script>
+<style lang="scss">
+.form__group {
+    margin: 12px 0;
+    width: 100%;
+}
+</style>

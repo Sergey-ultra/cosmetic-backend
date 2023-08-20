@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="header">
-            <buttonComponent :color="'gray'" @click="back">
+            <buttonComponent :color="'grey'" @click="back">
                 <fa icon="arrow-left"></fa>
             </buttonComponent>
 

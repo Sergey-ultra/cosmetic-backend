@@ -27,7 +27,7 @@ class MessageRepository
             ->all();
     }
 
-    public function getAllTechSupportMessagesByUserId(int $myUserId, ?int $dialogUserId): array
+    public function getAllTechSupportMessagesByUserId(?int $myUserId, ?int $dialogUserId): array
     {
         return $this->getMessageQuery()
             ->where(function ($query) use ($myUserId, $dialogUserId) {

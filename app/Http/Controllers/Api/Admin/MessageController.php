@@ -44,14 +44,13 @@ class MessageController extends Controller
 
     public function chat(MessageRepository $messageRepository, int $lastMessageId): JsonResponse
     {
-        $userId = Auth::guard('api')->id();
+
         $lastMessage = UserMessage::query()->find($lastMessageId);
         if (!$lastMessage) {
             return response()->json([], Response::HTTP_NOT_FOUND);
         }
-        $dialogUserId = $lastMessage->from_user !== $userId
-            ? $lastMessage->from_user
-            : $lastMessage->to_user;
+        $dialogUserId = $lastMessage->to_user ?? $lastMessage->from_user;
+
 
         $dialogUserName = MessageRepository::TECHNICAL_SUPPORT;
         $dialogUserAvatar = UserInfo::TECHNICAL_SUPPORT_AVATAR;
@@ -62,7 +61,7 @@ class MessageController extends Controller
             $dialogUserAvatar = $dialogUser->avatar;
         }
 
-        $result = $messageRepository->getAllTechSupportMessagesByUserId($userId, $dialogUserId);
+        $result = $messageRepository->getAllTechSupportMessagesByUserId(null, $dialogUserId);
 
         return response()->json(['data' =>
             [
