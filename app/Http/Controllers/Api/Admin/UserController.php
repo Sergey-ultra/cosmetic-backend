@@ -54,7 +54,9 @@ class UserController extends Controller
                 sprintf('%s.user_id', UserInfo::TABLE),
                 '=',
                 sprintf('%s.id', User::TABLE)
-            );
+            )
+            ->orderByDesc(sprintf('%s.created_at', User::TABLE))
+        ;
 
         $result = $this->prepareModel($request, $query, true)->paginate( $perPage);
 
