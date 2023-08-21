@@ -144,7 +144,6 @@ class SkuRepository implements ISkuRepository
         if ($maxPrice) {
             $productQuery->where('sku_store.price', '<', $maxPrice);
         }
-        dd( $productQuery->toSql());
 
         $this->allSkus = $productQuery->get()->toArray();
 
