@@ -13,6 +13,8 @@ use App\Services\CompressImageService\CompressImageInterface;
 use App\Services\CompressImageService\CompressImageService;
 use App\Services\ImageLoadingService\ImageLoadingInterface;
 use App\Services\ImageLoadingService\ImageLoadingService;
+use App\Services\MessageService\MessageService;
+use App\Services\MessageService\MessageServiceInterface;
 use App\Services\Parser\ActualPriceParsingService;
 use App\Services\Parser\Contracts\ILinkParser;
 use App\Services\Parser\LinkCrawlerParser;
@@ -57,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(IArticleRepository::class, ArticleRepositoryRepository::class);
         $this->app->singleton(ISkuRepository::class, ISkuRepository::class);
         $this->app->singleton(IPayment::class, YooMoneyService::class);
+        $this->app->singleton(MessageServiceInterface::class, MessageService::class);
 
         $this->app->bind(
             PriceCrawlerService::class,
