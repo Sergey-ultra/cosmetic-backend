@@ -315,20 +315,20 @@ class ReviewController extends Controller
 
     public function updatePublished(int $id, ReviewRequest $request): JsonResponse
     {
-        $existing = Review::query()->find($id);
+        $review = Review::query()->find($id);
 
-        if (!$existing) {
+        if (!$review) {
             response()->json([], Response::HTTP_NOT_FOUND);
         }
 
-        $currentSku = Sku::query()->find($request->input('sku_id'));
+        $currentSku = $review->sku;
 
         if (!$currentSku) {
             response()->json([], Response::HTTP_NOT_FOUND);
         }
 
 
-        $updated = $existing->update([
+        $updated = $review->update([
             'status' => EntityStatus::MODERATED,
             'rating' => $request->input('rating'),
             'title' => $request->input('title'),
@@ -339,11 +339,11 @@ class ReviewController extends Controller
         ]);
 
         if (request()->ip() !== config('telegrambot.admin_ip')) {
-            $message = sprintf("Добавлен/обновлен отзыв с id %d", $existing->id);
+            $message = sprintf("Добавлен/обновлен отзыв с id %d", $review->id);
             AdminNotificationJob::dispatch($message);
         }
 
-        UpdateSkuRatingJob::dispatch($currentSku, 'minus');
+        UpdateSkuRatingJob::dispatch($review, 'minus');
 
         return response()->json([
             'data' => [
@@ -364,8 +364,7 @@ class ReviewController extends Controller
 
         if ($review) {
             if ($review->status === EntityStatus::PUBLISHED) {
-                $currentSku = Sku::query()->find($review->sku_id);
-                UpdateSkuRatingJob::dispatch($currentSku, 'minus');
+                UpdateSkuRatingJob::dispatch($review, 'minus');
             }
 
             $review->update(['status' => EntityStatus::DELETED]);

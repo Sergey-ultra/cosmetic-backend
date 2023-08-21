@@ -157,9 +157,9 @@ class ReviewController extends Controller
                 }
 
                 ReviewPublishedJob::dispatch($review->user_id, $review->id);
-                UpdateSkuRatingJob::dispatch($review->sku, 'plus');
+                UpdateSkuRatingJob::dispatch($review, 'plus');
             } else if ($review->status === 'published') {
-                UpdateSkuRatingJob::dispatch($review->sku, 'minus');
+                UpdateSkuRatingJob::dispatch($review, 'minus');
             }
         }
 
@@ -182,7 +182,7 @@ class ReviewController extends Controller
         $review->rejectedReasons()->sync($reasonIds);
 
         if ($review->status === 'published') {
-            UpdateSkuRatingJob::dispatch($review->sku, 'minus');
+            UpdateSkuRatingJob::dispatch($review, 'minus');
         }
 
         return response()->json(['data' => ['status' => 'success']]);

@@ -15,30 +15,31 @@ class UpdateSkuRatingJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     public function __construct(
-        protected Sku $currentSku,
+        protected Review $review,
         protected string $type,
     ){}
 
     public function handle(): void
     {
-        $reviewCount = Review::query()->where('sku_id', $this->currentSku->id)->count();
+        $currentSku = $this->review->sku;
+        $reviewCount = Review::query()->where('sku_id', $currentSku->id)->count();
 
         if ($this->type === 'plus') {
-            $newCommonRating = ($this->currentSku->rating * $reviewCount + $this->currentSku->rating) / ($reviewCount + 1);
-            $reviewsCount = $this->currentSku->reviews_count + 1;
+            $newCommonRating = ($currentSku->rating * $reviewCount + $this->review->rating) / ($reviewCount + 1);
+            $reviewsCount = $currentSku->reviews_count + 1;
         } else if ($this->type === 'minus') {
             if ($reviewCount - 1 === 0) {
                 $reviewsCount = 0;
                 $newCommonRating = 5;
             } else {
-                $newCommonRating = ($this->currentSku->rating * $reviewCount - $this->currentSku->rating) / ($reviewCount - 1);
-                $reviewsCount = $this->currentSku->reviews_count - 1;
+                $newCommonRating = ($currentSku->rating * $reviewCount - $this->review->rating) / ($reviewCount - 1);
+                $reviewsCount = $currentSku->reviews_count - 1;
             }
         }
 
 
-        $this->currentSku->rating = $newCommonRating;
-        $this->currentSku->reviews_count = $reviewsCount;
-        $this->currentSku->save();
+        $currentSku->rating = $newCommonRating;
+        $currentSku->reviews_count = $reviewsCount;
+        $currentSku->save();
     }
 }
