@@ -41,7 +41,7 @@ class MessageRepository
                     'id' => $item->id,
                     'message' => $item->message,
                     'user_name' => $userName,
-                    'avatar' =>$userAvatar,
+                    'avatar' => $userAvatar,
                     'data' => $item->data,
                     'type' => $item->type,
                     'created_at' => $item->created_at->format('Y-m-d') === now()->format('Y-m-d')

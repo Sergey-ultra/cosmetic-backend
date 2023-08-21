@@ -60,7 +60,7 @@ class MessageController extends Controller
         if (null !== $dialogUserId) {
             $dialogUser = $messageRepository->getDialogUser($dialogUserId);
             $dialogUserName = $dialogUser->user_name;
-            $dialogUserAvatar = $dialogUser->avatar;
+            $dialogUserAvatar = $dialogUser?->avatar ?? UserInfo::DEFAULT_AVATAR;
         }
 
         $result = $messageRepository->getAllMessagesByUserId(null, $dialogUserId);
