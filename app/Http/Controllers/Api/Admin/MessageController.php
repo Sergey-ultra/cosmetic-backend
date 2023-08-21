@@ -63,7 +63,7 @@ class MessageController extends Controller
             $dialogUserAvatar = $dialogUser->avatar;
         }
 
-        $result = $messageRepository->getAllTechSupportMessagesByUserId(null, $dialogUserId);
+        $result = $messageRepository->getAllMessagesByUserId(null, $dialogUserId);
 
         return response()->json(['data' =>
             [

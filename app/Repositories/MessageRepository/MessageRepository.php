@@ -6,28 +6,53 @@ use App\Models\User;
 use App\Models\UserInfo;
 use App\Models\UserMessage;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class MessageRepository
 {
     const TECHNICAL_SUPPORT = 'Техническая поддержка';
-    public function getLastMessagesByUserId(?int $myUserId): array
+    public function getLastMessagesByUserId(?int $userId): array
     {
         return $this->getMessageQuery()
-            ->whereIn(sprintf('%s.id', UserMessage::TABLE), function ($query) use ($myUserId) {
+            ->whereIn(sprintf('%s.id', UserMessage::TABLE), function ($query) use ($userId) {
                 $query
                     ->selectRaw('Max(id)')
                     ->from(UserMessage::TABLE)
-                    ->where('to_user', $myUserId)
-                    ->orWhere('from_user', $myUserId)
+                    ->where('to_user', $userId)
+                    ->orWhere('from_user', $userId)
                     ->groupBy('chat');
             })
             ->get()
-            ->map($this->getMapper($myUserId))
+            ->map(function(UserMessage $item) use($userId) {
+                $withUserId = $item->from_user === $userId ? $item->to_user : $item->from_user;
+
+                if (is_null($withUserId)) {
+                    $userName = self::TECHNICAL_SUPPORT;
+                    $userAvatar = UserInfo::TECHNICAL_SUPPORT_AVATAR;
+                } else {
+                    $withUser = User::query()->with('info')->find($withUserId);
+                    $userName = $withUser->name;
+                    $userAvatar = $withUser?->info?->avatar ?? UserInfo::DEFAULT_AVATAR;
+                }
+
+
+                return [
+                    'id' => $item->id,
+                    'message' => $item->message,
+                    'user_name' => $userName,
+                    'avatar' =>$userAvatar,
+                    'data' => $item->data,
+                    'type' => $item->type,
+                    'created_at' => $item->created_at->format('Y-m-d') === now()->format('Y-m-d')
+                        ? sprintf('Сегодня в %s', $item->created_at->format('H-i'))
+                        : $item->created_at->format('Y-m-d'),
+                ];
+            })
             ->all();
     }
 
-    public function getAllTechSupportMessagesByUserId(?int $myUserId, ?int $dialogUserId): array
+    public function getAllMessagesByUserId(?int $myUserId, ?int $dialogUserId): array
     {
         return $this->getMessageQuery()
             ->where(function ($query) use ($myUserId, $dialogUserId) {
@@ -48,6 +73,7 @@ class MessageRepository
                 sprintf('%s.id', UserMessage::TABLE),
                 sprintf('%s.message', UserMessage::TABLE),
                 sprintf('%s.from_user', UserMessage::TABLE),
+                sprintf('%s.to_user', UserMessage::TABLE),
                 sprintf('%s.name AS user_name', User::TABLE),
                 sprintf('%s.data', UserMessage::TABLE),
                 sprintf('%s.type', UserMessage::TABLE),
@@ -76,7 +102,7 @@ class MessageRepository
                 'message' => $item->message,
                 'is_mine' => $item->from_user === $userId,
                 'user_name' => $item->user_name ?? self::TECHNICAL_SUPPORT,
-                'avatar' => $item->avatar ?? ($item->from_user === null
+                'avatar' => $item->avatar ?? (is_null($userId)
                         ? UserInfo::TECHNICAL_SUPPORT_AVATAR
                         : UserInfo::DEFAULT_AVATAR),
                 'data' => $item->data,
@@ -88,7 +114,7 @@ class MessageRepository
         };
     }
 
-    public function getDialogUser(int $dialogUserId): ?User
+    public function getDialogUser(int $dialogUserId): ?Model
     {
         return User::query()
             ->select(
