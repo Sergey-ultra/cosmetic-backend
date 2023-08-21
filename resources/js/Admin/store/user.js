@@ -21,6 +21,7 @@ export default {
         availableRoles: [],
         masterPassword: '',
         savingBotsStatus: '',
+        myUser: null,
     },
     getters: {
         availableRoleNames: state => state.availableRoles.map(el => el.name),
@@ -53,8 +54,15 @@ export default {
         setAvailableRoles: (state, payload) => state.availableRoles = [...payload],
         setMasterPassword: (state, payload) => state.masterPassword = payload,
         setSavingBotsStatus: (state, payload) => state.savingBotsStatus = payload,
+        setMyUser: (state, payload) => state.myUser = {...payload},
     },
     actions: {
+        loadMyUser: async({ commit }) => {
+            const { data } = await api.get('/users/my');
+            if (data) {
+                commit('setMyUser', data);
+            }
+        },
         loadMasterPassword: async({ commit }) => {
             const { data } = await api.get('/users/master-password');
             if (data) {

@@ -18,8 +18,11 @@
             <dropdown class="header__item header__item-profile">
                 <template v-slot:activator="{ on }">
 
-                    <router-link :to="{ name: 'messages' }">
+                    <router-link :to="{ name: 'messages' }" style="position:relative;">
                         <fa class="dropdown__icon" icon="envelope"></fa>
+                        <span v-if="myUser && myUser.unreadMessageCount" class="badge">
+                            {{ myUser.unreadMessageCount }}
+                        </span>
                     </router-link>
                     <div class="header__user">{{ userName }}</div>
                     <div class="avatar" @click="on">
@@ -127,13 +130,14 @@
         },
         computed: {
             ...mapState('auth', ['userName', 'userRole', 'userAvatar']),
+            ...mapState('user', ['myUser']),
         },
         created() {
             // if (this.userRole.toLowerCase() === 'admin') {
             //     adminRoutes.forEach(el => this.$router.addRoute(el))
             //    // this.$router.addRoute(adminRoutes);
             // }
-
+            this.loadMyUser();
             this.initMenu()
         },
         watch:{
@@ -153,6 +157,7 @@
         },
         methods: {
             ...mapActions('auth', ['logout']),
+            ...mapActions('user', ['loadMyUser']),
             initMenu() {
                 if (this.userRole.toLowerCase() === 'admin') {
                     this.routes = this.routes.concat([
@@ -333,7 +338,24 @@
         display:flex;
     }
 
-
+    .badge {
+        position: absolute;
+        left: 9px;
+        top: -7px;
+        height: 20px;
+        line-height: 20px;
+        min-width: 20px;
+        padding: 0 5px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        background-image: linear-gradient(to bottom, #ffd6e7, rgb(248, 140, 182));
+        color: #fff;
+        font-size: 12px;
+        font-weight: bolder;
+        text-align: center;
+    }
     .navbar {
         display:block;
         overflow-y:auto;

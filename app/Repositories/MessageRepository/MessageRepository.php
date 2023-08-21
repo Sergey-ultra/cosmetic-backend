@@ -130,4 +130,14 @@ class MessageRepository
             ->where(sprintf('%s.id', User::TABLE), $dialogUserId)
             ->first();
     }
+
+    public function unreadFeedbackMessagesCount(): int
+    {
+        return UserMessage::query()
+            ->where(function ($query) {
+                $query->where('to_user', null)->orWhere('from_user', null);
+            })
+            ->where('is_viewed', false)
+            ->count();
+    }
 }

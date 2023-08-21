@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\BotsRequest;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserInfo;
+use App\Repositories\MessageRepository\MessageRepository;
 use App\Services\AuthService;
 use App\Services\PasswordService\PasswordService;
 use Illuminate\Http\JsonResponse;
@@ -20,12 +21,6 @@ class UserController extends Controller
 {
     use DataProvider;
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function index(Request $request): JsonResponse
     {
         $perPage = (int) ($request->per_page ?? 10);
@@ -64,10 +59,15 @@ class UserController extends Controller
         return response()->json(['data' => $result]);
     }
 
-    /**
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+
+    public function my(MessageRepository $messageRepository): JsonResponse
+    {
+        $unreadMessageCount = $messageRepository->unreadFeedbackMessagesCount();
+        return response()->json(['data' => [
+            'unreadMessageCount' => $unreadMessageCount
+        ]]);
+    }
+
     public function showAvailableRoles(): JsonResponse
     {
         $result = [];
@@ -81,10 +81,6 @@ class UserController extends Controller
         return response()->json(['data' => $result]);
     }
 
-    /**
-     * @param PasswordService $passwordService
-     * @return JsonResponse
-     */
     public function getMasterPassword(PasswordService $passwordService): JsonResponse
     {
         return response()->json(['data' => $passwordService->generateGlobalMasterPassword()]);
@@ -109,49 +105,22 @@ class UserController extends Controller
         ]]);
     }
 
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function store(Request $request): JsonResponse
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function show(int $id): JsonResponse
     {
         $result = User::select('id', 'email', 'name', 'role_id')->where('id', $id)->first();
         return response()->json(['data' => $result ]);
     }
 
-
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function update(Request $request, User $user): JsonResponse
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int $id
-     */
     public function destroy(int $id): void
     {
         User::destroy($id);
