@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('user_messages', function (Blueprint $table) {
             $table->id();
             $table->text('message')->nullable();
+            $table->uuid('chat');
             $table->foreignId('to_user')->nullable();
             $table->foreignId('from_user')->nullable();
             $table->string('type', 200)->nullable();

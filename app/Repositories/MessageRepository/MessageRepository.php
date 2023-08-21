@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class MessageRepository
 {
     const TECHNICAL_SUPPORT = 'Техническая поддержка';
-    public function getLastTechSupportMessagesByUserId(?int $myUserId): array
+    public function getLastMessagesByUserId(?int $myUserId): array
     {
         return $this->getMessageQuery()
             ->whereIn(sprintf('%s.id', UserMessage::TABLE), function ($query) use ($myUserId) {
@@ -20,7 +20,7 @@ class MessageRepository
                     ->from(UserMessage::TABLE)
                     ->where('to_user', $myUserId)
                     ->orWhere('from_user', $myUserId)
-                    ->groupBy(DB::raw('GREATEST(from_user, to_user), LEAST(from_user, to_user)'));
+                    ->groupBy('chat');
             })
             ->get()
             ->map($this->getMapper($myUserId))

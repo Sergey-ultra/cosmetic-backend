@@ -6,7 +6,7 @@
             </buttonComponent>
 
             <div class="avatar">
-                <img :src="`/${dialogAvatar}`" :alt="dialogUser">
+                <img :src="dialogAvatar" :alt="dialogUser">
             </div>
             <div class="user-name">{{ dialogUser }}</div>
         </div>

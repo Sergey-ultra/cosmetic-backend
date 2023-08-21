@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\UserInfo;
 use App\Models\UserMessage;
 use App\Repositories\MessageRepository\MessageRepository;
+use App\Services\MessageService\MessageServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,7 @@ class MessageController extends Controller
     public function myMessages(MessageRepository $messageRepository): JsonResponse
     {
         $userId = Auth::guard('api')->id();
-        $result = $messageRepository->getLastTechSupportMessagesByUserId($userId);
+        $result = $messageRepository->getLastMessagesByUserId($userId);
 
         return response()->json(['data' => $result]);
     }
@@ -56,40 +57,19 @@ class MessageController extends Controller
         ]);
     }
 
-    public function sendMessage(MessageRequest $request): JsonResponse
+    public function sendMessage(MessageRequest $request, MessageServiceInterface $messageService): JsonResponse
     {
-        $userId = Auth::guard('api')->id();
-        $params = [
-            'message' => $request->input('message'),
-            'from_user' => $userId,
-        ];
-        if ($request->input('dialog_user_id')) {
-            $params['to_user'] = $request->input('dialog_user_id');
-        } else {
-            $params['type'] = 'feedback';
-        }
+        $new = $messageService->sendMessage(
+            Auth::guard('api')->id(),
+            $request->input('message'),
+            $request->input('dialog_user_id')
+        );
 
-        $new = UserMessage::query()->create($params);
-
-        if ($new->type === 'feedback' && app()->environment(['production'])) {
-            $message = sprintf("Добавлено новое сообщение в техподдержку с id %d", $new->id);
+        if ($new['type'] === 'feedback' && app()->environment(['production'])) {
+            $message = sprintf("Добавлено новое сообщение в техподдержку с id %d", $new['id']);
             AdminNotificationJob::dispatch($message);
         }
 
-        $new->load('user.info');
-
-        $result = [
-            'id' => $new->id,
-            'message' => $new->message,
-            'is_mine' => true,
-            'user_name' => $new->user->name ,
-            'avatar' => $new->user->info->avatar ?? UserInfo::DEFAULT_AVATAR,
-            'type' => $new->type,
-            'created_at' => $new->created_at->format('Y-m-d') === now()->format('Y-m-d')
-                ? sprintf('Сегодня в %s', $new->created_at->format('H-i'))
-                : $new->created_at->format('Y-m-d'),
-        ];
-
-        return response()->json(['data' => $result], Response::HTTP_CREATED);
+        return response()->json(['data' => $new], Response::HTTP_CREATED);
     }
 }

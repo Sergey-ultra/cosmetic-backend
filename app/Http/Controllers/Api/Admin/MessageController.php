@@ -10,9 +10,11 @@ use App\Jobs\AdminNotificationJob;
 use App\Models\UserInfo;
 use App\Models\UserMessage;
 use App\Repositories\MessageRepository\MessageRepository;
+use App\Services\MessageService\MessageServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 
@@ -37,7 +39,7 @@ class MessageController extends Controller
 
     public function adminMessage(MessageRepository $messageRepository): JsonResponse
     {
-        $result = $messageRepository->getLastTechSupportMessagesByUserId(null);
+        $result = $messageRepository->getLastMessagesByUserId(null);
 
         return response()->json(['data' => $result]);
     }
@@ -73,36 +75,13 @@ class MessageController extends Controller
         ]);
     }
 
-    public function sendMessage(MessageRequest $request): JsonResponse
+    public function sendMessage(MessageRequest $request, MessageServiceInterface $messageService): JsonResponse
     {
-        $userId = Auth::guard('api')->id();
-        $params = [
-            'message' => $request->input('message'),
-            'from_user' => $userId,
-        ];
-        if ($request->input('dialog_user_id')) {
-            $params['to_user'] = $request->input('dialog_user_id');
-        } else {
-            $params['type'] = 'feedback';
-        }
-
-        $new = UserMessage::query()->create($params);
-
-
-
-        $new->load('user.info');
-
-        $result = [
-            'id' => $new->id,
-            'message' => $new->message,
-            'is_mine' => true,
-            'user_name' => $new->user->name ,
-            'avatar' => $new->user->info->avatar ?? UserInfo::DEFAULT_AVATAR,
-            'type' => $new->type,
-            'created_at' => $new->created_at->format('Y-m-d') === now()->format('Y-m-d')
-                ? sprintf('Сегодня в %s', $new->created_at->format('H-i'))
-                : $new->created_at->format('Y-m-d'),
-        ];
+        $result = $messageService->sendMessage(
+            Auth::guard('api')->id(),
+            $request->input('message'),
+            $request->input('dialog_user_id')
+        );
 
         return response()->json(['data' => $result], Response::HTTP_CREATED);
     }

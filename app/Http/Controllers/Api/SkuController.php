@@ -17,6 +17,7 @@ use App\Models\UserMessage;
 use App\Repositories\SkuRepository\DTO\SkuDTO;
 use App\Repositories\SkuRepository\SkuRepository;
 use App\Services\EntityStatus;
+use App\Services\MessageService\MessageServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -248,7 +249,11 @@ class SkuController extends Controller
         return ComparedSkuResource::collection($skus);
     }
 
-    public function store(SkuRequest $request, SkuRepository $skuService): JsonResponse
+    public function store(
+        SkuRequest $request,
+        SkuRepository $skuService,
+        MessageServiceInterface $messageService
+    ): JsonResponse
     {
         $brand = Brand::query()->find($request->input('brand_id'));
 
@@ -265,14 +270,7 @@ class SkuController extends Controller
         try {
             $newSku = $skuService->createNewSku($skuDto);
 
-            UserMessage::query()->create([
-                'data' => [
-                    'sku_code' => $newSku['sku_code'],
-                    'name' => $newSku['name'],
-                ],
-                'type' => 'add-sku',
-                'to_user' => Auth::guard('api')->user()->id,
-            ]);
+            $messageService->addSku($newSku['sku_code'], $newSku['name'], Auth::guard('api')->user()->id);
 
             $message = sprintf('Добавлен новый sku c именем %s', $newSku['name']);
             AdminNotificationJob::dispatch($message);

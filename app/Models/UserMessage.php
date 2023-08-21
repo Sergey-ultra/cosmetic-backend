@@ -11,7 +11,7 @@ class UserMessage extends Model
 
     protected $table = self::TABLE;
 
-    protected $fillable = ['message', 'to_user', 'from_user', 'is_viewed', 'type', 'data'];
+    protected $fillable = ['message', 'chat', 'to_user', 'from_user', 'is_viewed', 'type', 'data'];
 
     protected $casts = [
         'to_user' => 'integer',
