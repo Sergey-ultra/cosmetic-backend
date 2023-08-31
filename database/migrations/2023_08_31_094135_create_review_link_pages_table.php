@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('review_link_option_id');
             $table->tinyInteger('page_number');
-            $table->string('page_number');
             $table->json('body')->nullable();
             $table->timestamps();
             $table->index('review_link_option_id');
