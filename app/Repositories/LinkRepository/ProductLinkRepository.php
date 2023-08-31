@@ -1,11 +1,19 @@
 <?php
 
-namespace App\Services\Parser;
+namespace App\Repositories\LinkRepository;
 
+use App\Models\LinkPage;
 use App\Models\ParsingLink;
 
-class LinkInsertService
+class ProductLinkRepository implements LinkRepositoryInterface
 {
+    public function insertBody(int $linkOptionId, int $pageNumber, BodyDTO $body): void
+    {
+        LinkPage::query()->updateOrCreate(
+            ['link_option_id' => $linkOptionId, 'page_number' => $pageNumber],
+            ['body' => json_encode($body)]);
+    }
+
     /**
      * @param array $parsedLinks
      * @param int $storeId
@@ -35,7 +43,7 @@ class LinkInsertService
             static function ($link) use ($storeId, $categoryId) {
                 return [
                     "link" => $link,
-                    "parsed" => 0,
+                    "parsed" => ParsingLink::UNPARSED,
                     "store_id" => $storeId,
                     "category_id" => $categoryId
                 ];

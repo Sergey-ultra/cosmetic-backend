@@ -21,11 +21,11 @@ class LinkOptionController extends Controller
 
     public function updateOrCreate(Request $request): JsonResponse
     {
-        $newPriceOption = LinkOption::updateOrCreate(
+        $newOption = LinkOption::updateOrCreate(
             ['store_id' =>  $request->store_id, 'category_id' => $request->category_id],
             ['options' => $request->options]
         );
 
-        return response()->json(['data' => $newPriceOption]);
+        return response()->json(['data' => $newOption]);
     }
 }

@@ -10,9 +10,9 @@ interface ILinkParser
         int     $linkOptionId,
         array   $body,
         ?string $nextPage,
-        string  $productLink,
-        string  $storeUrl
+        string  $link,
+        string  $targetUrl
     ): void;
-    public function parseProductLinks(string $categoryPageUrl): array;
+    public function parseLinksFromPage(string $categoryPageUrl): array;
     public function getParsedBodies(): array;
 }

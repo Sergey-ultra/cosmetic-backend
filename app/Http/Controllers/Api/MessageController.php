@@ -20,7 +20,7 @@ class MessageController extends Controller
     public function myMessages(MessageRepository $messageRepository): JsonResponse
     {
         $userId = Auth::guard('api')->id();
-        $result = $messageRepository->getLastMessagesByUserId($userId);
+        $result = $messageRepository->getChats($userId);
 
         return response()->json(['data' => $result]);
     }

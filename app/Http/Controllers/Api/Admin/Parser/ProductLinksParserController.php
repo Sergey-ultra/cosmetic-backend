@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Api\Admin\Parser;
 
 use App\Http\Controllers\Controller;
 use App\Models\LinkOption;
-use App\Services\Parser\Contracts\ILinkParser;
-use App\Services\Parser\LinkInsertService;
+use App\Repositories\LinkRepository\ProductLinkRepository;
+use App\Services\Parser\LinkCrawlerParser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class LinkParserController extends Controller
+class ProductLinksParserController extends Controller
 {
-    public function parseLinks(Request $request, ILinkParser $linkParserService): JsonResponse
+    public function parseLinks(Request $request, LinkCrawlerParser $linkParserService): JsonResponse
     {
         set_time_limit(7200);
 
@@ -40,23 +40,23 @@ class LinkParserController extends Controller
 
         $bodyArray = $linkOption->pages
             ? $linkOption->pages
-                ->map(fn($item) => json_decode($item['body'] ,true))
+                ->map(fn(array $item) => json_decode($item['body'] ,true))
                 ->all()
             : [];
 
 //        $isRelatedProductLink =  (bool)($linkOption->options['relatedLink'] ?? false);
 //        $isRelatedPageUrl = (bool)($linkOption->options['relatedPageUrl'] ?? false);
 
-        $linkParserService->setParsingOptions(
-            $linkOption->id,
-            $bodyArray,
-            $linkOption->options['nextPage'] ?? null,
-            $linkOption->options['productLink'],
-            $linkOption->link
-        );
+        $linkParserService
+            ->setLinkOptionId($linkOption->id)
+            ->setBody($bodyArray)
+            ->setNextPage($linkOption->options['nextPage'] ?? null)
+            ->setLink($linkOption->options['productLink'])
+            ->setTargetUrl($linkOption->link);
 
 
-        $parsedLinks = $linkParserService->parseProductLinks($linkOption->options['categoryUrl']);
+
+        $parsedLinks = $linkParserService->parseLinksFromPage($linkOption->options['categoryUrl']);
 
         $result['links'] = $parsedLinks;
 
@@ -69,7 +69,7 @@ class LinkParserController extends Controller
             $result['message'] = 'success';
 
             if ($isLoadToDb) {
-                (new LinkInsertService())->insert($parsedLinks, $storeId, $categoryId);
+                (new ProductLinkRepository())->insert($parsedLinks, $storeId, $categoryId);
             }
         }
 

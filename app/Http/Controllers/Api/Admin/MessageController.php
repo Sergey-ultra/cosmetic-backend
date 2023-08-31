@@ -39,7 +39,7 @@ class MessageController extends Controller
 
     public function adminMessage(MessageRepository $messageRepository): JsonResponse
     {
-        $result = $messageRepository->getLastMessagesByUserId(null);
+        $result = $messageRepository->getSupportChats();
 
         return response()->json(['data' => $result]);
     }

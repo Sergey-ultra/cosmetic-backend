@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\Parser\ReviewParserController;
 use App\Http\Controllers\Api\Admin\RejectedReasonController;
 use App\Http\Controllers\Api\Admin\SettingController;
 use App\Http\Controllers\Api\ArticleCommentController;
@@ -61,7 +62,7 @@ use App\Http\Controllers\Api\Admin\LinkClickController;
 use App\Http\Controllers\Api\Admin\SitemapController;
 use App\Http\Controllers\Api\Admin\SupplierController;
 use App\Http\Controllers\Api\Admin\Parser\LinkOptionController;
-use App\Http\Controllers\Api\Admin\Parser\LinkParserController;
+use App\Http\Controllers\Api\Admin\Parser\ProductLinksParserController;
 use App\Http\Controllers\Api\Admin\Parser\ParsingLinkController;
 use App\Http\Controllers\Api\Admin\Parser\PriceOptionController;
 use App\Http\Controllers\Api\Admin\Parser\PriceParserController;
@@ -253,22 +254,28 @@ Route::group(['middleware' => ['auth:api']], function () {
 
         Route::prefix('/parser')->group(function () {
 
-            Route::get('/save-brand', [ParserControllerProxy::class, 'saveBrand']);
-            Route::get('/save-category', [ParserControllerProxy::class, 'saveCategory']);
-            Route::get('/save-country', [ParserControllerProxy::class, 'saveCountry']);
-            Route::get('/save-link', [ParserControllerProxy::class, 'saveLink']);
-            Route::get('/parser/save-product', [ParserControllerProxy::class, 'saveProduct']);
-            Route::get('/save-sku', [ParserControllerProxy::class, 'saveSku']);
-            Route::get('/save-price-history', [ParserControllerProxy::class, 'savePriceHistory']);
-            Route::get('/save-current-price', [ParserControllerProxy::class, 'saveCurrentPrice']);
-            Route::get('/save-store', [ParserControllerProxy::class, 'saveStore']);
-            Route::get('/save-ingredient', [ParserControllerProxy::class, 'saveIngredient']);
-            Route::get('/save-ingredient-product', [ParserControllerProxy::class, 'saveIngredientProduct']);
+//            Route::get('/save-brand', [ParserControllerProxy::class, 'saveBrand']);
+//            Route::get('/save-category', [ParserControllerProxy::class, 'saveCategory']);
+//            Route::get('/save-country', [ParserControllerProxy::class, 'saveCountry']);
+//            Route::get('/save-link', [ParserControllerProxy::class, 'saveLink']);
+//            Route::get('/parser/save-product', [ParserControllerProxy::class, 'saveProduct']);
+//            Route::get('/save-sku', [ParserControllerProxy::class, 'saveSku']);
+//            Route::get('/save-price-history', [ParserControllerProxy::class, 'savePriceHistory']);
+//            Route::get('/save-current-price', [ParserControllerProxy::class, 'saveCurrentPrice']);
+//            Route::get('/save-store', [ParserControllerProxy::class, 'saveStore']);
+//            Route::get('/save-ingredient', [ParserControllerProxy::class, 'saveIngredient']);
+//            Route::get('/save-ingredient-product', [ParserControllerProxy::class, 'saveIngredientProduct']);
 
             Route::group(['prefix' => '/parsed-links'], function() {
                 Route::get('/', [ParsingLinkController::class, 'index']);
                 Route::get('/stores-with-links-count', [ParsingLinkController::class, 'storesWithLinksCount']);
                 Route::delete('/delete-body-from-parsing-link/{id}', [ParsingLinkController::class, 'deleteBodyFromParsingLink']);
+            });
+
+            Route::group(['prefix' => '/review'], function() {
+                Route::get('/link-option', [ReviewParserController::class, 'linkOptions']);
+                Route::post('/link-option', [ReviewParserController::class, 'updateOrCreate']);
+                Route::post('/parse-links', [ReviewParserController::class, 'parseLinks']);
             });
 
 
@@ -296,7 +303,7 @@ Route::group(['middleware' => ['auth:api']], function () {
                 [PriceParserController::class, 'parsePricesFromActualPriceParsingTable']
             );
 
-            Route::post('/link/parse-links', [LinkParserController::class, 'parseLinks']
+            Route::post('/link/parse-links', [ProductLinksParserController::class, 'parseLinks']
             );
         });
 

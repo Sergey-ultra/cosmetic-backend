@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 class MessageRepository
 {
     const TECHNICAL_SUPPORT = 'Техническая поддержка';
-    public function getLastMessagesByUserId(?int $userId): array
+    public function getChats(?int $userId): array
     {
         return $this->getMessageQuery()
             ->whereIn(sprintf('%s.id', UserMessage::TABLE), function ($query) use ($userId) {
@@ -24,31 +24,26 @@ class MessageRepository
                     ->groupBy('chat');
             })
             ->get()
-            ->map(function(UserMessage $item) use($userId) {
-                $withUserId = $item->from_user === $userId ? $item->to_user : $item->from_user;
-
-                if (is_null($withUserId)) {
-                    $userName = self::TECHNICAL_SUPPORT;
-                    $userAvatar = UserInfo::TECHNICAL_SUPPORT_AVATAR;
-                } else {
-                    $withUser = User::query()->with('info')->find($withUserId);
-                    $userName = $withUser->name;
-                    $userAvatar = $withUser?->info?->avatar ?? UserInfo::DEFAULT_AVATAR;
-                }
+            ->map($this->getMessagesMapper($userId))
+            ->all();
+    }
 
 
-                return [
-                    'id' => $item->id,
-                    'message' => $item->message,
-                    'user_name' => $userName,
-                    'avatar' => $userAvatar,
-                    'data' => $item->data,
-                    'type' => $item->type,
-                    'created_at' => $item->created_at->format('Y-m-d') === now()->format('Y-m-d')
-                        ? sprintf('Сегодня в %s', $item->created_at->format('H-i'))
-                        : $item->created_at->format('Y-m-d'),
-                ];
+    public function getSupportChats(): array
+    {
+        return $this->getMessageQuery()
+            ->whereIn(sprintf('%s.id', UserMessage::TABLE), function ($query) {
+                $query
+                    ->selectRaw('Max(id)')
+                    ->from(UserMessage::TABLE)
+                    ->where(function ($query) {
+                        $query->whereNull('to_user')->orWhereNull('from_user');
+                    })
+                    ->where('type', 'feedback')
+                    ->groupBy('chat');
             })
+            ->get()
+            ->map($this->getMessagesMapper(null))
             ->all();
     }
 
@@ -92,6 +87,36 @@ class MessageRepository
                 '=',
                 sprintf('%s.from_user', UserMessage::TABLE)
             );
+    }
+
+
+    private function getMessagesMapper(?int $userId): callable
+    {
+        return function(UserMessage $item) use($userId) {
+            $withUserId = $item->from_user === $userId ? $item->to_user : $item->from_user;
+
+            if (is_null($withUserId)) {
+                $userName = self::TECHNICAL_SUPPORT;
+                $userAvatar = UserInfo::TECHNICAL_SUPPORT_AVATAR;
+            } else {
+                $withUser = User::query()->with('info')->find($withUserId);
+                $userName = $withUser->name;
+                $userAvatar = $withUser?->info?->avatar ?? UserInfo::DEFAULT_AVATAR;
+            }
+
+
+            return [
+                'id' => $item->id,
+                'message' => $item->message,
+                'user_name' => $userName,
+                'avatar' => $userAvatar,
+                'data' => $item->data,
+                'type' => $item->type,
+                'created_at' => $item->created_at->format('Y-m-d') === now()->format('Y-m-d')
+                    ? sprintf('Сегодня в %s', $item->created_at->format('H-i'))
+                    : $item->created_at->format('Y-m-d'),
+            ];
+        };
     }
 
     private function getMapper(?int $userId): callable

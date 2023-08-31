@@ -101,7 +101,6 @@
                 isLoadToDb: false,
                 storeId: 'null',
                 categoryId: 'null',
-                isFormChanging:false,
                 isShowLinkOptions: false,
                 options: {
                     categoryUrl: "",
@@ -140,7 +139,6 @@
         methods:{
             ...mapActions('store', ['loadAllStores']),
             ...mapActions('category', ['loadAllCategories']),
-            ...mapActions('linkOptions', ['loadLinkOptions', 'saveLinkOptions']),
             ...mapActions('linkParser', ['parseLinks']),
             ...mapMutations('linkParser', ['setIsShowPreview', 'setIsOpenPreviewAfterParsing']),
             async parse() {
