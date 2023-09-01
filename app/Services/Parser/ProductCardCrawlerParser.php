@@ -8,11 +8,10 @@ namespace App\Services\Parser;
 use App\Exceptions\ImageSavingException;
 use App\Exceptions\TextExtractException;
 use App\Exceptions\TextMethodException;
+use App\Repositories\LinkRepository\ParsingLinkWithOptionsDTO;
 use App\Services\ImageLoadingService\ImageLoadingInterface;
 use App\Services\Parser\Contracts\AbstractProductCardParser;
-use App\Services\Parser\DTO\ParsingLinkWithOptionsDTO;
 use App\Services\Parser\DTO\ProductCardDTO;
-use App\Services\ImageLoadingService\ImageLoadingService;
 use App\Services\UrlService\IUrlService;
 use Symfony\Component\DomCrawler\Crawler;
 

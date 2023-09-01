@@ -84,6 +84,12 @@ const constantRoutes = [
         meta: { title:'Парсинг ссылок на отзывы' }
     },
     {
+        path:'/admin/parser-review',
+        name:'review-parser',
+        component:() => import('../views/parser-review/index.vue'),
+        meta: { title:'Парсинг отзывов' }
+    },
+    {
         path:'/admin/settings',
         name:'settings',
         component:() => import('../views/settings/index.vue'),

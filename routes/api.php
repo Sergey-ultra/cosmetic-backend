@@ -273,9 +273,11 @@ Route::group(['middleware' => ['auth:api']], function () {
             });
 
             Route::group(['prefix' => '/review'], function() {
+                Route::get('/parsed-links', [ReviewParserController::class, 'parsedLinks']);
                 Route::get('/link-option', [ReviewParserController::class, 'linkOptions']);
                 Route::post('/link-option', [ReviewParserController::class, 'updateOrCreate']);
                 Route::post('/parse-links', [ReviewParserController::class, 'parseLinks']);
+                Route::post('/parse-by-link-ids', [ReviewParserController::class, 'parseByLinkIds']);
             });
 
 

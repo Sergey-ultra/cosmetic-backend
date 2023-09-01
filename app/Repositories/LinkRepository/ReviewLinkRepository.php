@@ -4,9 +4,11 @@ namespace App\Repositories\LinkRepository;
 
 use App\Models\LinkPage;
 use App\Models\ReviewLinkPage;
-use App\Models\ReviewParsingLinks;
+use App\Models\ReviewParsingLink;
+use Illuminate\Support\Facades\DB;
+use stdClass;
 
-class ReviewLinkRepository implements  LinkRepositoryInterface
+class ReviewLinkRepository implements LinkRepositoryInterface
 {
     public function insertBody(int $linkOptionId, int $pageNumber, BodyDTO $body): void
     {
@@ -17,7 +19,7 @@ class ReviewLinkRepository implements  LinkRepositoryInterface
 
     public function insert(array $parsedLinks, int $categoryId): void
     {
-        $existingParsingLinks = ReviewParsingLinks::query()
+        $existingParsingLinks = ReviewParsingLink::query()
             ->select('link')
             ->whereIn('link', $parsedLinks)
             ->get()
@@ -38,13 +40,30 @@ class ReviewLinkRepository implements  LinkRepositoryInterface
             static function ($link) use ($categoryId) {
                 return [
                     "link" => $link,
-                    "parsed" => ReviewParsingLinks::UNPARSED,
+                    "parsed" => ReviewParsingLink::UNPARSED,
                     "category_id" => $categoryId
                 ];
             },
             $parsedLinks
         );
 
-        ReviewParsingLinks::query()->upsert($preparedParsedLinks, []);
+        ReviewParsingLink::query()->upsert($preparedParsedLinks, []);
+    }
+
+    public function getLinksWithOptionsByIds(array $ids): array
+    {
+        return ReviewParsingLink::query()
+            ->select('id', 'link', 'category_id', 'body')
+            ->whereIn('id', $ids)
+            ->get()
+            ->map(static function (ReviewParsingLink $item): ReviewLinkDTO {
+                return new ReviewLinkDTO(
+                    $item->id,
+                    $item->link,
+                    $item->category_id,
+                    $item->body
+                );
+            })
+            ->all();
     }
 }

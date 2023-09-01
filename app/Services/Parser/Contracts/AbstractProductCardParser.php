@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Services\Parser\Contracts;
 
 use App\Models\ParsingLink;
-use App\Services\Parser\DTO\ParsingLinkWithOptionsDTO;
+use App\Repositories\LinkRepository\ParsingLinkWithOptionsDTO;
 use App\Services\Parser\DTO\ProductCardDTO;
 use App\Services\ProxyHttpClientService\ProxyHttpClientService;
-use GuzzleHttp\Client;
 
 
 abstract class AbstractProductCardParser

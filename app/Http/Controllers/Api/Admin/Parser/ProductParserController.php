@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin\Parser;
 
+use App\Helpers\MemoryUsage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductParsingRequest;
 use App\Jobs\CompressImageJob;
@@ -28,11 +29,7 @@ class ProductParserController extends Controller
 
         $result = $productParserService->parseProducts($isLoadToDb, $linkIds, $storeId, $isInsertIngredients, $brandId);
 
-        $size = memory_get_usage(true);
-        $unit = ['b','kb','mb','gb','tb','pb'];
-        $size = round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
-
-        return response()->json(['data' => $result, 'size' => $size]);
+        return response()->json(['data' => $result, 'size' => MemoryUsage::getMemoryUsage()]);
     }
 
     public function compressAllUncompressedImages(): JsonResponse

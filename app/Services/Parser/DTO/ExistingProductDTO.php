@@ -9,6 +9,5 @@ class ExistingProductDTO
         public readonly int $brandId,
         public readonly int $ingredientsCount
     )
-    {
-    }
+    {}
 }

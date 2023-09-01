@@ -16,7 +16,8 @@ return new class extends Migration
         Schema::create('review_parsing_links', function (Blueprint $table) {
             $table->id();
             $table->string('link')->unique();
-            $table->longtext('body')->nullable();
+            $table->longText('body')->nullable();
+            $table->json('json')->nullable();
             $table->string('parsed')->default(0);
             $table->unsignedInteger('category_id')->nullable();
             $table->timestamp('created_at')->useCurrent();

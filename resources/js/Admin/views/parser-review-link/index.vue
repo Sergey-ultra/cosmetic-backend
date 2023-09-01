@@ -93,7 +93,7 @@ export default {
     },
     computed: {
         ...mapState('category',['allCategories']),
-        ...mapState('reviewLinkParser',['isParsing', 'isShowPreview', 'isOpenPreviewAfterParsing']),
+        ...mapState('reviewParser',['isParsing', 'isShowPreview', 'isOpenPreviewAfterParsing']),
         isShowPreviewLocal: {
             get() {
                 return this.isShowPreview;
@@ -116,8 +116,8 @@ export default {
     },
     methods:{
         ...mapActions('category', ['loadAllCategories']),
-        ...mapActions('reviewLinkParser', ['parseLinks']),
-        ...mapMutations('reviewLinkParser', ['setIsShowPreview', 'setIsOpenPreviewAfterParsing']),
+        ...mapActions('reviewParser', ['parseLinks']),
+        ...mapMutations('reviewParser', ['setIsShowPreview', 'setIsOpenPreviewAfterParsing']),
         async parse() {
             await this.parseLinks({
                 category_id: this.categoryId,

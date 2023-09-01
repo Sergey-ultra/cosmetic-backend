@@ -84,7 +84,7 @@ export default {
         }
     },
     computed: {
-        ...mapState('reviewLinkParser', ['linkOptions']),
+        ...mapState('reviewParser', ['linkOptions']),
     },
     watch: {
         categoryId() {
@@ -98,7 +98,7 @@ export default {
         this.loadOptions()
     },
     methods: {
-        ...mapActions('reviewLinkParser', ['loadLinkOptions', 'saveLinkOptions']),
+        ...mapActions('reviewParser', ['loadLinkOptions', 'saveLinkOptions']),
         setFormChangingToTrue() {
             this.isFormChanging = true
         },

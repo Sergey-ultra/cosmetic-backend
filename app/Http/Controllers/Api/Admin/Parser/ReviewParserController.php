@@ -2,17 +2,25 @@
 
 namespace App\Http\Controllers\Api\Admin\Parser;
 
+use App\Helpers\MemoryUsage;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
+use App\Http\Requests\Admin\ReviewParsingRequest;
 use App\Models\LinkOption;
 use App\Models\ReviewLinkOption;
 use App\Models\ReviewLinkPage;
+use App\Models\ReviewParsingLink;
 use App\Repositories\LinkRepository\ReviewLinkRepository;
 use App\Services\Parser\LinkCrawlerParser;
+use App\Services\Parser\ReviewParsingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ReviewParserController extends Controller
 {
+    use DataProviderWithDTO;
     const TARGET_LINK = 'https://kosmetista.ru';
 
     public function linkOptions(Request $request): JsonResponse
@@ -30,6 +38,29 @@ class ReviewParserController extends Controller
         );
 
         return response()->json(['data' => $newOption]);
+    }
+
+    public function parsedLinks(Request $request): JsonResponse
+    {
+        $perPage = (int)($request->per_page ?? 30);
+
+        $query = ReviewParsingLink::query()
+            ->select([
+                'id',
+                'link',
+                DB::raw('DATE(created_at) as date'),
+                DB::raw("IF(body IS NULL, false, true) AS is_body_exist")
+            ])
+            ->where('parsed', 0);
+
+        $paramsDto = new ParamsDTO(
+            $request->input('filter') ?? [],
+            $request->input('sort') ?? '',
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
+
+        return response()->json(['data' => $result]);
     }
 
     public function parseLinks(
@@ -87,5 +118,18 @@ class ReviewParserController extends Controller
         }
 
         return response()->json(['data' => $result]);
+    }
+
+    public function parseByLinkIds(ReviewParsingRequest $request, ReviewParsingService $parserService): JsonResponse
+    {
+        set_time_limit(7200);
+        $linkIds = $request->input('linkIds');
+        $isLoadToDb = $request->boolean('isLoadToDb');
+
+
+
+        $result = $parserService->parseLinks($linkIds, $isLoadToDb);
+
+        return response()->json(['data' => $result, 'size' => MemoryUsage::getMemoryUsage()]);
     }
 }

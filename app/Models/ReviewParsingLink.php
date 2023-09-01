@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ReviewParsingLinks extends Model
+class ReviewParsingLink extends Model
 {
     public const UNPARSED = 0;
     public const PARSED = 1;
@@ -18,5 +18,11 @@ class ReviewParsingLinks extends Model
 
     protected $table = 'review_parsing_links';
 
-    protected $fillable = ['link', 'parsed',  'category_id'];
+    protected $fillable = ['link', 'parsed', 'body', 'json', 'category_id'];
+
+    protected array $cast = [
+        'id' => 'integer',
+        'category_id' => 'integer',
+        'json' => 'array',
+    ];
 }

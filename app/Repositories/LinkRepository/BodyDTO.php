@@ -2,7 +2,7 @@
 
 namespace App\Repositories\LinkRepository;
 
-class BodyDTO
+final class BodyDTO
 {
     public function __construct(
         public readonly int $code,
