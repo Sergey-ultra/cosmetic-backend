@@ -97,10 +97,10 @@ class ProductCardCrawlerParser extends AbstractProductCardParser
                 }
 
                 try {
-                    [$size, $imgPath] = $this->imageLoadingService->loadingImage(self::DESTINATION_FOLDER, $imgLink, $fileName);
+                    $imageSavedPathResult = $this->imageLoadingService->loadingImage(self::DESTINATION_FOLDER, $imgLink, $fileName);
 
-                    if (is_array($size)) {
-                        $this->productCard->images[] = $imgPath;
+                    if (is_array($imageSavedPathResult->sizeOptions)) {
+                        $this->productCard->images[] = $imageSavedPathResult->imageSavePath;
                     }
                 } catch (ImageSavingException $e) {
 

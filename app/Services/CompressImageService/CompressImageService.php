@@ -50,10 +50,10 @@ class CompressImageService implements CompressImageInterface
         $imageName = $imagePathParts[count($imagePathParts) - 1];
         $imagePathParts[count($imagePathParts) - 1] = $folder;
 
-        $newFolderPath = implode('/',$imagePathParts);
+        $newFolderPath = implode('/', $imagePathParts);
         $this->checkNewFolder($newFolderPath);
         $imagePathParts[] = $imageName;
-        return implode('/',$imagePathParts);
+        return implode('/', $imagePathParts);
     }
 
     protected function checkNewFolder(string $path): void

@@ -14,10 +14,10 @@ class ImageLoadingService implements ImageLoadingInterface
      * @param string $destinationFolder
      * @param string $sourceUrl
      * @param string $fileName
-     * @return array
+     * @return ImageSavedPathDTO
      * @throws ImageSavingException
      */
-    public  function loadingImage(string $destinationFolder, string $sourceUrl, string $fileName): array
+    public function loadingImage(string $destinationFolder, string $sourceUrl, string $fileName): ImageSavedPathDTO
     {
         try {
             $imageName = $this->getFileName($sourceUrl, $fileName);
@@ -47,7 +47,7 @@ class ImageLoadingService implements ImageLoadingInterface
 
             $size = @getimagesize($filePath);
 
-            return  [$size, $imageSavePath];
+            return new ImageSavedPathDTO($size, $imageSavePath);
 
         } catch (\Throwable $e) {
             throw new ImageSavingException($e->getMessage());
