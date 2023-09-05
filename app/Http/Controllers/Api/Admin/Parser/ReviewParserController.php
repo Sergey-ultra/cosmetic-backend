@@ -118,6 +118,15 @@ class ReviewParserController extends Controller
         ]]);
     }
 
+    public function setPublished(int $id): JsonResponse
+    {
+        $review = ReviewParsingLink::query()
+            ->find($id)
+            ->update(['parsed' => ReviewParsingLink::PUBLISHED]);
+
+        return response()->json(['data' => $review]);
+    }
+
     public function parseLinks(
         Request $request,
         LinkCrawlerParser $linkParserService,

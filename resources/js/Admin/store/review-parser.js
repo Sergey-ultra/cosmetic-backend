@@ -141,6 +141,9 @@ export default {
             }
             commit('setIsLoadingReviewData', false);
         },
+        setPublished: async({ commit }, id) => {
+            const { data } = await api.post(`/parser/review/parsed-links/set-published/${id}`);
+        },
         deleteBodyFromParsingLink: async ({ dispatch }, id) => {
             await api.delete(`/parser/review/parsed-links/delete-body-from-parsing-link/${id}`);
             dispatch('notification/setSuccess', 'Тело данной ссылки успешно удалено', { root: true })

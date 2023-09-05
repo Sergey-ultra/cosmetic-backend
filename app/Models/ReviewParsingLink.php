@@ -8,12 +8,12 @@ class ReviewParsingLink extends Model
 {
     public const UNPARSED = 0;
     public const PARSED = 1;
-    public const ABANDONED = 2;
+    public const PUBLISHED = 2;
 
     public const STATUS_MAP = [
         self::UNPARSED => 'Не обработанная',
         self::PARSED => 'Обработанная',
-        self::ABANDONED => 'Отклоненная',
+        self::PUBLISHED => 'Опубликовано',
     ];
 
     protected $table = 'review_parsing_links';

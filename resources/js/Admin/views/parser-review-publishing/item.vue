@@ -5,8 +5,33 @@
     />
     <form v-else class="form">
         <h2>{{ currentReviewData?.title }}</h2>
-        <add-new-sku v-if="currentSku === null" @setNewSku="setCurrentSku"/>
-        <compactSku v-else :currentSku="currentSku"/>
+
+        <div v-if="!isShowAddForm">
+            <div class="item flex">
+                <inputComponent v-model.trim="search" :color="'white'" :isLoading="isLoadingSuggests" @input="getSuggests"/>
+                <buttonComponent @click="showAddForm">
+                    Далее
+                </buttonComponent>
+            </div>
+
+            <ul class="suggest__content" v-if="search">
+                <li
+                    v-for="(sku, index) in suggest?.skus ?? []"
+                    :key="index"
+                    class="suggest__item">
+                    <a :href="`/product/${sku.sku_code}/add-review`" class="mini-suggest__link">
+                        <div class="suggest__img" :style="`background-image: url(${sku.image})`">
+
+                        </div>
+                        <div class="suggest__text">
+                            <span class="suggest__title">{{`${sku.name} ${sku.volume}`}}</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <add-new-sku v-if="isShowAddForm" @setNewSku="setCurrentSku"/>
+        <compactSku v-if="currentSku" :currentSku="currentSku"/>
 
 
         <review-body :currentReviewData="currentReviewData"/>
@@ -81,13 +106,16 @@ import AddNewSku from "./src/add-new-sku.vue";
 
 import {computed, onMounted, ref} from "vue";
 import {useStore} from "vuex";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import useVuelidate from "@vuelidate/core";
 import {helpers, maxLength, minLength, required} from "@vuelidate/validators";
 
 const store = useStore();
 const route = useRoute();
+const router = useRouter();
 
+const search = ref('');
+const isShowAddForm = ref(false);
 const currentSku = ref(null);
 const editedReview = ref({
     rating: 0,
@@ -109,6 +137,8 @@ const editedReview = ref({
 
 const currentReviewData = computed(() => store.state.reviewParser.currentReviewData);
 const isLoadingReviewData = computed(() => store.state.reviewParser.isLoadingReviewData);
+const suggest = computed(() => store.state.sku.suggest);
+const isLoadingSuggests = computed(() => store.state.sku.isLoadingSuggests);
 
 const mustBeRating = value => value > 0;
 
@@ -143,10 +173,25 @@ const saveNewReview = async () => {
     if (validated) {
         await store.dispatch('review/createItem', editedReview.value);
         v$.value.$reset();
+        await store.dispatch('reviewParser/setPublished', route.params.id);
+        await router.push({ name: 'review-publishing-list' });
     }
 };
 
+const getSuggests = () => {
+    if (search.value) {
+        store.dispatch('sku/getSuggests', search.value);
+    } else {
+        store.dispatch('sku/setSuggestsToDefault');
+    }
+}
+
+const showAddForm = () => isShowAddForm.value = true;
+
+
+
 const setCurrentSku = review => {
+    isShowAddForm.value = false;
     currentSku.value =  review;
     editedReview.value.sku_id = review.sku_id;
 };

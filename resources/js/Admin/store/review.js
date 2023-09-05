@@ -84,10 +84,11 @@ export default {
             }
         },
         createItem: async({ dispatch }, object) => {
-            const { data } = await api.post('/reviews', object)
-            if (data) {
-                dispatch('reloadReviews')
-            }
+            const { data } = await api.post('/reviews', object);
+            return data;
+            // if (data) {
+            //     dispatch('reloadReviews')
+            // }
         },
         updateItem: async ({ dispatch }, object) => {
             const { data } = await api.put(`/reviews/${object.id}`, object)
