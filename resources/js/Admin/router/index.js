@@ -90,8 +90,20 @@ const constantRoutes = [
         meta: { title:'Парсинг отзывов' }
     },
     {
-        path:'/admin/settings',
-        name:'settings',
+        path:'/admin/parser-review-publishing',
+        name: 'review-publishing-list',
+        component:() => import('../views/parser-review-publishing/index.vue'),
+        meta: { title:'Публикация отзывов' }
+    },
+    {
+        path:'/admin/parser-review-publishing/:id',
+        name:'review-publishing',
+        component:() => import('../views/parser-review-publishing/item.vue'),
+        meta: { title:'Публикация отзыва' }
+    },
+    {
+        path: '/admin/settings',
+        name: 'settings',
         component:() => import('../views/settings/index.vue'),
         meta: { title:'Настройки' }
     },

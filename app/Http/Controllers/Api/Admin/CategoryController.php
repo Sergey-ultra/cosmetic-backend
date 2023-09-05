@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
 use App\Models\Category;
 use App\Services\ImageSavingService\ImageSavingService;
+use App\Services\TreeService\TreeInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,6 +39,19 @@ class CategoryController extends Controller
 
         return response()->json(['data' => $result]);
     }
+
+    public function tree(TreeInterface $treeService): JsonResponse
+    {
+        $categories = Category::query()
+            ->select(['id', 'name', 'code', 'parent_id'])
+            ->get()
+            ->toArray();
+
+        $result = $treeService->buildTree($categories, 'parent_id');
+
+        return response()->json(['data' => $result]);
+    }
+
 
 
     /**

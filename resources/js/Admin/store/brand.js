@@ -49,7 +49,7 @@ export default {
     actions:{
         loadAllBrands: async({ commit }) => {
             const { data } = await api.get('/brands', { params: { per_page: -1 }})
-            if (data){
+            if (data) {
                 commit('setAllBrands', data)
             }
         },

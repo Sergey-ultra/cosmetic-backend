@@ -18,11 +18,11 @@ class ReviewParsingLink extends Model
 
     protected $table = 'review_parsing_links';
 
-    protected $fillable = ['link', 'parsed', 'body', 'json', 'category_id'];
+    protected $fillable = ['link', 'parsed', 'body', 'content', 'category_id'];
 
     protected array $cast = [
         'id' => 'integer',
         'category_id' => 'integer',
-        'json' => 'array',
+        'content' => 'json',
     ];
 }

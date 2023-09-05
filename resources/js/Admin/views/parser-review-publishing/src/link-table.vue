@@ -19,24 +19,10 @@
                     <path d="M 15 3 C 12.031398 3 9.3028202 4.0834384 7.2070312 5.875 A 1.0001 1.0001 0 1 0 8.5058594 7.3945312 C 10.25407 5.9000929 12.516602 5 15 5 C 20.19656 5 24.450989 8.9379267 24.951172 14 L 22 14 L 26 20 L 30 14 L 26.949219 14 C 26.437925 7.8516588 21.277839 3 15 3 z M 4 10 L 0 16 L 3.0507812 16 C 3.562075 22.148341 8.7221607 27 15 27 C 17.968602 27 20.69718 25.916562 22.792969 24.125 A 1.0001 1.0001 0 1 0 21.494141 22.605469 C 19.74593 24.099907 17.483398 25 15 25 C 9.80344 25 5.5490109 21.062074 5.0488281 16 L 8 16 L 4 10 z"/>
                 </svg>
             </buttonComponent>
-
-            <div class="table__buttons">
-                <slot name="buttons"></slot>
-                <buttonComponent
-                    :size="'small'"
-                    :disabled="!selectedLinkIds.length"
-                    @click="$emit('getItemsByLinkIds', selectedLinkIds)">
-                    Спарсить по выбранным ссылкам
-                </buttonComponent>
-            </div>
-
         </div>
 
         <div class="table__wrapper">
             <div class="table__row table__row-header">
-                <div class="table__item table__item-select">
-                    <input type="checkbox"  v-model="isSelectAllLinks"/>
-                </div>
                 <div
                     v-for="header in headers"
                     :style="`width:${header.width}`"
@@ -62,17 +48,14 @@
                 <span>Нет данных</span>
             </div>
 
-            <div
-                class="table__row"
-                v-for="link in links"
-                :key="link.id"
-            >
-                <label class="table__item table__item-select">
-                    <input type="checkbox" :value="link.id" v-model="selectedLinkIds">
-                </label>
-                <div class="table__item table__item-id" @click="toggleSelectedLink(link.id)">{{ link.id }}</div>
-                <div class="table__item table__item-link" @click="toggleSelectedLink(link.id)">
+            <div class="table__row" v-for="link in links" :key="link.id">
+
+                <div class="table__item table__item-id">{{ link.id }}</div>
+                <div class="table__item table__item-link">
                     <span>{{ link.link }}</span>
+                </div>
+                <div class="table__item table__item-title">
+                    <span>{{ link.title }}</span>
                 </div>
                 <div class="table__item table__item-external">
                     <a :href="link.link" target="_blank">
@@ -96,21 +79,20 @@
                         </svg>
                     </a>
                 </div>
-                <div class="table__item table__item-date">{{ link.date}}</div>
-                <div v-if="link.is_body_exist" class="table__item table__item-is_body_exist">{{ link.is_body_exist}}</div>
-                <div v-if="link.is_body_exist" class="table__item table__item-action">
+                <div class="table__item table__item-date">{{ link.date }}</div>
+                <div  class="table__item table__item-action">
                     <buttonComponent
-                        @click="deleteBodyFromParsingLinkLocal(link.id)"
-                        :color="'red'"
+                        :color="'green'"
                         :icon="true"
                         :outline="true"
-                        :round="true"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                             class="bi bi-trash-fill" viewBox="0 0 16 16">
-                            <path
-                                d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
-                        </svg>
+                        :round="true">
+                        <router-link :to="{ name: 'review-publishing', params: { id: link.id} }">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+                            </svg>
+                        </router-link>
                     </buttonComponent>
                 </div>
             </div>
@@ -126,8 +108,7 @@
                 :outline="true"
                 :disabled="options.page === 1"
                 @click="minusPage"
-                class="pagination__item"
-            >
+                class="pagination__item">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                      class="bi bi-chevron-left" viewBox="0 0 16 16">
                     <path fill-rule="evenodd"
@@ -168,14 +149,12 @@ export default {
     data() {
         return {
             optionsItemsPerPage:[5,10,20,30,50],
-            selectedLinkIds:[],
-            isSelectAllLinks:false,
             headers: [
                 {title: 'id', value: 'id', width: '4%'},
-                {title: 'Ссылка', value: 'link', width: '73%'},
+                {title: 'Ссылка', value: 'link', width: '62%'},
+                {title: 'Заголовок', value: 'title', width: '20%'},
                 {title: 'Ext', value: 'link', width: '4%'},
                 {title: 'Дата', value: 'date', width: '5%'},
-                {title: 'Есть Body?', value: 'is_body_exist', width: '5%'},
                 {title: 'Действия', value: 'action', width: '5%'},
             ],
         };
@@ -214,47 +193,28 @@ export default {
         tableOptions: {
             deep: true,
             handler() {
-                this.isSelectAllLinks = false
-                this.selectedLinkIds = []
-                this.loadLinksWithPagination()
+                this.isSelectAllLinks = false;
+                this.selectedLinkIds = [];
+                this.loadParsedLinksWithPagination();
             }
         },
         isReloadLinks(value) {
             if (value) {
-                this.setTableOptionsToDefault()
-                this.$emit('update:isReloadLinks', false)
-            }
-        },
-        isSelectAllLinks(value) {
-            if (value) {
-                this.selectedLinkIds = this.links.map(el => el.id)
-            } else {
-                this.selectedLinkIds = []
+                this.setTableOptionsToDefault();
+                this.$emit('update:isReloadLinks', false);
             }
         },
     },
     created() {
-        this.loadLinksWithPagination()
+        this.loadParsedLinksWithPagination();
     },
     unmounted() {
         this.setLinksWithPaginationToDefault();
         this.setTableOptionsToDefault();
     },
     methods: {
-        ...mapActions('reviewParser', ['loadLinksWithPagination', 'deleteBodyFromParsingLink']),
+        ...mapActions('reviewParser', ['loadParsedLinksWithPagination']),
         ...mapMutations('reviewParser', ['setLinksWithPaginationToDefault','setTableOptions', 'setTableOptionsToDefault']),
-        async deleteBodyFromParsingLinkLocal(id) {
-            await this.deleteBodyFromParsingLink(id);
-            await this.loadLinksWithPagination();
-        },
-        toggleSelectedLink(id) {
-            const index = this.selectedLinkIds.indexOf(id);
-            if (index === -1) {
-                this.selectedLinkIds.push(id)
-            } else {
-                this.selectedLinkIds.splice(index, 1);
-            }
-        },
         setSortBy(value) {
             if (this.options.sortBy === value) {
                 if (this.options.sortDesc === false) {
@@ -344,17 +304,16 @@ export default {
         &-id {
             width: 4%;
         }
+        &-title {
+            width: 20%;
+        }
         &-link {
-            width: 73%;
+            width: 62%;
             display:flex;
             justify-content: space-between;
         }
         &-external {
             width: 4%;
-        }
-        &-is_body_exist {
-            justify-content: center;
-            width: 5%;
         }
         &-date {
             width: 5%;

@@ -11,7 +11,7 @@
             @reloadTable="reloadArticles"
     >
         <template v-slot:add>
-            <router-link :to="{name: 'article-create'}">
+            <router-link :to="{ name: 'article-create' }">
                 <buttonComponent :size="'small'" :color="'blue'">Добавить</buttonComponent>
             </router-link>
         </template>

@@ -27,6 +27,8 @@ export default {
             sortDesc: false
         },
         isReloadLinks: false,
+        currentReviewData: null,
+        isLoadingReviewData: false,
     },
     mutations: {
         setLinkOptions: (state, payload) => state.linkOptions = { ...payload },
@@ -40,6 +42,10 @@ export default {
             state.links = [...payload.data]
             state.totalCount = payload.total
         },
+        setParsedLinksWithPagination: (state, payload) => {
+            state.links = [...payload.data]
+            state.totalCount = payload.meta.total
+        },
         setLinksWithPaginationToDefault: state => {
             state.links = []
             state.totalCount = 0
@@ -51,6 +57,8 @@ export default {
             sortBy: '',
             sortDesc: false,
         },
+        setCurrentReviewData: (state, payload) => state.currentReviewData = {...payload},
+        setIsLoadingReviewData: (state, payload) => state.isLoadingReviewData = payload,
     },
     actions: {
         loadLinkOptions: async({ commit }, obj) => {
@@ -86,7 +94,6 @@ export default {
             commit('setIsParsing' , false)
         },
         loadLinksWithPagination: async ({commit, state}) => {
-
             let params = {
                 page: state.tableOptions.page,
                 per_page: state.tableOptions.pageSize,
@@ -100,12 +107,39 @@ export default {
                 params.sortBy = sortBy
             }
 
-
-            const { data} = await api.get("/parser/review/parsed-links", { params })
+            const { data } = await api.get("/parser/review/links", { params })
 
             if (data) {
                 commit('setLinksWithPagination', data)
             }
+        },
+        loadParsedLinksWithPagination: async({ commit, state }) => {
+            let params = {
+                page: state.tableOptions.page,
+                per_page: state.tableOptions.pageSize,
+            }
+
+            if (state.tableOptions.sortBy) {
+                let sortBy = state.tableOptions.sortBy
+                if (state.tableOptions.sortDesc) {
+                    sortBy = '-' + sortBy
+                }
+                params.sortBy = sortBy
+            }
+
+            const response = await api.get("/parser/review/parsed-links", { params })
+
+            if (response) {
+                commit('setParsedLinksWithPagination', response)
+            }
+        },
+        loadReviewData: async({ commit }, id) => {
+            commit('setIsLoadingReviewData', true);
+            const { data } = await api.get(`/parser/review/parsed-links/${id}`);
+            if (data) {
+               commit('setCurrentReviewData', data);
+            }
+            commit('setIsLoadingReviewData', false);
         },
         deleteBodyFromParsingLink: async ({ dispatch }, id) => {
             await api.delete(`/parser/review/parsed-links/delete-body-from-parsing-link/${id}`);
@@ -133,5 +167,5 @@ export default {
 
             commit('setIsParsingLinks', false)
         },
-    }
+    },
 }

@@ -16,7 +16,8 @@ export default {
             sortDesc: false
         },
         total: 0,
-        filterOptions: {}
+        filterOptions: {},
+        categoryTree: [],
     },
     getters: {
         availableCategoryNames: state => state.allCategories.map(el => el.name)
@@ -40,6 +41,7 @@ export default {
             sortDesc: false
         },
         setAllCategories: (state, payload) => state.allCategories = [...payload],
+        setCategoryTree: (state, payload) => state.categoryTree = [...payload],
         setCategories: (state, payload) => {
             state.categories = [...payload.data]
             state.total = payload.total
@@ -52,6 +54,12 @@ export default {
             const { data } = await api.get('/categories', { params: { per_page: -1 }})
             if (data) {
                 commit('setAllCategories', data)
+            }
+        },
+        loadCategoryTree: async({ commit }) => {
+            const { data } = await api.get('/categories/tree');
+            if (data) {
+                commit('setCategoryTree', data)
             }
         },
         reloadCategories: ({ commit, dispatch }) => {

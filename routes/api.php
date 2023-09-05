@@ -273,7 +273,9 @@ Route::group(['middleware' => ['auth:api']], function () {
             });
 
             Route::group(['prefix' => '/review'], function() {
+                Route::get('/links', [ReviewParserController::class, 'links']);
                 Route::get('/parsed-links', [ReviewParserController::class, 'parsedLinks']);
+                Route::get('/parsed-links/{id}', [ReviewParserController::class, 'showParsedLink']);
                 Route::get('/link-option', [ReviewParserController::class, 'linkOptions']);
                 Route::post('/link-option', [ReviewParserController::class, 'updateOrCreate']);
                 Route::post('/parse-links', [ReviewParserController::class, 'parseLinks']);
@@ -326,6 +328,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::apiResource('/tags', AdminTagController::class);
         Route::apiResource('/skus', AdminSkuController::class);
         Route::apiResource('/brands', AdminBrandController::class);
+        Route::get('/categories/tree', [AdminCategoryController::class, 'tree']);
         Route::apiResource('/categories', AdminCategoryController::class);
 
         Route::get('/ingredients/show-available-active-ingredients-groups', [AdminIngredientController::class, 'showAvailableActiveIngredientsGroups']);

@@ -4,24 +4,23 @@
                 v-for="(image, index) in previewImages"
                 :key="index"
                 class="file-form__item file-form__img"
-                :style="{width: width, height: `${height}px`}"
-        >
+                :style="{width: width, height: `${height}px`}">
             <img :src="image" class="">
 
             <progress-bar
-                    v-if="isUploading"
-                    :progress="progress"
-                    class="indicator"
-            />
+                v-if="isUploading"
+                :progress="progress"
+                class="indicator"/>
 
             <div class="file-form__img-layer">
                 <div class="file-form__close" @click="deletePhoto(index)">×</div>
-                <div v-if="index !== mainPhotoIndex"  class="main-photo-title"><span>Сделать главной</span></div>
+                <div v-if="index !== mainPhotoIndex" class="main-photo-title"><span>Сделать главной</span></div>
+                <div v-else class="main-photo-title">Главное фото</div>
             </div>
-            <div v-if="index == mainPhotoIndex" class="main-photo-title">Главное фото</div>
+
 
         </div>
-        <div  class="file-form__item file-form__upload"     :style="{width: width, height: `${height}px`}">
+        <div  class="file-form__item file-form__upload" :style="{width: width, height: `${height}px`}">
             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
                  stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em"
                  xmlns="http://www.w3.org/2000/svg">
@@ -29,9 +28,8 @@
                 <circle cx="8.5" cy="8.5" r="1.5"></circle>
                 <polyline points="21 15 16 10 5 21"></polyline>
             </svg>
-            <p>Добавьте свои фотографии (до 10
-                штук)<span>*</span></p>
-            <input @change="loadImages($event)" type="file" name="images" id="formFileMultiple" multiple accept="image/jpeg, image/png">
+            <p>Добавьте свои фотографии (до 10 штук)<span>*</span></p>
+            <input @change="loadImages($event)" type="file" name="images" multiple accept="images" :disabled="disabled">
         </div>
     </div>
 </template>
@@ -42,12 +40,15 @@
 
     export default {
         name: "image-upload",
-        components:{
+        components: {
             ProgressBar
         },
-        props:{
-            folder: String,
-            initialImageUrls: Array,
+        props: {
+            entity: String,
+            initialImageUrls: {
+                type: Array,
+                default: () => [],
+            },
             photoCountInRow: {
                 type: Number,
                 default: 5
@@ -55,26 +56,44 @@
             height: {
                 type:Number,
                 default: 113
-            }
+            },
+            disabled: {
+                type: Boolean,
+                default: false
+            },
         },
-        data () {
+        data() {
             return {
                 previewImages: [],
                 mainPhotoIndex: 0
-            }
+            };
         },
-        computed:{
-            ...mapState('image', ['progress', 'isUploading']),
-            width () {
-                return `calc(100% /  ${this.photoCountInRow}  - 16px)`
+        computed: {
+            ...mapState('image', ['progress', 'isUploading', 'uploadingFileUrls']),
+            width() {
+                return `calc(100% / ${this.photoCountInRow}  - 16px)`
+            },
+            initialImageUrlsLocal: {
+                get() {
+                    return this.initialImageUrls;
+                },
+                set(value) {
+                    this.$emit('update:initialImageUrls', value);
+                },
             },
         },
         watch: {
-            initialImageUrls(value){
+            initialImageUrls(value) {
                 if (value.length) {
                     this.previewImages = [...value]
                 }
+            },
+            uploadingFileUrls(value) {
+                if (value.length) {
+                    this.initialImageUrlsLocal = this.initialImageUrlsLocal.concat(value);
+                }
             }
+
         },
         methods:{
             ...mapActions('image',['loadSelectedToBackend']),
@@ -87,12 +106,8 @@
                     reader.onload = e =>  this.previewImages.push(e.target.result)
                 }
 
-
-                this.loadSelectedToBackend({ files, folder: this.folder })
+                this.loadSelectedToBackend({ files, entity: this.entity, type: 'image' });
             },
-            //clearPreview() {
-            // this.previewImages = []
-            // },
             deletePhoto(index) {
                 this.previewImages.splice(index, 1);
                 this.$emit('deleteFromEditedImageUrls', index)

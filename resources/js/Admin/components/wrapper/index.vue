@@ -192,6 +192,7 @@
                             children: [
                                 {name: 'Парсинг ссылок на отзывы',  link: {name: 'review-link-parser'}},
                                 {name: 'Парсинг отзывов',  link: {name: 'review-parser'}},
+                                {name: 'Публикация',  link: {name: 'review-publishing-list'}},
                             ],
                         },
                         {

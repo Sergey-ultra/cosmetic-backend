@@ -13,6 +13,7 @@ use Symfony\Component\DomCrawler\Crawler;
 class ReviewCrawlerParser
 {
     const REVIEW = '.article-text-container';
+    const REVIEW_TITLE = '.kf-post-title';
     const REVIEW_P = '.article-text-container p';
 
     const IMAGE_TAG = '.article-text-container figure picture img';
@@ -21,6 +22,8 @@ class ReviewCrawlerParser
 
     //protected ProductCardDTO $review;
     protected ReviewLinkDTO $currentLink;
+
+    protected string $title = '';
     protected array $paragraphs = [];
 
     protected array $imagesUrls = [];
@@ -42,16 +45,17 @@ class ReviewCrawlerParser
         if ($body = $this->getBody()) {
             $this->crawler->addHtmlContent($body);
 
+            $this->getTitle();
             $this->getParagraphs();
             $this->getImages();
 
 
-            $result = ['images' => $this->imagesUrls, 'paragraphs' => $this->paragraphs];
+            $result = ['title' => $this->title, 'images' => $this->imagesUrls, 'paragraphs' => $this->paragraphs];
 
             if ($isLoadToDb) {
                 ReviewParsingLink::query()
                     ->find($this->currentLink->id)
-                    ->update(['json' => $result, 'parsed' => ReviewParsingLink::PARSED]);
+                    ->update(['content' => $result, 'parsed' => ReviewParsingLink::PARSED]);
             }
 
             //$this->getImages();
@@ -59,6 +63,14 @@ class ReviewCrawlerParser
         }
 
         return null;
+    }
+
+    protected function getTitle(): void
+    {
+        $reviewTitle = $this->crawler->filter(self:: REVIEW_TITLE);
+        if (1 === count($reviewTitle)) {
+            $this->title = $reviewTitle->text();
+        }
     }
 
     protected function getParagraphs(): void

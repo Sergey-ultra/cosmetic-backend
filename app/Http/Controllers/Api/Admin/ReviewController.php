@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
 use App\Http\Requests\RejectReviewRequest;
+use App\Http\Requests\ReviewRequest;
 use App\Http\Requests\StatusRequest;
 use App\Http\Resources\Admin\ReviewCollection;
 use App\Http\Resources\Admin\ReviewOneResource;
@@ -47,25 +48,17 @@ class ReviewController extends Controller
         return new ReviewCollection($result);
     }
 
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \App\Services\ImageSavingService\ImageSavingService $imageSavingService
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(Request $request, ImageSavingService $imageSavingService): JsonResponse
+    public function store(ReviewRequest $request, ImageSavingService $imageSavingService): JsonResponse
     {
         $params = $request->all();
 
-        $params['images'] = null;
-        if ($request->has('images')) {
-            $fileName = 'review_' . $params['id'];
-            $params['images'] = $imageSavingService->saveImages($request->images, self::IMAGES_FOLDER, $fileName);
-        }
+//        $params['images'] = null;
+//        if ($request->has('images')) {
+//            $fileName = 'review_' . $params['id'];
+//            $params['images'] = $imageSavingService->saveImages($request->images, self::IMAGES_FOLDER, $fileName);
+//        }
 
-        $createdReview = Review::create($params);
+        $createdReview = Review::query()->create($params);
 
         return response()->json([
             'data' => [

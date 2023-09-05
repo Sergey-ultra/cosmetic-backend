@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('link')->unique();
             $table->longText('body')->nullable();
-            $table->json('json')->nullable();
+            $table->json('content')->nullable();
             $table->string('parsed')->default(0);
             $table->unsignedInteger('category_id')->nullable();
             $table->timestamp('created_at')->useCurrent();

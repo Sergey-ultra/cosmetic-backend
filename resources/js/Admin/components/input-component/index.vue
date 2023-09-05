@@ -35,13 +35,15 @@ let currentValue = computed({
 <style lang="scss" scoped>
 .input {
     width: 100%;
-    outline: #000 none medium;
+    outline: none;
     overflow: visible;
     transition: background-color 0.3s ease 0s, border-color 0.3s ease 0s;
     border: 1px solid transparent;
     border-radius: 8px;
-    padding: 8px 10px;
+    height: 35px;
+    padding: 4px 10px;
     background-color: rgb(240, 242, 252);
+
     &:hover {
         border-color: rgb(192, 201, 240);
         transition: border-color 0.3s ease 0s;

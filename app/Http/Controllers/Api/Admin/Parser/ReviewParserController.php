@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProviderWithDTO;
 use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Requests\Admin\ReviewParsingRequest;
+use App\Http\Resources\Admin\Parser\ParsedLinkCollection;
 use App\Models\LinkOption;
 use App\Models\ReviewLinkOption;
 use App\Models\ReviewLinkPage;
@@ -40,9 +41,9 @@ class ReviewParserController extends Controller
         return response()->json(['data' => $newOption]);
     }
 
-    public function parsedLinks(Request $request): JsonResponse
+    public function links(Request $request): JsonResponse
     {
-        $perPage = (int)($request->per_page ?? 30);
+        $perPage = $request->integer('per_page', 30);
 
         $query = ReviewParsingLink::query()
             ->select([
@@ -61,6 +62,60 @@ class ReviewParserController extends Controller
         $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return response()->json(['data' => $result]);
+    }
+
+    public function parsedLinks(Request $request): ParsedLinkCollection
+    {
+        $perPage = $request->integer('per_page', 30);
+
+        $query = ReviewParsingLink::query()
+            ->select(['id', 'link', 'content', DB::raw('DATE(created_at) as date')])
+            ->where('parsed', 1);
+
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
+        return new ParsedLinkCollection($result);
+    }
+
+    public function showParsedLink(int $id): JsonResponse
+    {
+        $review = ReviewParsingLink::query()
+            ->select(['id', 'link', 'content'])
+            ->find($id);
+
+        $content = json_decode($review->content, true);
+
+        $images = array_map(fn($item) => ['data' => ['text' => $item], 'type' => 'image'], $content['images']);
+        $paragraphs = array_map(fn($item) => ['data' => ['text' => $item], 'type' => 'paragraph'], $content['paragraphs']);
+
+
+        $mainArray = [];
+        if (count($images) > count($paragraphs)) {
+            $mainArray = $images;
+            $restArray = $paragraphs;
+        } else {
+            $mainArray = $paragraphs;
+            $restArray = $images;
+        }
+
+        $body = [];
+        foreach ($mainArray as $key => $item) {
+            $body[] = $item;
+            if (isset($restArray[$key])) {
+                $body[] = $restArray[$key];
+            }
+        }
+
+        return response()->json(['data' => [
+            'id' => $review->id,
+            'link' => $review->link,
+            'title' => $content['title'] ?? '',
+            'body' => $body,
+        ]]);
     }
 
     public function parseLinks(

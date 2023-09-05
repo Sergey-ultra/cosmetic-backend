@@ -1,0 +1,108 @@
+$mainColor: #454cee;
+$mainFontColor: #26325c;
+$mainGreyColor: #e8ebef;
+a {
+    text-decoration: none;
+}
+p {
+    margin: 0;
+}
+.invalid-feedback {
+    color: #fc675c;
+}
+.label {
+    margin-bottom: 8px;
+}
+.text-gray {
+    color: #83899f;
+}
+.buttons {
+    margin-top: 15px;
+    margin-bottom: 25px;
+    align-items: center;
+    display: flex;
+    justify-content: flex-end;
+}
+.form {
+    padding: 16px 0;
+    display: block;
+    &__title {
+        margin-bottom: 16px;
+        font-weight: 700;
+        font-size: 24px;
+        color:$mainFontColor;
+    }
+    &__block {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 16px 0;
+        border-top: 1px solid $mainGreyColor;
+        border-bottom: 1px solid $mainGreyColor;
+    }
+    &__row {
+        margin-bottom: 20px;
+    }
+    &__group {
+        width: 100%;
+        margin: 12px 0;
+    }
+}
+
+.alert {
+    margin-bottom: 16px;
+    background-color: #e5f4df;
+    color: #5b9040;
+    padding: 16px;
+    border-radius: 8px;
+    line-height: 150%;
+    & li {
+        color: #13709b;
+    }
+}
+
+.alert-warning {
+    margin-bottom: 16px;
+    background-color: #f1eff1;
+    color: #770d38;
+    padding: 16px;
+    border-radius: 8px;
+    line-height: 150%;
+    & li {
+        color: #13709b;
+    }
+}
+.select {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    outline: #000 none medium;
+    overflow: visible;
+    background-color: rgb(240, 242, 252);
+    padding: 8px;
+    &:hover {
+        border-color: rgb(192, 201, 240);
+        transition: border-color 0.3s ease 0s;
+    }
+}
+//.input {
+//    width: 100%;
+//    outline: #000 none medium;
+//    overflow: visible;
+//    transition: background-color 0.3s ease 0s, border-color 0.3s ease 0s;
+//    border: 1px solid transparent;
+//    border-radius: 8px;
+//    padding: 8px;
+//    background-color: rgb(240, 242, 252);
+//    &:hover {
+//        border-color: rgb(192, 201, 240);
+//        transition: border-color 0.3s ease 0s;
+//    }
+//    &:focus {
+//        background-color: white;
+//        border-color: rgb(59, 87, 208);
+//        transition: background-color 0.3s ease 0s, border-color 0.3s ease 0s;
+//    }
+//}
+
+
