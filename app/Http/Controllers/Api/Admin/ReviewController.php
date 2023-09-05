@@ -16,6 +16,7 @@ use App\Jobs\ReviewPublishedJob;
 use App\Jobs\UpdateSkuRatingJob;
 use App\Models\Review;
 use App\Models\Sku;
+use App\Models\User;
 use App\Repositories\ReviewRepository\IReviewRepository;
 use App\Services\EntityStatus;
 use App\Services\ImageSavingService\ImageSavingService;
@@ -57,6 +58,15 @@ class ReviewController extends Controller
 //            $fileName = 'review_' . $params['id'];
 //            $params['images'] = $imageSavingService->saveImages($request->images, self::IMAGES_FOLDER, $fileName);
 //        }
+
+        $botUserIds = User::query()
+            ->select('id')
+            ->where('role_id', User::ROLE_BOT)
+            ->get()
+            ->pluck('id')
+            ->all();
+
+        $params['user_id'] = array_rand($botUserIds);
 
         $createdReview = Review::query()->create($params);
 
