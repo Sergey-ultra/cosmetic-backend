@@ -312,6 +312,7 @@ Route::group(['middleware' => ['auth:api']], function () {
             );
         });
 
+        Route::get('/suggest', [SearchController::class, 'index']);
 
         Route::get('/sitemap', [SitemapController::class, 'create']);
         Route::get('/settings/get-is-required-email-verification', [SettingController::class, 'getIsRequiredEmailVerification']);

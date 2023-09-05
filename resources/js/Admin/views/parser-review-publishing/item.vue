@@ -197,7 +197,8 @@ const setCurrentSku = review => {
 };
 
 const initEditedReview = () => {
-    editedReview.value.blocks = currentReviewData.value.body && Object.keys(currentReviewData.value.body).length
+    console.log(currentReviewData.value.body);
+    editedReview.value.blocks = currentReviewData.value.body && currentReviewData.value.body.length
         ? currentReviewData.value.body
         : [
             {
