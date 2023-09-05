@@ -28,7 +28,7 @@ class SearchController extends Controller
             ->join('categories', 'products.category_id', '=', 'categories.id')
 //            ->join('sku_store', 'skus.id', '=', 'sku_store.sku_id')
 //            ->join('links', 'sku_store.link_id', '=', 'links.id')
-            ->whereNotNull('sku_store.price')
+//            ->whereNotNull('sku_store.price')
             ->where('products.name', 'LIKE', "%{$request->input('search')}%")
             ->groupBy('products.id', 'products.name', 'products.code', 'skus.id', 'skus.volume','skus.images', 'categories.code', 'categories.name')
             ->limit(8)
