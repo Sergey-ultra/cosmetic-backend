@@ -21,8 +21,7 @@ class SearchController extends Controller
                 'skus.volume AS volume',
                 'skus.images',
                 DB::raw("CONCAT('/category/', categories.code) AS category_url"),
-                'categories.name AS category_name',
-                DB::raw('MIN(sku_store.price) AS min_price')
+                'categories.name AS category_name'
             )
             ->join('products', 'products.id', '=', 'skus.product_id')
             ->join('categories', 'products.category_id', '=', 'categories.id')
