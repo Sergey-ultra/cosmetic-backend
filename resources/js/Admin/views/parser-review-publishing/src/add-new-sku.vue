@@ -233,7 +233,7 @@ const hideAddingBrand = () => isShowAddingBrand.value = false;
 
 
 const saveBrand = async () => {
-    await store.dispatch('brand/createBrand', newBrand.value);
+    await store.dispatch('brand/createItem', { name: newBrand.value });
     await store.dispatch('brand/loadAllBrands');
     hideAddingBrand();
 };

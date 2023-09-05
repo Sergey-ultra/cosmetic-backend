@@ -80,9 +80,9 @@ export default {
         },
         createItem: async({ dispatch }, object) => {
             const { data } = await api.post('/brands', object)
-            if (data) {
-                dispatch('reloadBrands')
-            }
+            // if (data) {
+            //     dispatch('reloadBrands')
+            // }
         },
         updateItem: async ({ dispatch }, object) => {
             const { data } = await api.put(`/brands/${object.id}`, object)
