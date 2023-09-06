@@ -16,10 +16,10 @@
 
             <ul class="suggest__content" v-if="search">
                 <li
-                    v-for="(sku, index) in suggest?.skus ?? []"
+                    v-for="(sku, index) in suggestSkus"
                     :key="index"
                     class="suggest__item">
-                    <a :href="`/product/${sku.sku_code}/add-review`" class="mini-suggest__link">
+                    <a :href="`/product/${sku.sku_code}`" class="mini-suggest__link">
                         <div class="suggest__img" :style="`background-image: url(${sku.image})`">
 
                         </div>
@@ -137,7 +137,7 @@ const editedReview = ref({
 
 const currentReviewData = computed(() => store.state.reviewParser.currentReviewData);
 const isLoadingReviewData = computed(() => store.state.reviewParser.isLoadingReviewData);
-const suggest = computed(() => store.state.sku.suggest);
+const suggestSkus = computed(() => store.state.sku.suggestSkus);
 const isLoadingSuggests = computed(() => store.state.sku.isLoadingSuggests);
 
 const mustBeRating = value => value > 0;
@@ -197,7 +197,6 @@ const setCurrentSku = review => {
 };
 
 const initEditedReview = () => {
-    console.log(currentReviewData.value.body);
     editedReview.value.blocks = currentReviewData.value.body && currentReviewData.value.body.length
         ? currentReviewData.value.body
         : [
@@ -255,4 +254,68 @@ onMounted(async() => {
     color: red;
 }
 
+
+.suggest {
+    &__content {
+        padding: 3px 0;
+        display: block;
+        list-style: none;
+        margin: 0;
+        width:100%;
+    }
+    &__item {
+        margin: 0 3px;
+        border-radius: 7px;
+        height: auto;
+        &:hover {
+            background-color: #fef5da;
+        }
+
+    }
+    &__link {
+        width: 100%;
+        padding: 8px 13px;
+        color: #000;
+        display: block;
+        outline: none;
+        text-decoration: none;
+    }
+    &__img {
+        background-position: 50%;
+        background-repeat: no-repeat;
+        border-radius: 4px;
+        display: inline-block;
+        position: relative;
+        vertical-align: middle;
+        height: 40px;
+        margin-right: -40px;
+        width: 40px;
+        background-size: contain;
+        & img {
+            max-width:100%;
+            max-height:100%;
+        }
+    }
+    &__text {
+        padding-left: 52px;
+        display: inline-flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 40px;
+        vertical-align: middle;
+        width: 100%;
+    }
+    &__title {
+        color: #222;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    &__info {
+        color: grey;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+    }
+}
 </style>

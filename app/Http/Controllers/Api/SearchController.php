@@ -18,6 +18,7 @@ class SearchController extends Controller
                 'products.id AS id',
                 'products.name AS name',
                 DB::raw("CONCAT(products.code,  '-', skus.id) AS sku_code"),
+                'sku.id AS sku_id',
                 'skus.volume AS volume',
                 'skus.images',
                 DB::raw("CONCAT('/category/', categories.code) AS category_url"),

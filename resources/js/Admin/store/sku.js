@@ -19,7 +19,7 @@ export default {
             category: { value: 'null' },
             status: { value: 'null' }
         },
-        suggest: null,
+        suggestSkus: [],
         isLoadingSuggests: false,
     },
     mutations:{
@@ -48,8 +48,7 @@ export default {
             state.total = payload.meta.total
         },
         setSuggest: (state, payload) => {
-            this.suggest.categories = [...payload.categories];
-            this.suggest.skus = [...payload.skus];
+            state.suggestSkus = [...payload.skus];
         },
     },
     actions:{
