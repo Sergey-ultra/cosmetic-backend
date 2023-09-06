@@ -22,13 +22,13 @@ class UpdateSkuRatingJob implements ShouldQueue
     public function handle(): void
     {
         $currentSku = $this->review->sku;
-        $reviewCount = Review::query()->where('sku_id', $currentSku->id)->count();
+        //$reviewCount = Review::query()->where('sku_id', $currentSku->id)->count();
 
         if ($this->type === 'plus') {
             $newCommonRating = ($currentSku->rating * $currentSku->reviews_count + $this->review->rating) / ($currentSku->reviews_count + 1);
             $reviewsCount = $currentSku->reviews_count + 1;
         } else if ($this->type === 'minus') {
-            if ($reviewCount - 1 === 0) {
+            if ($currentSku->reviews_count - 1 === 0) {
                 $reviewsCount = 0;
                 $newCommonRating = 5;
             } else {
