@@ -25,14 +25,14 @@ class UpdateSkuRatingJob implements ShouldQueue
         $reviewCount = Review::query()->where('sku_id', $currentSku->id)->count();
 
         if ($this->type === 'plus') {
-            $newCommonRating = ($currentSku->rating * $reviewCount + $this->review->rating) / ($reviewCount + 1);
+            $newCommonRating = ($currentSku->rating * $currentSku->reviews_count + $this->review->rating) / ($currentSku->reviews_count + 1);
             $reviewsCount = $currentSku->reviews_count + 1;
         } else if ($this->type === 'minus') {
             if ($reviewCount - 1 === 0) {
                 $reviewsCount = 0;
                 $newCommonRating = 5;
             } else {
-                $newCommonRating = ($currentSku->rating * $reviewCount - $this->review->rating) / ($reviewCount - 1);
+                $newCommonRating = ($currentSku->rating * $currentSku->reviews_count - $this->review->rating) / ($currentSku->reviews_count - 1);
                 $reviewsCount = $currentSku->reviews_count - 1;
             }
         }
