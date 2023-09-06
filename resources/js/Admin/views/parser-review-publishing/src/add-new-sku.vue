@@ -246,7 +246,7 @@ const createNewSku = async () => {
         review.image = review.images.length ? review.images[0] : '';
         delete review.images;
 
-        emit('setNewSku', review);
+        emit('setCurrentSku', review);
         v$.value.$reset();
     }
 }

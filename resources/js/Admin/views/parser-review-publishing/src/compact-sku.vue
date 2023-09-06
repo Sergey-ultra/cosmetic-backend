@@ -1,6 +1,6 @@
 <template>
     <div class="compact">
-        <div class="back">
+        <div class="back" @click="emit('setCurrentSku', null)">
             <div class="back__link">
                 <div class="back__icon">
                     <svg><use xlink:href="#icons_arrow-left">
@@ -9,7 +9,7 @@
                         </symbol>
                     </use></svg>
                 </div>
-                <span>К описанию товара</span>
+                <span>Назад</span>
             </div>
         </div>
         <div class="compact__main">
@@ -35,6 +35,7 @@
 
 <script setup>
 import {computed, defineProps} from "vue";
+const emit = defineEmits(['setCurrentSku']);
 const props = defineProps({
     currentSku: {
         type: Object,
