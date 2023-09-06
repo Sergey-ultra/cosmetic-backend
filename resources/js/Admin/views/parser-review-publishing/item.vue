@@ -110,6 +110,26 @@
             </div>
         </div>
 
+        <div class="form__group">
+            <div class="label">
+                <span class="text-gray">Порекоммендовали бы друзьям?</span>
+            </div>
+            <div>
+                <radioComponent
+                    v-model="editedReview.is_recommend"
+                    :value="1"
+                >
+                    <span>Да</span>
+                </radioComponent>
+                <radioComponent
+                    v-model="editedReview.is_recommend"
+                    :value="0"
+                >
+                    <span>Нет</span>
+                </radioComponent>
+            </div>
+        </div>
+
         <div class="buttons">
             <button-component class="button" @click="saveNewReview">Сохранить</button-component>
         </div>
@@ -119,6 +139,7 @@
 <script setup>
 import compactSku from './src/compact-sku.vue'
 import ButtonComponent from "../../components/button-component.vue";
+import radioComponent from "../../components/radioComponent.vue";
 import inputComponent from '../../components/input-component/index.vue';
 import ratingForm from '../../components/rating-form.vue';
 import loader from "../../components/loader.vue";

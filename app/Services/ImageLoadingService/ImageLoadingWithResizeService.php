@@ -24,6 +24,8 @@ class ImageLoadingWithResizeService
             if (! (is_file($filePath) && file_exists($filePath))) {
                 $fileContent = file_get_contents($sourceUrl);
                 $this->crop($fileContent, $filePath);
+
+                CompressImageJob::dispatch($filePath);
             }
 
             $size = @getimagesize($filePath);
