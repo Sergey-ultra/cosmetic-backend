@@ -39,12 +39,11 @@ class ReviewController extends Controller
      */
     public function index(IReviewRepository $reviewRepository, Request $request): ReviewCollection
     {
-        $perPage = (int)($request->per_page ?? 10);
+        $perPage = $request->integer('per_page', 10);
 
         $query = $reviewRepository->getAdminReviewListQuery();
 
         $result = $this->prepareModel($request, $query, true)->paginate($perPage);
-
 
         return new ReviewCollection($result);
     }
@@ -66,7 +65,7 @@ class ReviewController extends Controller
             ->pluck('id')
             ->all();
 
-        $params['user_id'] = array_rand($botUserIds);
+        $params['user_id'] = $botUserIds[rand(0, count($botUserIds) - 1)];
 
         $createdReview = Review::query()->create($params);
 
