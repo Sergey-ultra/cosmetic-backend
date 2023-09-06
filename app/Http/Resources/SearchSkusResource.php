@@ -25,7 +25,6 @@ class SearchSkusResource extends JsonResource
             'name' => $this->name,
             'sku_code' => $this->sku_code,
             'image' => $transformImagePathService->getDestinationPath($this->image, 'small'),
-            'min_price' =>$this->min_price,
         ];
     }
 }

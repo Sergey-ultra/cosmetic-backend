@@ -18,15 +18,14 @@
                 <li
                     v-for="(sku, index) in suggestSkus"
                     :key="index"
+                    @click="setCurrentSku(sku)"
                     class="suggest__item">
-                    <a :href="`/product/${sku.sku_code}`" class="mini-suggest__link">
-                        <div class="suggest__img" :style="`background-image: url(${sku.image})`">
-
-                        </div>
-                        <div class="suggest__text">
+                    <div  class="mini-suggest__link">
+                        <a :href="`/product/${sku.sku_code}`" class="suggest__img" :style="`background-image: url(${sku.image})`"></a>
+                        <a :href="`/product/${sku.sku_code}`" class="suggest__text">
                             <span class="suggest__title">{{`${sku.name} ${sku.volume}`}}</span>
-                        </div>
-                    </a>
+                        </a>
+                    </div>
                 </li>
             </ul>
         </div>

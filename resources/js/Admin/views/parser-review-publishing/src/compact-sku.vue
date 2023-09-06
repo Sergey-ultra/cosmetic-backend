@@ -15,9 +15,9 @@
         <div class="compact__main">
             <div class="sku">
                 <div class="sku__inner">
-                    <div class="sku__image"  v-if="currentSku.images && currentSku.images.length">
+                    <div class="sku__image"  v-if="currentSku.image">
                         <a :href="`/product/${currentSkuProductCode}`">
-                            <img :src="currentSku.images[0]" />
+                            <img :src="currentSku.image" />
                         </a>
                     </div>
                     <div class="sku__text">

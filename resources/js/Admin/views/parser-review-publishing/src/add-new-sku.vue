@@ -243,6 +243,9 @@ const createNewSku = async () => {
     const validated = await v$.value.sku.$validate();
     if (validated) {
         const review = await store.dispatch('sku/createItem', sku.value);
+        review.image = review.images.length ? review.images[0] : '';
+        delete review.images;
+
         emit('setNewSku', review);
         v$.value.$reset();
     }
