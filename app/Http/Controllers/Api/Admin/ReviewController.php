@@ -69,6 +69,7 @@ class ReviewController extends Controller
         $params['status'] = 'published';
 
         $createdReview = Review::query()->create($params);
+        UpdateSkuRatingJob::dispatch($createdReview, 'plus');
 
         return response()->json([
             'data' => [
