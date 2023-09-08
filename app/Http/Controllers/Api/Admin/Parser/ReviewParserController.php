@@ -127,6 +127,15 @@ class ReviewParserController extends Controller
         return response()->json(['data' => $review]);
     }
 
+    public function setArchived(int $id): JsonResponse
+    {
+        $review = ReviewParsingLink::query()
+            ->find($id)
+            ->update(['parsed' => ReviewParsingLink::ARCHIVED]);
+
+        return response()->json(['data' => $review]);
+    }
+
     public function parseLinks(
         Request $request,
         LinkCrawlerParser $linkParserService,

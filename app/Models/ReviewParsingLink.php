@@ -9,11 +9,13 @@ class ReviewParsingLink extends Model
     public const UNPARSED = 0;
     public const PARSED = 1;
     public const PUBLISHED = 2;
+    public const ARCHIVED = 3;
 
     public const STATUS_MAP = [
         self::UNPARSED => 'Не обработанная',
         self::PARSED => 'Обработанная',
         self::PUBLISHED => 'Опубликовано',
+        self::ARCHIVED => 'В архиве',
     ];
 
     protected $table = 'review_parsing_links';

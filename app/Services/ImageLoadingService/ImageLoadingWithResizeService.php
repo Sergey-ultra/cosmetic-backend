@@ -4,10 +4,8 @@ namespace App\Services\ImageLoadingService;
 
 use App\Exceptions\ImageSavingException;
 use App\Jobs\CompressImageJob;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Imagick;
-use ImagickException;
 
 class ImageLoadingWithResizeService
 {

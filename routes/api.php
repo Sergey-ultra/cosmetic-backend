@@ -277,6 +277,7 @@ Route::group(['middleware' => ['auth:api']], function () {
                 Route::get('/parsed-links', [ReviewParserController::class, 'parsedLinks']);
                 Route::get('/parsed-links/{id}', [ReviewParserController::class, 'showParsedLink']);
                 Route::post('/parsed-links/set-published/{id}', [ReviewParserController::class, 'setPublished']);
+                Route::post('/parsed-links//set-archived/{id}', [ReviewParserController::class, 'setArchived']);
                 Route::get('/link-option', [ReviewParserController::class, 'linkOptions']);
                 Route::post('/link-option', [ReviewParserController::class, 'updateOrCreate']);
                 Route::post('/parse-links', [ReviewParserController::class, 'parseLinks']);

@@ -1,14 +1,11 @@
 <template>
     <div class="table-block">
         <link-table v-model:isReloadLinks="isReloadLinksLocal"/>
-
     </div>
-
-
 </template>
 
 <script>
-import {mapActions, mapMutations, mapState} from "vuex";
+import {mapMutations, mapState} from "vuex";
 import linkTable from "./src/link-table.vue"
 import buttonComponent from "../../components/button-component.vue"
 
