@@ -385,7 +385,7 @@ class SkuRepository implements ISkuRepository
                 "product_id" => $newProduct->id,
                 'rating' => 5,
                 "images" => $sku->images,
-                'status' => EntityStatus::MODERATED,
+                'status' => $sku->status,
                 'user_id' => $userId,
             ]);
 

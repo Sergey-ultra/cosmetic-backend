@@ -12,5 +12,6 @@ final class SkuDTO
         public readonly string $description,
         public readonly string $volume,
         public readonly array $images,
+        public readonly string $status,
     ){}
 }

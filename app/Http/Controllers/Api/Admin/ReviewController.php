@@ -66,6 +66,7 @@ class ReviewController extends Controller
             ->all();
 
         $params['user_id'] = $botUserIds[rand(0, count($botUserIds) - 1)];
+        $params['status'] = 'published';
 
         $createdReview = Review::query()->create($params);
 

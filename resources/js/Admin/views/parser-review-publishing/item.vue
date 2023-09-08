@@ -24,10 +24,11 @@ import reviewBody from './src/body.vue'
 import publish from './src/publish.vue'
 import {computed, onMounted, ref} from "vue";
 import {useStore} from "vuex";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 
 const store = useStore();
 const route = useRoute();
+const router = useRouter();
 
 const isShowPublishedForm = ref(false);
 

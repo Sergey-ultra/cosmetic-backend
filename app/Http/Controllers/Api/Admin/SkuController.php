@@ -134,6 +134,7 @@ class SkuController extends Controller
             $request->input('description'),
             $request->input('volume'),
             $imageUrls,
+            'published'
         );
 
 

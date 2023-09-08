@@ -265,6 +265,7 @@ class SkuController extends Controller
             $request->input('description'),
             $request->input('volume'),
             $request->input('images'),
+            'moderated'
         );
 
         try {
