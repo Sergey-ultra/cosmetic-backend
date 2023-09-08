@@ -34,6 +34,7 @@ const isShowPublishedForm = ref(false);
 const showPublishForm = () => isShowPublishedForm.value = true;
 const setToArchive = async() => {
     await store.dispatch('reviewParser/setArchived', route.params.id);
+    await router.push({ name: 'review-publishing-list' });
 }
 
 
