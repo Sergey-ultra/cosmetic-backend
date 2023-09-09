@@ -52,7 +52,7 @@ class ReviewCrawlerParser
             if ($isLoadToDb) {
                 ReviewParsingLink::query()
                     ->find($this->currentLink->id)
-                    ->update(['content' => $result, 'parsed' => ReviewParsingLink::PARSED]);
+                    ->update(['content' => $result, 'status' => ReviewParsingLink::PARSED]);
             }
 
             return $result;
@@ -182,7 +182,7 @@ class ReviewCrawlerParser
             } else if ($code === 404) {
                 ReviewParsingLink::query()
                     ->find($this->currentLink->id)
-                    ->update(['parsed' => ReviewParsingLink::ARCHIVED]);
+                    ->update(['status' => ReviewParsingLink::ARCHIVED]);
             }
         }
         return $body;

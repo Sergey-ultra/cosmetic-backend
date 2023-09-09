@@ -40,7 +40,7 @@ class ReviewLinkRepository implements LinkRepositoryInterface
             static function ($link) use ($categoryId) {
                 return [
                     "link" => $link,
-                    "parsed" => ReviewParsingLink::UNPARSED,
+                    "status" => ReviewParsingLink::UNPARSED,
                     "category_id" => $categoryId
                 ];
             },

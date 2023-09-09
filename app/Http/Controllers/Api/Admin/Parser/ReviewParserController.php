@@ -52,7 +52,7 @@ class ReviewParserController extends Controller
                 DB::raw('DATE(created_at) as date'),
                 DB::raw("IF(body IS NULL, false, true) AS is_body_exist")
             ])
-            ->where('parsed', 0);
+            ->where('status', 0);
 
         $paramsDto = new ParamsDTO(
             $request->input('filter') ?? [],
@@ -70,7 +70,7 @@ class ReviewParserController extends Controller
 
         $query = ReviewParsingLink::query()
             ->select(['id', 'link', 'content', DB::raw('DATE(created_at) as date')])
-            ->where('parsed', 1);
+            ->where('status', 1);
 
         $paramsDto = new ParamsDTO(
             $request->input('filter', []),
@@ -102,7 +102,7 @@ class ReviewParserController extends Controller
     {
         $review = ReviewParsingLink::query()
             ->find($id)
-            ->update(['parsed' => ReviewParsingLink::PUBLISHED]);
+            ->update(['status' => ReviewParsingLink::PUBLISHED]);
 
         return response()->json(['data' => $review]);
     }
@@ -111,7 +111,7 @@ class ReviewParserController extends Controller
     {
         $review = ReviewParsingLink::query()
             ->find($id)
-            ->update(['parsed' => ReviewParsingLink::ARCHIVED]);
+            ->update(['status' => ReviewParsingLink::ARCHIVED]);
 
         return response()->json(['data' => $review]);
     }
