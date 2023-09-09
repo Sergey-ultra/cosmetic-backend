@@ -24,9 +24,8 @@ class ReviewCrawlerParser
     protected ReviewLinkDTO $currentLink;
 
     protected string $title = '';
-    protected array $paragraphs = [];
+    protected array $body = [];
 
-    protected array $imagesUrls = [];
     public function __construct(
         protected ProxyHttpClientService $httpClient,
         protected Crawler $crawler,
@@ -42,15 +41,13 @@ class ReviewCrawlerParser
 
     public function parse(bool $isLoadToDb = false): ?array
     {
-        if ($body = $this->getBody()) {
+        if ($body = $this->getContent()) {
             $this->crawler->addHtmlContent($body);
 
             $this->getTitle();
-            $this->getParagraphs();
-            $this->getImages();
+            $this->getBody();
 
-
-            $result = ['title' => $this->title, 'images' => $this->imagesUrls, 'paragraphs' => $this->paragraphs];
+            $result = ['title' => $this->title, 'body' => $this->body];
 
             if ($isLoadToDb) {
                 ReviewParsingLink::query()
@@ -58,7 +55,6 @@ class ReviewCrawlerParser
                     ->update(['content' => $result, 'parsed' => ReviewParsingLink::PARSED]);
             }
 
-            //$this->getImages();
             return $result;
         }
 
@@ -73,47 +69,105 @@ class ReviewCrawlerParser
         }
     }
 
-    protected function getParagraphs(): void
+    protected function getBody(): void
     {
-        $reviewParagraphs = $this->crawler->filter(self::REVIEW_P);
+        $body = $this->crawler
+            ->filter(self:: REVIEW)
+            ->children()
+            ->children()
+            ->children()
+            ->each(function(Crawler $node, $i) {
+                if ($node->nodeName() === 'figure') {
+                    $node = $node->filter('img')->getNode(0);
+                    if ($node) {
 
-        if (count($reviewParagraphs)) {
-            $this->paragraphs = $reviewParagraphs->each(function(Crawler $node, $i) {
-                return $node->text();
-            });
+                        $imgLink = $node->getAttribute('src');
 
-            $this->paragraphs = array_values(array_filter($this->paragraphs));
-        }
-    }
-
-    protected function getImages(): void
-    {
-        $images = $this->crawler->filter(self::IMAGE_TAG);
-
-        if (count($images)) {
-            foreach($images as $image) {
-                $imgLink = $image->getAttribute('src');
-
-                if ($imgLink) {
-                    $urlParts = explode('/', $imgLink);
-                    $fileName = end($urlParts);
-
-                    try {
-                        $imageSavedPathResult = $this->imageLoadingService->loadingImage(self::DESTINATION_FOLDER, $imgLink, $fileName);
-
-                        if (is_array($imageSavedPathResult->sizeOptions)) {
-                            $this->imagesUrls[] = $imageSavedPathResult->imageSavePath;
+                        if ($imgLink) {
+                            return $this->getImageBlock($this->processImages($imgLink));
                         }
-                    } catch (ImageSavingException $e) {
 
                     }
+                    return null;
                 }
+
+                return $this->getParagraphBlock($node->text());
+            });
+
+        $this->body = array_values(array_filter($body));
+
+    }
+
+    protected function getImageBlock(string $url): array
+    {
+        return ['data' => ['text' => $url], 'type' => 'image'];
+    }
+
+    protected function getParagraphBlock(string $text): ?array
+    {
+        if ('' === $text) {
+            return null;
+        }
+        return ['data' => ['text' => $text], 'type' => 'paragraph'];
+    }
+
+    protected function processImages(string $imgLink): string
+    {
+        $urlParts = explode('/', $imgLink);
+        $fileName = end($urlParts);
+
+        try {
+            $imageSavedPathResult = $this->imageLoadingService->loadingImage(self::DESTINATION_FOLDER, $imgLink, $fileName);
+
+            if (is_array($imageSavedPathResult->sizeOptions)) {
+                return $imageSavedPathResult->imageSavePath;
             }
+        } catch (ImageSavingException $e) {
+
         }
     }
 
+//    protected function getParagraphs(): void
+//    {
+//        $reviewParagraphs = $this->crawler->filter(self::REVIEW_P);
+//
+//        if (count($reviewParagraphs)) {
+//            $this->paragraphs = $reviewParagraphs->each(function(Crawler $node, $i) {
+//                return $node->text();
+//            });
+//
+//            $this->paragraphs = array_values(array_filter($this->paragraphs));
+//        }
+//    }
+//
+//    protected function getImages(): void
+//    {
+//        $images = $this->crawler->filter(self::IMAGE_TAG);
+//
+//        if (count($images)) {
+//            foreach($images as $image) {
+//                $imgLink = $image->getAttribute('src');
+//
+//                if ($imgLink) {
+//                    $urlParts = explode('/', $imgLink);
+//                    $fileName = end($urlParts);
+//
+//                    try {
+//                        $imageSavedPathResult = $this->imageLoadingService->loadingImage(self::DESTINATION_FOLDER, $imgLink, $fileName);
+//
+//                        if (is_array($imageSavedPathResult->sizeOptions)) {
+//                            $this->imagesUrls[] = $imageSavedPathResult->imageSavePath;
+//                        }
+//                    } catch (ImageSavingException $e) {
+//
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-    protected function getBody(): ?string
+
+    protected function getContent(): ?string
     {
         $body = $this->currentLink->body;
         if (!$body) {
@@ -128,7 +182,7 @@ class ReviewCrawlerParser
             } else if ($code === 404) {
                 ReviewParsingLink::query()
                     ->find($this->currentLink->id)
-                    ->update(['parsed' => ReviewParsingLink::ABANDONED]);
+                    ->update(['parsed' => ReviewParsingLink::ARCHIVED]);
             }
         }
         return $body;

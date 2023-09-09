@@ -89,32 +89,12 @@ class ReviewParserController extends Controller
 
         $content = json_decode($review->content, true);
 
-        $images = array_map(fn($item) => ['data' => ['text' => $item], 'type' => 'image'], $content['images']);
-        $paragraphs = array_map(fn($item) => ['data' => ['text' => $item], 'type' => 'paragraph'], $content['paragraphs']);
-
-
-        $mainArray = [];
-        if (count($images) > count($paragraphs)) {
-            $mainArray = $images;
-            $restArray = $paragraphs;
-        } else {
-            $mainArray = $paragraphs;
-            $restArray = $images;
-        }
-
-        $body = [];
-        foreach ($mainArray as $key => $item) {
-            $body[] = $item;
-            if (isset($restArray[$key])) {
-                $body[] = $restArray[$key];
-            }
-        }
 
         return response()->json(['data' => [
             'id' => $review->id,
             'link' => $review->link,
             'title' => $content['title'] ?? '',
-            'body' => $body,
+            'body' => $content['body'],
         ]]);
     }
 
