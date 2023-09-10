@@ -9,7 +9,7 @@ use Imagick;
 
 class ImageLoadingWithResizeService
 {
-    const HEIGHT = 0.97;
+    const HEIGHT = 0.96;
     public function loadingImage(string $destinationFolder, string $sourceUrl, string $fileName): ImageSavedPathDTO
     {
         $destinationPath = $destinationFolder . $fileName;
