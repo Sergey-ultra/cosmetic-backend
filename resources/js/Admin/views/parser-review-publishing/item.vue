@@ -6,7 +6,7 @@
     <div v-else>
         <form v-if="!isShowPublishedForm" class="form">
             <h2>{{ currentReviewData?.title }}</h2>
-            <review-body :currentReviewData="currentReviewData"/>
+            <review-body v-model:body="currentReviewData.body"/>
 
             <div class="buttons">
                 <button-component class="button" @click="setToArchive">В архив</button-component>
@@ -20,9 +20,9 @@
 <script setup>
 import ButtonComponent from "../../components/button-component.vue";
 import loader from "../../components/loader.vue";
-import reviewBody from './src/body.vue'
+import reviewBody from './src/review-body.vue'
 import publish from './src/publish.vue'
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {useStore} from "vuex";
 import {useRoute, useRouter} from "vue-router";
 
@@ -42,6 +42,7 @@ const setToArchive = async() => {
 const currentReviewData = computed(() => store.state.reviewParser.currentReviewData);
 const isLoadingReviewData = computed(() => store.state.reviewParser.isLoadingReviewData);
 
+watch(currentReviewData.value, value => console.log(value));
 
 onMounted(async() => {
     if (route.params.id) {

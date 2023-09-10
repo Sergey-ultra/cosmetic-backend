@@ -27,7 +27,10 @@ export default {
             sortDesc: false
         },
         isReloadLinks: false,
-        currentReviewData: null,
+        currentReviewData: {
+            body: [],
+            title: '',
+        },
         isLoadingReviewData: false,
     },
     mutations: {

@@ -8,6 +8,7 @@
 
         <div v-if="!currentSku">
             <div v-if="!isShowAddForm">
+                <p class="item bold">Введите <span class="red">точное название</span> объекта отзыва, о котором хотите написать:</p>
                 <div class="item flex">
                     <inputComponent v-model.trim="search" :color="'white'" :isLoading="isLoadingSuggests" @input="getSuggests"/>
                     <buttonComponent @click="showAddForm">
@@ -55,7 +56,8 @@
         <compactSku v-else :currentSku="currentSku" @setCurrentSku="setCurrentSku"/>
 
 
-        <review-body :currentReviewData="currentReviewData"/>
+        <review-body v-model:body="editedReview.body.blocks" isEditMode @toggleDisabledItem="toggleDisabledItem"/>
+
 
         <div class="invalid-feedback" v-for="error of v$.editedReview.sku_id.$errors" :key="error.$uid">
             {{ error.$message }}
@@ -138,7 +140,7 @@
 
 <script setup>
 import compactSku from './compact-sku.vue'
-import reviewBody from './body.vue'
+import reviewBody from './review-body.vue'
 import AddNewSku from "./add-new-sku.vue";
 import ButtonComponent from "../../../components/button-component.vue";
 import radioComponent from "../../../components/radioComponent.vue";
@@ -210,9 +212,17 @@ const rules = {
 
 const v$ = useVuelidate(rules, { editedReview });
 
+const toggleDisabledItem = index => {
+    if (editedReview.value.body.blocks) {
+        editedReview.value.body.blocks[index].disabled = !editedReview.value.body.blocks[index].disabled;
+    }
+};
+
 const saveNewReview = async () => {
     const validated = await v$.value.editedReview.$validate();
     if (validated) {
+        editedReview.value.body.blocks = editedReview.value.body.blocks.filter(el => !el.disabled);
+
         await store.dispatch('review/createItem', editedReview.value);
         v$.value.$reset();
         await store.dispatch('reviewParser/setPublished', route.params.id);
@@ -261,6 +271,10 @@ onMounted(async() => {
 
 <style lang="scss" scoped>
 @import '@/Admin/scss/form.scss';
+.flex {
+    display: flex;
+    gap: 15px;
+}
 .form {
     max-width:1000px;
     background: inherit;

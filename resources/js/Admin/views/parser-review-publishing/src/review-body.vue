@@ -3,7 +3,7 @@
         <div  class="review__wrapper">
             <div class="review__inner">
                 <div class="review__items">
-                    <p v-for="(block, index) in currentReviewData?.body ?? []" :key="index" class="review__item">
+                    <p v-for="(block, index) in body" :key="index" class="review__item">
                         <div v-if="block.type === 'paragraph'">
                               <textareaComponent v-model="block.data.text"></textareaComponent>
                         </div>
@@ -11,6 +11,8 @@
                             v-else-if="block.type === 'image'"
                             :src="block.data.text"
                             :alt="block.data.description">
+                        <div v-if="isEditMode" class="review__item-close" @click="emit('toggleDisabledItem',index)">×</div>
+                        <div v-if="block.disabled" class="review__item-overlay"></div>
                     </p>
                 </div>
             </div>
@@ -18,19 +20,22 @@
         </div>
     </div>
 </template>
-<script>
+<script setup>
 import textareaComponent from '../../../components/textarea-component.vue'
+import {computed, defineProps, defineEmits} from "vue";
 
-export default {
-    components: {
-        textareaComponent,
-    },
-    props: {
-        currentReviewData: {
-            type: Object,
+const emit = defineEmits(['toggleDisabledItem']);
+const props = defineProps({
+        body: {
+            type: Array,
+            default: () => [],
+        },
+        isEditMode: {
+            type: Boolean,
+            default: false,
         }
-    },
-}
+    });
+
 </script>
 <style scoped lang="scss">
 $greenColor: #46bd87;
@@ -69,7 +74,6 @@ $greenColor: #46bd87;
     }
     &__inner {
         padding-right: 65px;
-        width: 75%;
     }
     &__right {
         flex-grow: 1;
@@ -85,6 +89,41 @@ $greenColor: #46bd87;
         margin: 12px 0;
         color: #2b2b2b;
         display: block;
+        position: relative;
+        &:hover .review__item-close {
+            display: flex;
+        }
+        &-close {
+            z-index:1;
+            position: absolute;
+            top: 0;
+            right: 0;
+            overflow: hidden;
+            transition: color .1s ease-out;
+            border: none;
+            border-radius: 0;
+            outline: initial;
+            background: 0 0;
+            font-family: serif;
+            font-size: 30px;
+            cursor: pointer;
+            color: #000;
+            display: none;
+            justify-content: center;
+            align-items:center;
+            margin: 10px 10px 0 0;
+            height: 15px;
+            width: 15px;
+        }
+        &-overlay {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            background: #000;
+            opacity: .6;
+        }
 
         img {
             max-width: 100%;
