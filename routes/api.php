@@ -100,7 +100,7 @@ Route::get('/login/{service}/callback', [AuthSocialController::class, 'callback'
 
 Route::group(['prefix' => '/admin'], function () {
     Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth:api', 'role:admin']);
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth:api']);
 });
 
 Route::get('/users/best', [UserController::class, 'bestUsers']);
