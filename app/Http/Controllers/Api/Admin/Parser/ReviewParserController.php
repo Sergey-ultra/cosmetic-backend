@@ -69,7 +69,7 @@ class ReviewParserController extends Controller
         $perPage = $request->integer('per_page', 30);
 
         $query = ReviewParsingLink::query()
-            ->select(['id', 'link', 'content', DB::raw('DATE(created_at) as date')])
+            ->select(['id', 'link', 'category_id', 'content', DB::raw('DATE(created_at) as date')])
             ->where('status', 1);
 
         $paramsDto = new ParamsDTO(
