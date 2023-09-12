@@ -69,7 +69,7 @@ class ReviewParserController extends Controller
         $perPage = $request->integer('per_page', 30);
 
         $query = ReviewParsingLink::query()
-            ->select(['id', 'link', 'category_id', 'content', DB::raw('DATE(created_at) as date')])
+            ->select(['id', 'link', 'content', DB::raw('DATE(created_at) as date')])
             ->where('status', 1);
 
         $paramsDto = new ParamsDTO(
@@ -84,7 +84,7 @@ class ReviewParserController extends Controller
     public function showParsedLink(int $id): JsonResponse
     {
         $review = ReviewParsingLink::query()
-            ->select(['id', 'link', 'content'])
+            ->select(['id', 'link', 'content', 'category_id'])
             ->find($id);
 
         $content = json_decode($review->content, true);
@@ -92,6 +92,7 @@ class ReviewParserController extends Controller
 
         return response()->json(['data' => [
             'id' => $review->id,
+            'category_id' => $review->category_id,
             'link' => $review->link,
             'title' => $content['title'] ?? '',
             'body' => $content['body'],

@@ -80,7 +80,6 @@ export default {
         createItem: async({ dispatch }, object) => {
             const { data } = await api.post('/skus', object)
             if (data) {
-                dispatch('reloadSkus');
                 return data
             }
         },

@@ -254,23 +254,29 @@ Route::group(['middleware' => ['auth:api']], function () {
     ], function() {
         Route::get('/users/my', [AdminUserController::class, 'my']);
         Route::get('/categories', [AdminCategoryController::class, 'index']);
+        Route::get('/suggest', [SearchController::class, 'index']);
+        Route::get('/categories/tree', [AdminCategoryController::class, 'tree']);
+        Route::get('/brands', [AdminBrandController::class, 'index']);
+
+        Route::post('/files', [FileController::class, 'storeAsForm']);
+
+        Route::post('/skus', [AdminSkuController::class, 'store']);
+
+        Route::group(['prefix' => '/parser/review'], function () {
+            Route::get('/links', [ReviewParserController::class, 'links']);
+            Route::get('/parsed-links', [ReviewParserController::class, 'parsedLinks']);
+            Route::get('/parsed-links/{id}', [ReviewParserController::class, 'showParsedLink']);
+            Route::post('/parsed-links/set-published/{id}', [ReviewParserController::class, 'setPublished']);
+            Route::post('/parsed-links/set-archived/{id}', [ReviewParserController::class, 'setArchived']);
+            Route::get('/link-option', [ReviewParserController::class, 'linkOptions']);
+            Route::post('/link-option', [ReviewParserController::class, 'updateOrCreate']);
+            Route::post('/parse-links', [ReviewParserController::class, 'parseLinks']);
+            Route::post('/parse-by-link-ids', [ReviewParserController::class, 'parseByLinkIds']);
+
+        });
     });
 
-    Route::group([
-        'middleware' => ['role:review_editor'],
-        'prefix' => '/admin/parser/review'
-    ], function () {
-        Route::get('/links', [ReviewParserController::class, 'links']);
-        Route::get('/parsed-links', [ReviewParserController::class, 'parsedLinks']);
-        Route::get('/parsed-links/{id}', [ReviewParserController::class, 'showParsedLink']);
-        Route::post('/parsed-links/set-published/{id}', [ReviewParserController::class, 'setPublished']);
-        Route::post('/parsed-links/set-archived/{id}', [ReviewParserController::class, 'setArchived']);
-        Route::get('/link-option', [ReviewParserController::class, 'linkOptions']);
-        Route::post('/link-option', [ReviewParserController::class, 'updateOrCreate']);
-        Route::post('/parse-links', [ReviewParserController::class, 'parseLinks']);
-        Route::post('/parse-by-link-ids', [ReviewParserController::class, 'parseByLinkIds']);
 
-    });
 
     //доступ только у админа
     Route::group([
@@ -329,7 +335,7 @@ Route::group(['middleware' => ['auth:api']], function () {
             );
         });
 
-        Route::get('/suggest', [SearchController::class, 'index']);
+
 
         Route::get('/sitemap', [SitemapController::class, 'create']);
         Route::get('/settings/get-is-required-email-verification', [SettingController::class, 'getIsRequiredEmailVerification']);
@@ -337,7 +343,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 
         //Route::delete('/images/{image}',[FileController::class, 'destroy']);
-        Route::post('/files', [FileController::class, 'storeAsForm']);
+
 
         Route::get('/articles/categories', [AdminArticleController::class, 'articleCategories']);
         Route::post('/articles/publish/{id}', [AdminArticleController::class, 'publish'])->where(['id' => '[0-9]+']);
@@ -345,9 +351,9 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::apiResource('/articles', AdminArticleController::class);
         Route::get('/tags/tree', [AdminTagController::class, 'tree']);
         Route::apiResource('/tags', AdminTagController::class);
-        Route::apiResource('/skus', AdminSkuController::class);
-        Route::apiResource('/brands', AdminBrandController::class);
-        Route::get('/categories/tree', [AdminCategoryController::class, 'tree']);
+        Route::apiResource('/skus', AdminSkuController::class)->except('store');
+        Route::apiResource('/brands', AdminBrandController::class)->except('index');
+
         Route::apiResource('/categories', AdminCategoryController::class)->except('index');
 
         Route::get('/ingredients/show-available-active-ingredients-groups', [AdminIngredientController::class, 'showAvailableActiveIngredientsGroups']);

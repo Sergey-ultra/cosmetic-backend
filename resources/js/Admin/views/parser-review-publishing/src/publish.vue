@@ -50,7 +50,7 @@
                     </li>
                 </ul>
             </div>
-            <add-new-sku v-if="isShowAddForm" @setCurrentSku="setCurrentSku"/>
+            <add-new-sku v-if="isShowAddForm" @setCurrentSku="setCurrentSku" :categoryId="currentReviewData.category_id"/>
         </div>
 
         <compactSku v-else :currentSku="currentSku" @setCurrentSku="setCurrentSku"/>

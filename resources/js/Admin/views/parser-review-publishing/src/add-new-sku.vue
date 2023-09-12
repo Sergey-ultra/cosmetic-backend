@@ -2,38 +2,38 @@
     <form class="form fill" @submit.prevent="createNewSku">
         <h3>Добавление нового объекта</h3>
 
-        <div class="form__group">
-            <label>
-                <div class="label">
-                    <span class="text-gray">Раздел:</span>
-                </div>
-                <selectComponent
-                    :color="'white'"
-                    v-model="topLevelCategoryId"
-                    :items="topLevelCategories"
-                    :item-title="'name'"
-                    :item-value="'id'"
-                />
-                <div class="invalid-feedback" v-for="error of v$.sku.category_id.$errors" :key="error.$uid">
-                    {{ error.$message }}
-                </div>
-            </label>
-        </div>
+<!--        <div class="form__group">-->
+<!--            <label>-->
+<!--                <div class="label">-->
+<!--                    <span class="text-gray">Раздел:</span>-->
+<!--                </div>-->
+<!--                <selectComponent-->
+<!--                    :color="'white'"-->
+<!--                    v-model="topLevelCategoryId"-->
+<!--                    :items="topLevelCategories"-->
+<!--                    :item-title="'name'"-->
+<!--                    :item-value="'id'"-->
+<!--                />-->
+<!--                <div class="invalid-feedback" v-for="error of v$.sku.category_id.$errors" :key="error.$uid">-->
+<!--                    {{ error.$message }}-->
+<!--                </div>-->
+<!--            </label>-->
+<!--        </div>-->
 
-        <div v-if="topLevelCategoryId && lowLevelCategories.length" class="form__group">
-            <label>
-                <div class="label">
-                    <span class="text-gray">Подраздел:</span>
-                </div>
-                <selectComponent
-                    :color="'white'"
-                    v-model="sku.category_id"
-                    :items="lowLevelCategories"
-                    :item-title="'name'"
-                    :item-value="'id'"
-                />
-            </label>
-        </div>
+<!--        <div v-if="topLevelCategoryId && lowLevelCategories.length" class="form__group">-->
+<!--            <label>-->
+<!--                <div class="label">-->
+<!--                    <span class="text-gray">Подраздел:</span>-->
+<!--                </div>-->
+<!--                <selectComponent-->
+<!--                    :color="'white'"-->
+<!--                    v-model="sku.category_id"-->
+<!--                    :items="lowLevelCategories"-->
+<!--                    :item-title="'name'"-->
+<!--                    :item-value="'id'"-->
+<!--                />-->
+<!--            </label>-->
+<!--        </div>-->
 
         <div class="form__group">
             <label>
@@ -149,12 +149,15 @@ const props = defineProps({
     name: {
         type: String,
         default: '',
+    },
+    categoryId: {
+        type: Number,
     }
 });
 
 const emit = defineEmits(['hideAddForm', 'setNewSkuId']);
 
-const topLevelCategoryId = ref(null);
+// const topLevelCategoryId = ref(null);
 const isShowAddingBrand = ref(false);
 const newBrand = ref('');
 const sku = ref({
@@ -163,7 +166,7 @@ const sku = ref({
 });
 
 
-const categoryTree = computed(() => store.state.category.categoryTree);
+
 const allBrands  = computed(() => store.state.brand.allBrands);
 const localSkuName = computed({
     get() {
@@ -185,9 +188,9 @@ const rules = {
         brand_id: {
             required: helpers.withMessage('Поле должно быть заполнено', required),
         },
-        category_id: {
-            required: helpers.withMessage('Поле должно быть заполнено', required),
-        },
+        // category_id: {
+        //     required: helpers.withMessage('Поле должно быть заполнено', required),
+        // },
         volume: {
             required: helpers.withMessage('Поле должно быть заполнено', required),
         },
@@ -203,23 +206,23 @@ const rules = {
 
 const v$ = useVuelidate(rules, { sku });
 
-const topLevelCategories = computed(() => {
-    return [{
-        id: null,
-        name: 'Выберите раздел',
-    }].concat(categoryTree.value.filter(el => !el.parent_id));
-});
-
-let lowLevelCategories = computed(() => {
-    let currentCategory = categoryTree.value.find(el => el.id === topLevelCategoryId.value)
-    if (currentCategory && currentCategory.children && currentCategory.children.length) {
-        return [{
-            id: null,
-            name: 'Выберите подраздел',
-        }].concat(currentCategory.children);
-    }
-    return [];
-});
+// const topLevelCategories = computed(() => {
+//     return [{
+//         id: null,
+//         name: 'Выберите раздел',
+//     }].concat(categoryTree.value.filter(el => !el.parent_id));
+// });
+//
+// let lowLevelCategories = computed(() => {
+//     let currentCategory = categoryTree.value.find(el => el.id === topLevelCategoryId.value)
+//     if (currentCategory && currentCategory.children && currentCategory.children.length) {
+//         return [{
+//             id: null,
+//             name: 'Выберите подраздел',
+//         }].concat(currentCategory.children);
+//     }
+//     return [];
+// });
 
 let brands = computed(() => {
     return [{
@@ -242,6 +245,7 @@ const saveBrand = async () => {
 const createNewSku = async () => {
     const validated = await v$.value.sku.$validate();
     if (validated) {
+        sku.value.category_id = props.categoryId;
         const review = await store.dispatch('sku/createItem', sku.value);
         review.image = review.images.length ? review.images[0] : '';
         delete review.images;
@@ -252,8 +256,7 @@ const createNewSku = async () => {
 }
 
 onMounted(async() => {
-    store.dispatch('category/loadCategoryTree');
-    store.dispatch('brand/loadAllBrands');
+    await store.dispatch('brand/loadAllBrands');
 })
 </script>
 <style scoped lang="scss">
