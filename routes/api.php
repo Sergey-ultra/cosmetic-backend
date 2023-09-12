@@ -261,6 +261,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/files', [FileController::class, 'storeAsForm']);
 
         Route::post('/skus', [AdminSkuController::class, 'store']);
+        Route::post('/reviews', [AdminReviewController::class, 'store']);
 
         Route::group(['prefix' => '/parser/review'], function () {
             Route::get('/links', [ReviewParserController::class, 'links']);
@@ -376,7 +377,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/reviews/set-status/{id}', [AdminReviewController::class, 'setStatus'])->where(['id' => '[0-9]+']);
         Route::post('/reviews/reject/{id}', [AdminReviewController::class, 'reject'])->where(['id' => '[0-9]+']);
         Route::get('/reviews/dynamics', [AdminReviewController::class, 'dynamics']);
-        Route::apiResource('/reviews', AdminReviewController::class);
+        Route::apiResource('/reviews', AdminReviewController::class)->except('store');
 
         Route::post('/questions/set-status/{id}', [AdminQuestionController::class, 'setStatus'])->where(['id' => '[0-9]+']);
         Route::get('/questions', [AdminQuestionController::class, 'index']);
