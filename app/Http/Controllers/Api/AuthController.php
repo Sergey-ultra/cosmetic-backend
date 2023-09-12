@@ -92,7 +92,7 @@ class AuthController extends Controller
             ]);
         }
 
-        if ($request->has('asAdmin') && !$user->hasAnyRole(['admin', 'moderator'])) {
+        if ($request->has('asAdmin') && !$user->hasAnyRole(['admin', 'review_editor'])) {
             return response()->json([
                 'status' => false,
                 'message' => 'У вас нет прав доступа'

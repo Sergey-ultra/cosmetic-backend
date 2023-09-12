@@ -45,6 +45,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public const ROLE_SUPPLIER= 5;
     public const ROLE_BOT = 6;
 
+    public const REVIEW_EDITOR = 7;
+
     public const ROLE_MAP_NAME = [
         self::ROLE_ADMIN => 'Admin',
         self::ROLE_MODERATOR => 'Moderator',
@@ -52,6 +54,7 @@ class User extends Authenticatable implements MustVerifyEmail
         self::ROLE_WRITER => 'Writer',
         self::ROLE_SUPPLIER => 'Supplier',
         self::ROLE_BOT => 'Bot',
+        self::REVIEW_EDITOR => 'Review_editor'
     ];
 
     public const TABLE = 'users';

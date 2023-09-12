@@ -27,7 +27,7 @@ export default {
             object.asAdmin = true
             const res = await api.post('/login', object)
 
-            if (res.status && !res.isRequiredEmailVerification && ['admin', 'moderator'].includes(res.role.toLowerCase())) {
+            if (res.status && !res.isRequiredEmailVerification) {
                 dispatch('notification/setSuccess', res.message, { root: true })
                 const { message, name, token, avatar, role } = res
                 localStorage.setItem('userData', JSON.stringify({ userName: name,  token, avatar, role }))
@@ -39,7 +39,7 @@ export default {
         },
         checkAuth: ({ commit }) => {
             const data = JSON.parse(localStorage.getItem('userData'))
-            if (data && ['admin', 'moderator'].includes(data.role.toLowerCase())) {
+            if (data) {
                 const { userName, role, avatar } = data
                 commit('SET_USER', { userName, role, avatar })
             }

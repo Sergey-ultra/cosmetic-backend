@@ -246,6 +246,32 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/chats/{id}', [MessageController::class, 'chat']);
     Route::post('/messages', [MessageController::class, 'sendMessage'])->middleware( 'throttle:3,10');
 
+
+
+    Route::group([
+        'middleware' => 'role:admin,review_editor',
+        'prefix' => '/admin',
+    ], function() {
+        Route::get('/users/my', [AdminUserController::class, 'my']);
+        Route::get('/categories', [AdminCategoryController::class, 'index']);
+    });
+
+    Route::group([
+        'middleware' => ['role:review_editor'],
+        'prefix' => '/admin/parser/review'
+    ], function () {
+        Route::get('/links', [ReviewParserController::class, 'links']);
+        Route::get('/parsed-links', [ReviewParserController::class, 'parsedLinks']);
+        Route::get('/parsed-links/{id}', [ReviewParserController::class, 'showParsedLink']);
+        Route::post('/parsed-links/set-published/{id}', [ReviewParserController::class, 'setPublished']);
+        Route::post('/parsed-links/set-archived/{id}', [ReviewParserController::class, 'setArchived']);
+        Route::get('/link-option', [ReviewParserController::class, 'linkOptions']);
+        Route::post('/link-option', [ReviewParserController::class, 'updateOrCreate']);
+        Route::post('/parse-links', [ReviewParserController::class, 'parseLinks']);
+        Route::post('/parse-by-link-ids', [ReviewParserController::class, 'parseByLinkIds']);
+
+    });
+
     //доступ только у админа
     Route::group([
         'middleware' => ['role:admin'],
@@ -272,17 +298,7 @@ Route::group(['middleware' => ['auth:api']], function () {
                 Route::delete('/delete-body-from-parsing-link/{id}', [ParsingLinkController::class, 'deleteBodyFromParsingLink']);
             });
 
-            Route::group(['prefix' => '/review'], function() {
-                Route::get('/links', [ReviewParserController::class, 'links']);
-                Route::get('/parsed-links', [ReviewParserController::class, 'parsedLinks']);
-                Route::get('/parsed-links/{id}', [ReviewParserController::class, 'showParsedLink']);
-                Route::post('/parsed-links/set-published/{id}', [ReviewParserController::class, 'setPublished']);
-                Route::post('/parsed-links/set-archived/{id}', [ReviewParserController::class, 'setArchived']);
-                Route::get('/link-option', [ReviewParserController::class, 'linkOptions']);
-                Route::post('/link-option', [ReviewParserController::class, 'updateOrCreate']);
-                Route::post('/parse-links', [ReviewParserController::class, 'parseLinks']);
-                Route::post('/parse-by-link-ids', [ReviewParserController::class, 'parseByLinkIds']);
-            });
+
 
 
             Route::get('/product-option', [ProductOptionController::class, 'index']);
@@ -332,7 +348,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::apiResource('/skus', AdminSkuController::class);
         Route::apiResource('/brands', AdminBrandController::class);
         Route::get('/categories/tree', [AdminCategoryController::class, 'tree']);
-        Route::apiResource('/categories', AdminCategoryController::class);
+        Route::apiResource('/categories', AdminCategoryController::class)->except('index');
 
         Route::get('/ingredients/show-available-active-ingredients-groups', [AdminIngredientController::class, 'showAvailableActiveIngredientsGroups']);
         Route::apiResource('/ingredients', AdminIngredientController::class);
@@ -370,7 +386,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::apiResource('/article-comments', AdminArticleCommentController::class);
 
         Route::get('/users/show-available-roles', [AdminUserController::class, 'showAvailableRoles']);
-        Route::get('/users/my', [AdminUserController::class, 'my']);
+
         Route::get('/users/master-password', [AdminUserController::class, 'getMasterPassword']);
         Route::post('/users/save-bots', [AdminUserController::class, 'saveBots']);
         Route::apiResource('/users', AdminUserController::class);
