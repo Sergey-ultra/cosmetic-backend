@@ -18,7 +18,7 @@
             <dropdown class="header__item header__item-profile">
                 <template v-slot:activator="{ on }">
 
-                    <router-link :to="{ name: 'messages' }" style="position:relative;">
+                    <router-link v-if="isAdmin" :to="{ name: 'messages' }" style="position:relative;">
                         <fa class="dropdown__icon" icon="envelope"></fa>
                         <span v-if="myUser && myUser.unreadMessageCount" class="badge">
                             {{ myUser.unreadMessageCount }}
@@ -95,7 +95,7 @@
 
 <script>
     import dropdown from "../dropdown.vue";
-    import {mapActions, mapState} from "vuex";
+    import {mapActions, mapGetters, mapState} from "vuex";
     import adminRoutes from '../../router/admin';
 
     export default {
@@ -120,7 +120,8 @@
             }
         },
         computed: {
-            ...mapState('auth', ['userName', 'userRole', 'userAvatar']),
+            ...mapState('auth', ['userName', 'userAvatar']),
+            ...mapGetters('auth', ['isAdmin']),
             ...mapState('user', ['myUser']),
             adminMenu() {
                 return [
@@ -178,16 +179,14 @@
             },
         },
         created() {
-            // if (this.userRole.toLowerCase() === 'admin') {
-            //     adminRoutes.forEach(el => this.$router.addRoute(el))
-            //    // this.$router.addRoute(adminRoutes);
-            // }
-            this.loadMyUser();
+            if (this.isAdmin) {
+                this.loadMyUser();
+            }
             this.initMenu()
         },
         watch:{
-            userRole(value) {
-                if (value.toLowerCase() === 'admin') {
+            isAdmin(value) {
+                if (value) {
                     this.$router.addRoute(adminRoutes);
                 }
             },
@@ -204,7 +203,7 @@
             ...mapActions('auth', ['logout']),
             ...mapActions('user', ['loadMyUser']),
             initMenu() {
-                if (this.userRole.toLowerCase() === 'admin') {
+                if (this.isAdmin) {
                     this.menu = this.menu.concat(this.adminMenu)
                 }
 

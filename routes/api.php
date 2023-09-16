@@ -257,6 +257,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/suggest', [SearchController::class, 'index']);
         Route::get('/categories/tree', [AdminCategoryController::class, 'tree']);
         Route::get('/brands', [AdminBrandController::class, 'index']);
+        Route::post('/brands', [AdminBrandController::class, 'store']);
 
         Route::post('/files', [FileController::class, 'storeAsForm']);
 
@@ -353,7 +354,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/tags/tree', [AdminTagController::class, 'tree']);
         Route::apiResource('/tags', AdminTagController::class);
         Route::apiResource('/skus', AdminSkuController::class)->except('store');
-        Route::apiResource('/brands', AdminBrandController::class)->except('index');
+        Route::apiResource('/brands', AdminBrandController::class)->except(['index', 'store']);
 
         Route::apiResource('/categories', AdminCategoryController::class)->except('index');
 

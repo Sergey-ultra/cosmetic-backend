@@ -11,8 +11,11 @@ export default {
         },
         userName:'',
         userAvatar: '',
-        userRole:'',
+        userRole: '',
         isShowAuthModal: false
+    },
+    getters: {
+        isAdmin: state => state.userRole.toLowerCase() === 'admin',
     },
     mutations: {
         SET_USER: (state, { userName, avatar,  role }) => {
