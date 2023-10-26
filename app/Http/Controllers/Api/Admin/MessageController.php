@@ -25,12 +25,12 @@ class MessageController extends Controller
     {
         $perPage = $request->input('per_page') ?? 10;
 
-        $query = UserMessage::query()->whereNull('to_user');
-
         $paramsDto = new ParamsDTO(
             $request->input('filter') ?? [],
             $request->input('sort') ?? '',
         );
+
+        $query = UserMessage::query()->whereNull('to_user');
 
         $result = $this->prepareModel($paramsDto, $query, true)->paginate($perPage);
 

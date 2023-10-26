@@ -116,15 +116,8 @@
                             {name: 'Публикация',  link: {name: 'review-publishing-list'}},
                         ],
                     },
-                ]
-            }
-        },
-        computed: {
-            ...mapState('auth', ['userName', 'userAvatar']),
-            ...mapGetters('auth', ['isAdmin']),
-            ...mapState('user', ['myUser']),
-            adminMenu() {
-                return [
+                ],
+                adminMenu: [
                     {
                         name: 'Дашборд',
                         link: {name: 'main'},
@@ -146,7 +139,7 @@
                     {
                         name: 'Справочники',
                         icon: '<svg  class="menu__icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M18 1.5a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1h16zM2.5 17V3H7v6.5L13 8V3h4.5v14h-15zm9-14h-3v4.579l3-.75V3z"></path></svg>',
-                        children:[
+                        children: [
                             {name: 'Теги статей', link: {name: 'tag'}},
                             {name: 'Магазины', link: {name: 'store'}},
                             {name: 'Магазины поставщиков', link: {name: 'supplier'}},
@@ -163,9 +156,9 @@
                         name: 'Парсер',
                         icon: '<svg class="menu__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8.333 2.75a.75.75 0 1 1 0-1.5H12.6a.75.75 0 0 1 .75.75v4.267a.75.75 0 0 1-1.5 0V3.81l-8.32 8.32a.75.75 0 1 1-1.06-1.061l8.32-8.32H8.332zM2 15.25a.75.75 0 0 1 .75.75v2a.75.75 0 1 1-1.5 0v-2a.75.75 0 0 1 .75-.75zM7.75 14a.75.75 0 0 0-1.5 0v4a.75.75 0 1 0 1.5 0v-4zm4.916-4.75a.75.75 0 0 1 .75.75v8a.75.75 0 1 1-1.5 0v-8a.75.75 0 0 1 .75-.75zM18.75 2a.75.75 0 0 0-1.5 0v16a.75.75 0 1 0 1.5 0V2z"></path></svg>',
                         children: [
-                            {name: 'Парсинг ссылок',  link: {name: 'link-parser'}},
-                            {name: 'Парсинг цен',  link: {name: 'price-parser'}},
-                            {name: 'Парсинг товаров',  link: {name: 'product-parser'}}
+                            {name: 'Парсинг ссылок', link: {name: 'link-parser'}},
+                            {name: 'Парсинг цен', link: {name: 'price-parser'}},
+                            {name: 'Парсинг товаров', link: {name: 'product-parser'}}
                         ],
                     },
                     {
@@ -175,21 +168,26 @@
                             {name: 'Настройки', link: {name: 'settings'}},
                         ],
                     },
-                ];
-            },
+                ]
+            }
+        },
+        computed: {
+            ...mapState('auth', ['userName', 'userAvatar']),
+            ...mapGetters('auth', ['isAdminRole']),
+            ...mapState('user', ['myUser']),
         },
         created() {
-            if (this.isAdmin) {
+            if (this.isAdminRole) {
                 this.loadMyUser();
             }
             this.initMenu()
         },
         watch:{
-            isAdmin(value) {
-                if (value) {
-                    this.$router.addRoute(adminRoutes);
-                }
-            },
+            // isAdminRole(value) {
+            //     if (value) {
+            //         this.$router.addRoute(adminRoutes);
+            //     }
+            // },
             isCompactMenu() {
                 this.menu = this.menu.map(route => {
                     if (route.isShowChild) {
@@ -203,7 +201,7 @@
             ...mapActions('auth', ['logout']),
             ...mapActions('user', ['loadMyUser']),
             initMenu() {
-                if (this.isAdmin) {
+                if (this.isAdminRole) {
                     this.menu = this.menu.concat(this.adminMenu)
                 }
 
@@ -374,6 +372,7 @@
         background-color: rgb(5, 30, 52);
         flex-shrink: 0;
         width: 256px;
+        transition: width 0.3s ease 0s;
         /*&:hover .navbar__wrapper-compact {*/
         /*        width: 256px;*/
         /*    & .menu__name,*/

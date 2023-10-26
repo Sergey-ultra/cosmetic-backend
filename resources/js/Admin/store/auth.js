@@ -8,6 +8,9 @@ export default {
         userRole:'',
         userAvatar: '',
     },
+    getters: {
+        isAdminRole: state =>  state.userRole.toLowerCase() === 'admin',
+    },
     mutations: {
         SET_USER: (state, { userName, role, avatar }) => {
             state.isAuth = true

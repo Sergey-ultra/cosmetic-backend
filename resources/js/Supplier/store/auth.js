@@ -2,7 +2,7 @@ import api from '../utils/api'
 
 export default {
     namespaced: true,
-    state:{
+    state: {
         isAuth:false,
         mailVerification: {
             isRequired: true,
@@ -13,9 +13,6 @@ export default {
         userAvatar: '',
         userRole: '',
         isShowAuthModal: false
-    },
-    getters: {
-        isAdmin: state => state.userRole.toLowerCase() === 'admin',
     },
     mutations: {
         SET_USER: (state, { userName, avatar,  role }) => {

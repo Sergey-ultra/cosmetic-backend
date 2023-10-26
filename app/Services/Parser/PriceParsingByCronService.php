@@ -30,11 +30,11 @@ class PriceParsingByCronService
 
         try {
             if ($this->configuration->getBoolean('week_status')) {
-                if (! ($minHourCount = $this->configuration->get('min_hour_count'))) {
+                if (! ($minHourCount = (int)$this->configuration->get('min_hour_count'))) {
                     $minHourCount = self::MIN_HOUR_COUNT;
                 }
 
-                if (! ($maxHourCount = $this->configuration->get('max_hour_count'))) {
+                if (! ($maxHourCount = (int)$this->configuration->get('max_hour_count'))) {
                     $maxHourCount = self::MAX_HOUR_COUNT;
                 }
 

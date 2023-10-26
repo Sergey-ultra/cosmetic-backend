@@ -183,7 +183,7 @@ const rules = {
     sku: {
         name: {
             required: helpers.withMessage('Поле должно быть заполнено', required),
-            minLength: helpers.withMessage('Поле должно быть не меньше 5 символов', minLength(5)),
+            minLength: helpers.withMessage('Поле должно быть не меньше 3 символов', minLength(3)),
         },
         brand_id: {
             required: helpers.withMessage('Поле должно быть заполнено', required),

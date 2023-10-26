@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Traits;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Http\Request;
 
 trait DataProviderWithDTO
 {
