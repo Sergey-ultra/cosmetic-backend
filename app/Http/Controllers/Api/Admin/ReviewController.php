@@ -6,7 +6,8 @@ namespace App\Http\Controllers\Api\Admin;
 
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Requests\RejectReviewRequest;
 use App\Http\Requests\ReviewRequest;
 use App\Http\Requests\StatusRequest;
@@ -15,10 +16,8 @@ use App\Http\Resources\Admin\ReviewOneResource;
 use App\Jobs\ReviewPublishedJob;
 use App\Jobs\UpdateSkuRatingJob;
 use App\Models\Review;
-use App\Models\Sku;
 use App\Models\User;
 use App\Repositories\ReviewRepository\IReviewRepository;
-use App\Services\EntityStatus;
 use App\Services\ImageSavingService\ImageSavingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,7 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ReviewController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     const IMAGES_FOLDER = 'public/image/premoderatedReviews/';
 
@@ -43,7 +42,12 @@ class ReviewController extends Controller
 
         $query = $reviewRepository->getAdminReviewListQuery();
 
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return new ReviewCollection($result);
     }

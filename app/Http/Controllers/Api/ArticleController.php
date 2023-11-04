@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Resources\ArticleCollection;
 use App\Http\Resources\ArticleSingleResource;
 use App\Http\Resources\ArticleWithTagsCollection;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ArticleController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     public function index(Request $request): ArticleWithTagsCollection
     {
@@ -57,10 +58,14 @@ class ArticleController extends Controller
                 ['articles.status', '<>', 'deleted'],
                 'articles.user_id' => Auth::id()
             ])
-            ->orderBy('articles.created_at', 'DESC')
-        ;
+            ->orderBy('articles.created_at', 'DESC');
 
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return response()->json([ 'data'=> $result ]);
     }

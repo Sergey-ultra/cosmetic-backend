@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Resources\Admin\ProductCollection;
 use App\Http\Resources\Admin\ProductSingleResource;
 use App\Models\Brand;
@@ -21,10 +22,9 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
-
 class SkuController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     const IMAGES_FOLDER = 'public/image/sku/';
 
@@ -34,7 +34,7 @@ class SkuController extends Controller
      */
     public function index(Request $request): ProductCollection
     {
-        $perPage = $request->per_page ?? 10;
+        $perPage = (int)($request->per_page ?? 10);
 
         $ingredientProductSubQuery = DB::table('ingredient_product')
             ->select('product_id')
@@ -69,11 +69,14 @@ class SkuController extends Controller
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->leftJoinSub($ingredientProductSubQuery, 'ip', function ($join) {
                 $join->on('ip.product_id', '=', 'products.id');
-            })
-        ;
+            });
 
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
 
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return new ProductCollection($result);
     }

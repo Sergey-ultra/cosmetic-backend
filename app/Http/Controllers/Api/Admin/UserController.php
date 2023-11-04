@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api\Admin;
 
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Requests\Admin\BotsRequest;
-use App\Models\Role;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Repositories\MessageRepository\MessageRepository;
@@ -14,16 +14,15 @@ use App\Services\AuthService;
 use App\Services\PasswordService\PasswordService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 
 class UserController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = (int) ($request->per_page ?? 10);
+        $perPage = (int)($request->per_page ?? 10);
 
         if ($perPage === -1) {
             $users = User::query()->select(['id', 'name'])->get();
@@ -50,11 +49,14 @@ class UserController extends Controller
                 '=',
                 sprintf('%s.id', User::TABLE)
             )
-            ->orderByDesc(sprintf('%s.created_at', User::TABLE))
-        ;
+            ->orderByDesc(sprintf('%s.created_at', User::TABLE));
 
-        $result = $this->prepareModel($request, $query, true)->paginate( $perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
 
+        $result = $this->prepareModel($paramsDto, $query)->paginate( $perPage);
 
         return response()->json(['data' => $result]);
     }

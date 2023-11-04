@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Admin\Parser;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Requests\Admin\StoresWithLinkCountRequest;
 use App\Models\ParsingLink;
 use App\Models\Store;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class ParsingLinkController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     /**
      * @param Request $request
@@ -37,8 +38,12 @@ class ParsingLinkController extends Controller
             ->where('store_id', $storeId)
             ->where('parsed', $forPrice ? 1 : 0);
 
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
 
-        $result = $this->prepareModel($request, $query)->paginate($perPage);
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return response()->json(['data' => $result]);
     }

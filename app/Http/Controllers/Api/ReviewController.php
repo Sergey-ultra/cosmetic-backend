@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Requests\ReviewRequest;
 use App\Http\Resources\LastReviewsCollection;
 use App\Http\Resources\MyRejectedReviewsCollection;
@@ -28,7 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ReviewController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     public const LAST_LIMIT = 10;
 
@@ -47,7 +49,12 @@ class ReviewController extends Controller
                 sprintf('%s.status',Review::TABLE) => EntityStatus::PUBLISHED,
             ]);
 
-        $result = $this->prepareModel($request, $query)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return new MyReviewsCollection($result);
     }
@@ -61,7 +68,12 @@ class ReviewController extends Controller
                 sprintf('%s.status',Review::TABLE) => EntityStatus::DRAFT,
             ]);
 
-        $result = $this->prepareModel($request, $query)->get();
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->get();
 
         return new MyReviewsCollection($result);
     }
@@ -75,7 +87,12 @@ class ReviewController extends Controller
                 sprintf('%s.status',Review::TABLE) => EntityStatus::MODERATED,
             ]);
 
-        $result = $this->prepareModel($request, $query)->get();
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->get();
 
         return new MyReviewsCollection($result);
     }
@@ -90,7 +107,12 @@ class ReviewController extends Controller
                 sprintf('%s.status',Review::TABLE) => EntityStatus::REJECTED,
             ]);
 
-        $result = $this->prepareModel($request, $query)->get();
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->get();
 
         return new MyRejectedReviewsCollection($result);
     }
@@ -128,7 +150,12 @@ class ReviewController extends Controller
                 sprintf('%s.status', Review::TABLE) => EntityStatus::PUBLISHED,
             ]);
 
-        $result = $this->prepareModel($request, $query)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return new ReviewCollection($result);
     }

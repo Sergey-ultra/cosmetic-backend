@@ -7,14 +7,15 @@ namespace App\Http\Controllers\Api\Admin;
 
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TrackingController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     public function index(Request $request): JsonResponse
     {
@@ -30,11 +31,14 @@ class TrackingController extends Controller
             ])
             ->join('skus', 'trackings.sku_id', '=', 'skus.id')
             ->leftJoin('sku_store', 'skus.id', '=', 'sku_store.sku_id')
-            ->join('products', 'skus.product_id', '=', 'products.id')
-        ;
+            ->join('products', 'skus.product_id', '=', 'products.id');
 
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
 
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
         return response()->json($result);
     }
 

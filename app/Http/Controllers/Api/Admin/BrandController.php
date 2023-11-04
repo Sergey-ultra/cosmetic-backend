@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Resources\BrandResource;
 use App\Models\Brand;
 use App\Services\ImageSavingService\ImageSavingService;
@@ -17,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BrandController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     const IMAGES_FOLDER = 'public/image/brand/';
 
@@ -33,15 +34,14 @@ class BrandController extends Controller
         $perPage = (int) ($request->per_page ?? 10);
 
         if ($perPage === -1) {
-            $result = Brand::select(['id', 'name'])->get();
+            $result = Brand::query()->select(['id', 'name'])->get();
             return response()->json(['data' => $result]);
         }
 
         $productsWithSkusQuery = DB::table('products')
             ->selectRaw('count(products.brand_id) AS sku_count, products.brand_id')
             ->join('skus', 'skus.product_id', '=', 'products.id')
-            ->groupBy('products.brand_id')
-        ;
+            ->groupBy('products.brand_id');
 
 
         $query = DB::table('brands')
@@ -58,8 +58,12 @@ class BrandController extends Controller
             })
             ->leftJoin('countries', 'brands.country_id', '=', 'countries.id');
 
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
 
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return response()->json(['data' => $result]);
     }

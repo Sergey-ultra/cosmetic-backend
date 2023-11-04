@@ -6,17 +6,18 @@ namespace App\Http\Controllers\Api\Admin;
 
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Models\Article;
 use App\Models\ArticleComment;
-use App\Models\Comment;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ArticleCommentController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     /**
      * Display a listing of the resource.
@@ -51,7 +52,12 @@ class ArticleCommentController extends Controller
                 sprintf('%s.id', User::TABLE)
             );
 
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return response()->json(['data' => $result]);
     }

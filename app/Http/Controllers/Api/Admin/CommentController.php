@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-
 namespace App\Http\Controllers\Api\Admin;
 
-
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Models\Comment;
 use App\Models\Product;
 use App\Models\Review;
@@ -19,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 
 class CommentController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     /**
      * Display a listing of the resource.
@@ -67,7 +66,12 @@ class CommentController extends Controller
                 '=',
                 sprintf('%s.id', User::TABLE)
             );
-        $result = $this->prepareModel($request, $query)->paginate($perPage);
+
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return response()->json(['data' => $result]);
     }

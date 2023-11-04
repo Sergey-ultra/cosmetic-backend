@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Resources\Admin\ArticleCollection;
 use App\Http\Resources\Admin\ArticleSingleResource;
@@ -21,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ArticleController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     const IMAGES_FOLDER = 'public/image/articles/';
 
@@ -36,7 +37,12 @@ class ArticleController extends Controller
 
         $query = $articleRepository->getAdminArticleList();
 
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return new ArticleCollection($result);
     }

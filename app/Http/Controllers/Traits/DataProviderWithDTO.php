@@ -4,55 +4,81 @@ namespace App\Http\Controllers\Traits;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
 
 trait DataProviderWithDTO
 {
-    protected EloquentBuilder|Builder $query;
-    protected function prepareModel(
-        ParamsDTO               $params,
-        EloquentBuilder|Builder $query,
-        bool                    $isJoin = false
-    ): EloquentBuilder|Builder
+    private EloquentBuilder|Builder $query;
+
+    private array $columns;
+
+    private bool $isJoinQuery = false;
+    protected function prepareModel(ParamsDTO $params, EloquentBuilder|Builder $query): EloquentBuilder|Builder
     {
         $this->query = $query;
+        $this->setColumns();
 
         if ($params->filter) {
-            $this->filterModel($isJoin, $params->filter);
+            $this->filterQuery($params->filter);
         }
 
         if (is_string($params->sort) && $params->sort !== '') {
-            $this->sortModel($params->sort);
+            $this->sortQuery($params->sort);
         }
 
         return $this->query;
     }
 
-    protected function filterModel(bool $isJoin, array $filter): void
+    private function setColumns(): void
     {
-        $isQueryBuilder = $isJoin && $this->query instanceof Builder;
-
-        if ($isQueryBuilder) {
-            $columns = [];
-            foreach ($this->query->columns as $column) {
-
-                $parts = explode(' ', $column);
-                if (count($parts) > 1) {
-                    $columns[$parts[count($parts) - 1]] = $parts[0];
-                } else  {
-                    $parts = explode('.', $column,2);
-                    $columns[$parts[1]] = $column;
-                }
-            }
+        if ($this->query instanceof EloquentBuilder) {
+            $query = $this->query->getQuery();
+        } else {
+            $query = $this->query;
         }
 
+        $this->columns = $query->columns;
 
-        foreach ($filter as $filterKey => $param) {
-            $col = $isQueryBuilder ? $columns[$filterKey] : $filterKey;
-            $this->addCondition($col, $param);
+        if (is_array($query->joins) && count($query->joins)) {
+            $this->isJoinQuery = true;
         }
     }
 
-    protected function sortModel(string $sort): void
+    protected function filterQuery(array $filter): void
+    {
+        if ($this->isJoinQuery) {
+            $this->filterJoinedQuery($filter);
+        } else {
+            foreach ($filter as $filterKey => $param) {
+                $this->addCondition($filterKey, $param);
+            }
+        }
+    }
+
+    protected function filterJoinedQuery(array $filter): void
+    {
+        $availableColumns = [];
+        foreach ($this->columns as $column) {
+            if (is_string($column)) {
+                $parts = explode(' ', $column);
+                if (count($parts) > 1) {
+                    $availableColumns[$parts[count($parts) - 1]] = $parts[0];
+                } else {
+                    $parts = explode('.', $column, 2);
+                    $availableColumns[$parts[1]] = $column;
+                }
+            } else if ($column instanceof Expression) {
+                $parts = explode(' ', $column->getValue());
+                $availableColumns[$parts[count($parts) - 1]] = $parts[count($parts) - 1];
+            }
+        }
+
+        foreach ($filter as $filterKey => $param) {
+            $this->addCondition($availableColumns[$filterKey], $param);
+        }
+    }
+
+    protected function sortQuery(string $sort): void
     {
         if ($sort[0] === '-') {
             $sort = substr($sort, 1);
@@ -64,7 +90,6 @@ trait DataProviderWithDTO
 
     protected function addCondition(string $column, string|array $param): void
     {
-
         if (is_string($param)) {
             $this->query->where($column, $param);
         } else if(is_array($param)) {

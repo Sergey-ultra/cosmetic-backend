@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Models\Category;
 use App\Services\ImageSavingService\ImageSavingService;
 use App\Services\TreeService\TreeInterface;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     const IMAGES_FOLDER = 'public/image/store/';
 
@@ -27,15 +28,20 @@ class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $perPage = (int)  ($request->per_page ?? 10);
+        $perPage = (int)($request->per_page ?? 10);
 
         if ($perPage === -1) {
-            $result = Category::select(['id', 'name'])->whereNotNull('parent_id')->get();
+            $result = Category::query()->select(['id', 'name'])->whereNotNull('parent_id')->get();
             return response()->json(['data' => $result]);
         }
 
-        $query = Category::select(['id', 'image', 'name', 'code', 'description', 'image',  'parent_id']);
-        $result = $this->prepareModel($request, $query)->paginate($perPage);
+        $query = Category::query()->select(['id', 'image', 'name', 'code', 'description', 'image',  'parent_id']);
+
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return response()->json(['data' => $result]);
     }

@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Api;
 
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Requests\ReviewVideoWithBase64;
 use App\Http\Requests\ReviewVideoWithUrlsRequest;
 use App\Http\Resources\MyVideoCollection;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SkuVideoController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     const VIDEO_FOLDER = 'public/video/sku/';
 
@@ -49,10 +50,14 @@ class SkuVideoController extends Controller
             ->where([
                 'sku_videos.user_id' => Auth::id(),
                 ['sku_videos.status', '<>', 'deleted']
-            ])
-        ;
+            ]);
 
-        $result = $this->prepareModel($request, $query)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return new MyVideoCollection($result);
     }
