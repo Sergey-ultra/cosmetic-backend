@@ -11,7 +11,7 @@ services:
       - VIRTUAL_PORT=8000
       - VIRTUAL_HOST=smart-beautiful.local
     ports:
-      - "8000:80"
+      - "8010:80"
     links:
       - app
     volumes:

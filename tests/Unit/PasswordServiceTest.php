@@ -8,11 +8,18 @@ use PHPUnit\Framework\TestCase;
 
 class PasswordServiceTest extends TestCase
 {
-    protected PasswordService $passwordService;
+    private PasswordService $passwordService;
+
     public function setUp(): void
     {
         parent::setUp();
-        $this->passwordService = new PasswordService(new Configuration());
+
+        $configuration = $this->createMock(Configuration::class);
+        $configuration->expects($this->any())
+            ->method('getSaltMasterPassword')
+            ->willReturn('c0210sovsecontej2022');
+
+        $this->passwordService = new PasswordService($configuration);
     }
 
     /**
@@ -20,7 +27,7 @@ class PasswordServiceTest extends TestCase
      *
      * @return void
      */
-    public function test_example()
+    public function test_example(): void
     {
         $masterPassword = $this->passwordService->generateGlobalMasterPassword();
 
