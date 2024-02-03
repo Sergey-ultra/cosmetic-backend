@@ -12,7 +12,7 @@ class ReviewLinkPage extends Model
 
     protected $fillable = ['review_link_option_id', 'page_number', 'body'];
 
-    protected array $cast = [
+    protected $casts = [
         'review_link_option_id' => 'integer',
         'page_number' => 'integer',
         'body' => 'array'

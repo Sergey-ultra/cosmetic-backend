@@ -10,7 +10,7 @@ class LinkPage extends Model
     protected $table = self::TABLE;
     protected $fillable = ['link_option_id', 'page_number', 'body'];
 
-    protected $cast = [
+    protected $casts = [
         'link_option_id' => 'integer',
         'page_number' => 'integer',
         'body' => 'array'

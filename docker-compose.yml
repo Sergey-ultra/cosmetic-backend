@@ -27,7 +27,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/php/Dockerfile
     container_name: ${APP_NAME}_php
     restart: unless-stopped
     tty: true
@@ -39,7 +39,7 @@ services:
       - redis
     volumes:
       - ./:/var/www
-      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./docker/php/conf/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - cosmetic
 

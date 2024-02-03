@@ -22,7 +22,7 @@ class ReviewParsingLink extends Model
 
     protected $fillable = ['link', 'status', 'body', 'content', 'category_id'];
 
-    protected array $cast = [
+    protected $casts = [
         'id' => 'integer',
         'category_id' => 'integer',
         'content' => 'json',

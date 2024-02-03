@@ -13,7 +13,8 @@ class ProductLinkRepository implements LinkRepositoryInterface
     {
         LinkPage::query()->updateOrCreate(
             ['link_option_id' => $linkOptionId, 'page_number' => $pageNumber],
-            ['body' => json_encode($body)]);
+            ['body' => json_encode($body)]
+        );
     }
 
     /**

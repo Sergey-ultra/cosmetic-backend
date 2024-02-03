@@ -1,18 +1,17 @@
 <template>
-    <div class="drop-menu">
-        <button class="drop-menu__button" @click="toggleShowMenu">
-            <svg class="drop-menu__svg">
+    <div class="dropdown">
+        <button class="dropdown-button" @click="toggleShowMenu">
+            <svg class="dropdown-svg">
                 <use xlink:href="#icons_more-horiz">
                 <symbol viewBox="0 0 24 24" id="icons_more-horiz"><path fill-rule="evenodd" d="M4 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm8 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm8 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path></symbol>
                 </use>
             </svg>
         </button>
-        <ul class="drop-menu__list" v-show="isShowMenu" ref="dropdownMenu">
+        <ul class="dropdown-list" v-show="isShowMenu" ref="dropdownMenu">
             <li
-                    class="drop-menu__item"
-                    v-for="item in items"
-                    :key="item"
-            >
+                class="dropdown-item"
+                v-for="item in items"
+                :key="item">
                 <slot :name="item"/>
             </li>
         </ul>
@@ -56,11 +55,11 @@
 </script>
 
 <style scoped lang="scss">
-.drop-menu {
+.dropdown {
     font-size: 14px;
     line-height: 16px;
     position: relative;
-    &__button {
+    &-button {
         cursor: pointer;
         opacity: .3;
         display: block;
@@ -69,17 +68,18 @@
         padding: 0;
         outline: none;
         height: 30px;
+
         &:hover {
             opacity: 1;
         }
     }
-    &__svg {
+    &-svg {
         display: inline-block;
         position: relative;
         width: 32px;
         height: 30px;
     }
-    &__list {
+    &-list {
         position: absolute;
         padding: 0;
         white-space: nowrap;
@@ -91,7 +91,7 @@
         z-index: 10;
         margin-top: -8px;
     }
-    &__item {
+    &-item {
         list-style: none;
         cursor: pointer;
         border-radius: 4px;
