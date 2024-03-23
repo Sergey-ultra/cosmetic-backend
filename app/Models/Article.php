@@ -19,7 +19,6 @@ class Article extends Model
         'title',
         'slug',
         'preview',
-        'tag',
         'status',
         'body',
         'image',

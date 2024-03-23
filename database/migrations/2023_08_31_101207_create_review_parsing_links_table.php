@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('link')->unique();
             $table->longText('body')->nullable();
             $table->json('content')->nullable();
-            $table->string('parsed')->default(0);
-            $table->unsignedInteger('category_id')->nullable();
+            $table->unsignedTinyInteger('status')->default(0);
+            $table->foreignId('category_id')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
         });

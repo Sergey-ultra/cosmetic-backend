@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->foreignId('review_id');
             $table->unsignedInteger('accrual');
-            $table->enum('type', ['views, bonus']);
+            $table->enum('type', ['view', 'bonus']);
             $table->date('date');
             $table->timestamps();
         });

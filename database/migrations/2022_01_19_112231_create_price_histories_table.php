@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCurrentPricesTable extends Migration
+class CreatePriceHistoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateCurrentPricesTable extends Migration
      */
     public function up()
     {
-        Schema::create('prices_history', function (Blueprint $table) {
+        Schema::create('price_histories', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->foreignId('sku_id');
             $table->foreignId('store_id');
-            $table->foreignId('link_id')->references('id')->on('links');
+            $table->foreignId('link_id');
             $table->integer('price')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();

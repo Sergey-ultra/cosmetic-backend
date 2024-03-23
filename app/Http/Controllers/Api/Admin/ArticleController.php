@@ -96,7 +96,7 @@ class ArticleController extends Controller
         }
 
 
-        $article = Article::create($params);
+        $article = Article::query()->create($params);
 
         if ($request->input('tags_ids')) {
             foreach($request->input('tags_ids') as $tagId) {

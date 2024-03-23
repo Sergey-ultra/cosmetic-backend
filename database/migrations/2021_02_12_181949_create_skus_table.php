@@ -14,8 +14,8 @@ class CreateSkusTable extends Migration
     public function up()
     {
         Schema::create('skus', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedInteger('product_id');
+            $table->id();
+            $table->foreignId('product_id');
             $table->string('volume');
             $table->json('images')->nullable();
             $table->float('rating')->default(0);

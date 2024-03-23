@@ -20,10 +20,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::table('rejected_reasons')->insert([
-            ['reason' => 'Количество знаков должно быть 5000 или больше'],
-            ['reason' => 'Количество фотографий должно быть 3 или больше'],
-        ]);
+//        DB::table('rejected_reasons')->insert([
+//            ['reason' => 'Количество знаков должно быть 5000 или больше'],
+//            ['reason' => 'Количество фотографий должно быть 3 или больше'],
+//        ]);
     }
 
     /**

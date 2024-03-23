@@ -31,7 +31,7 @@ class CreateProductsTable extends Migration
             $table->timestamps();
             $table->unique(['brand_id', 'name']);
         });
-        DB::statement('ALTER TABLE products ADD FULLTEXT search(name, name_en, description, application)');
+        //DB::statement('ALTER TABLE products ADD FULLTEXT search(name, name_en, description, application)');
     }
 
     /**

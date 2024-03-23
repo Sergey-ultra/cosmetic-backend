@@ -14,13 +14,13 @@ class CreateBrandsTable extends Migration
     public function up()
     {
         Schema::create('brands', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->id();
             $table->string('name')->unique();
             $table->string('code')->unique()->nullable();
             $table->text('image')->nullable();
             $table->text('description')->nullable();
             $table->unsignedInteger('country_id')->nullable();
-            $table->unsignedInteger('user_id')->index();
+            $table->unsignedInteger('user_id')->nullable()->index();
             $table->timestamps();
         });
     }

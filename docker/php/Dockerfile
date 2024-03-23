@@ -11,6 +11,10 @@ RUN apt-get update && apt-get install -y curl libmagickwand-dev libpng-dev libon
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql
 
+RUN apt-get update && \
+    apt-get install -y libpq-dev && \
+    docker-php-ext-install pdo_pgsql pgsql
+
 
 RUN pecl install redis \
         && docker-php-ext-enable redis

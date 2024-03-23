@@ -18,7 +18,7 @@ class CreateExtractIngredientTable extends Migration
             $table->foreignId('ingredient_id');
             $table->foreignId('extract_id');
             $table->timestamps();
-            $table->unique(['ingredient_id', 'extract_id'], 'foreign_keys_unique');
+            $table->unique(['ingredient_id', 'extract_id'], 'unique_ingredient_extract');
         });
     }
 

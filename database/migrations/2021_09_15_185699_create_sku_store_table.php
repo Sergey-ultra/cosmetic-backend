@@ -16,7 +16,7 @@ class CreateSkuStoreTable extends Migration
         Schema::create('sku_store', function (Blueprint $table) {
             $table->foreignId('sku_id');
             $table->foreignId('store_id');
-            $table->foreignId('link_id')->references('id')->on('links');
+            $table->foreignId('link_id');
             $table->unsignedInteger('fails_count')->default(0);
             $table->integer('price')->nullable();
             $table->timestamps();
