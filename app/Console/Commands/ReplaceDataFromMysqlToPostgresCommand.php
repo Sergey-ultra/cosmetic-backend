@@ -24,7 +24,7 @@ class ReplaceDataFromMysqlToPostgresCommand extends Command
 
     public function handle(): void
     {
-        ini_set('memory_limit', '2G');
+        ini_set('memory_limit', '500M');
 
         $tables = DB::connection('mysql')->select("SELECT table_name FROM information_schema.tables
 WHERE table_schema = 'sanctum';");
@@ -37,7 +37,6 @@ WHERE table_schema = 'sanctum';");
 
         foreach ($tables as $table) {
             $this->handleOneTable($table);
-            sleep(1);
         }
     }
 
@@ -59,12 +58,9 @@ WHERE table_schema = 'sanctum';");
             foreach ($rows as $chunk) {
                 DB::table($table)->insert($chunk);
             }
-            unset($chunks);
         } else {
             echo 'Использование памяти ' . (memory_get_usage(true) / 1024 / 1024) . \PHP_EOL;
             DB::table($table)->insert($rows);
         }
-
-        unset($rows);
     }
 }
