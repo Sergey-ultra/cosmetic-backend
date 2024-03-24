@@ -31,7 +31,7 @@ WHERE table_schema = 'sanctum';");
 
         $tables = (new Collection($tables))
             ->map(fn(stdClass $table) => $table->TABLE_NAME)
-            ->filter(fn(string $table) => $table !== 'migrations')
+            ->filter(fn(string $table) => !in_array($table, ['parsing_links', 'migrations'], true))
             ->values()
             ->all();
 
