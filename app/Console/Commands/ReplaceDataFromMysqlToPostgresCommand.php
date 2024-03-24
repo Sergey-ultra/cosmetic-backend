@@ -62,5 +62,7 @@ WHERE table_schema = 'sanctum';");
             echo 'Использование памяти ' . (memory_get_usage(true) / 1024 / 1024) . \PHP_EOL;
             DB::table($table)->insert($rows);
         }
+
+        unset($rows);
     }
 }
