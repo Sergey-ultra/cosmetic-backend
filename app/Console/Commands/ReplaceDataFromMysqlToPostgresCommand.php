@@ -52,10 +52,12 @@ WHERE table_schema = 'sanctum';");
 
         if (count($rows) > 5000) {
             $rows = array_chunk($rows, 5000, true);
+            echo 'Использование памяти ' . (memory_get_usage(true) / 1024 / 1024) . \PHP_EOL;
             foreach ($rows as $chunk) {
                 DB::table($table)->insert($chunk);
             }
         } else {
+            echo 'Использование памяти ' . (memory_get_usage(true) / 1024 / 1024) . \PHP_EOL;
             DB::table($table)->insert($rows);
         }
     }
