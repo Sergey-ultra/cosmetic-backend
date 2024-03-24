@@ -42,6 +42,8 @@ WHERE table_schema = 'sanctum';");
 
     private function handleOneTable(string $table): void
     {
+        gc_collect_cycles();
+
         $this->info(sprintf("Обработка таблицы %s", $table));
 
         $rows = DB::connection('mysql')
