@@ -37,6 +37,7 @@ WHERE table_schema = 'sanctum';");
 
         foreach ($tables as $table) {
             $this->handleOneTable($table);
+            sleep(1);
         }
     }
 
