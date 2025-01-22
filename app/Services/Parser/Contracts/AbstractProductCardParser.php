@@ -38,9 +38,9 @@ abstract class AbstractProductCardParser
 
             if ($code === 200) {
                 $body = $response->getBody()->getContents();
-                ParsingLink::where('id', $this->currentLink->id)->update(['body' => $body]);
+                ParsingLink::query()->where('id', $this->currentLink->id)->update(['body' => $body]);
             } else if ($code === 404) {
-                ParsingLink::where('id', $this->currentLink->id)->update(['parsed' => 2]);
+                ParsingLink::query()->where('id', $this->currentLink->id)->update(['parsed' => 2]);
             }
         }
         return $body;

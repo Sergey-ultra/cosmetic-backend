@@ -19,7 +19,7 @@ class ProductParserController extends Controller
         set_time_limit(7200);
 
         $storeId = (int)$request->storeId;
-        $linkIds = (array)$request->linkIds;
+        $linkIds = (array)$request->input('linkIds', []);
 
 
         $isLoadToDb = (bool)($request->isLoadToDb ?? false);

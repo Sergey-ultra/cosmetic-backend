@@ -20,7 +20,6 @@ class ProductLinksParserController extends Controller
         $isLoadToDb = (bool)($request->isLoadToDb ?? false);
 
 
-
         $linkOption = LinkOption::query()
             ->select(
                 'link_options.id',
@@ -37,7 +36,11 @@ class ProductLinksParserController extends Controller
             return response()->json(['data' => ['message' => 'нет настроек']]);
         }
 
-
+        /** @var array{
+         *     code: int,
+         *     content: ?string
+         * } $bodyArray
+         */
         $bodyArray = $linkOption->pages
             ? $linkOption->pages
                 ->map(fn(array $item) => json_decode($item['body'] ,true))

@@ -44,7 +44,7 @@ trait DataProviderWithDTO
         }
     }
 
-    protected function filterQuery(array $filter): void
+    private function filterQuery(array $filter): void
     {
         if ($this->isJoinQuery) {
             $this->filterJoinedQuery($filter);
@@ -55,7 +55,7 @@ trait DataProviderWithDTO
         }
     }
 
-    protected function filterJoinedQuery(array $filter): void
+    private function filterJoinedQuery(array $filter): void
     {
         $availableColumns = [];
         foreach ($this->columns as $column) {
@@ -78,7 +78,7 @@ trait DataProviderWithDTO
         }
     }
 
-    protected function sortQuery(string $sort): void
+    private function sortQuery(string $sort): void
     {
         if ($sort[0] === '-') {
             $sort = substr($sort, 1);
@@ -88,7 +88,7 @@ trait DataProviderWithDTO
         }
     }
 
-    protected function addCondition(string $column, string|array $param): void
+    private function addCondition(string $column, string|array $param): void
     {
         if (is_string($param)) {
             $this->query->where($column, $param);

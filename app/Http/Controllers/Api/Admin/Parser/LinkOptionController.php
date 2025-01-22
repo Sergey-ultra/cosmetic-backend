@@ -13,7 +13,7 @@ class LinkOptionController extends Controller
     {
         $storeId =  (int) $request->store_id;
         $categoryId =  (int) $request->category_id;
-        $result = LinkOption::where(['store_id' => $storeId, 'category_id' => $categoryId])->first();
+        $result = LinkOption::query()->where(['store_id' => $storeId, 'category_id' => $categoryId])->first();
 
         return response()->json(['data' => $result?->options]);
     }
@@ -21,9 +21,9 @@ class LinkOptionController extends Controller
 
     public function updateOrCreate(Request $request): JsonResponse
     {
-        $newOption = LinkOption::updateOrCreate(
-            ['store_id' =>  $request->store_id, 'category_id' => $request->category_id],
-            ['options' => $request->options]
+        $newOption = LinkOption::query()->updateOrCreate(
+            ['store_id' =>  $request->get('store_id'), 'category_id' => $request->get('category_id')],
+            ['options' => $request->get('options')]
         );
 
         return response()->json(['data' => $newOption]);

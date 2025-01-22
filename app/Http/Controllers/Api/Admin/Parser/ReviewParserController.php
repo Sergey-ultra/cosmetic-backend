@@ -140,7 +140,7 @@ class ReviewParserController extends Controller
 
         $bodyArray = $linkOption->pages
             ? $linkOption->pages
-                ->mapWithKeys(fn(ReviewLinkPage $item) => [$item['page_number'] => json_decode($item['body'] ,true)])
+                ->mapWithKeys(fn(ReviewLinkPage $item): array => [$item['page_number'] => json_decode($item['body'] ,true)])
                 ->all()
             : [];
 

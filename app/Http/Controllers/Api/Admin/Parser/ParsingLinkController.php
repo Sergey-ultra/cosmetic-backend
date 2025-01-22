@@ -12,16 +12,13 @@ use App\Models\ParsingLink;
 use App\Models\Store;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class ParsingLinkController extends Controller
 {
     use DataProviderWithDTO;
 
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function index(Request $request): JsonResponse
     {
         $perPage = (int)($request->per_page ?? 30);
@@ -45,13 +42,10 @@ class ParsingLinkController extends Controller
 
         $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
-        return response()->json(['data' => $result]);
+        return new JsonResponse(['data' => $result]);
     }
 
-    /**
-     * @param StoresWithLinkCountRequest $request
-     * @return JsonResponse
-     */
+
     public function storesWithLinksCount(StoresWithLinkCountRequest $request): JsonResponse
     {
         $result = Store::query()->select(DB::raw("stores.id, stores.name, count(parsing_links.id) as count"))

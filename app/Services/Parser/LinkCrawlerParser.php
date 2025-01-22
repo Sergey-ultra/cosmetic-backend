@@ -10,19 +10,24 @@ use App\Repositories\LinkRepository\LinkRepositoryInterface;
 use App\Repositories\LinkRepository\ProductLinkRepository;
 use App\Services\ProxyHttpClientService\ProxyHttpClientInterface;
 use App\Services\UrlService\IUrlService;
+use DOMNode;
 use Symfony\Component\DomCrawler\Crawler;
 
 class LinkCrawlerParser
 {
-    protected int $pageNumber = 0;
+    protected int  $pageNumber    = 0;
     protected ?int $endPageNumber = null;
-    protected int $linkOptionId;
-    protected array $body;
-    protected ?string $nextPage = null;
-    protected string $link;
-    protected string $targetUrl;
-
-    protected string $paginationQueryString = '';
+    protected int  $linkOptionId;
+    /** @var array{
+     *     code: int,
+     *     content: ?string
+     * }
+     */
+    protected array                   $body;
+    protected ?string                 $nextPage              = null;
+    protected string                  $link;
+    protected string                  $targetUrl;
+    protected string                  $paginationQueryString = '';
     protected LinkRepositoryInterface $linkPageRepository;
 
     public function __construct(
@@ -50,6 +55,11 @@ class LinkCrawlerParser
         return $this;
     }
 
+    /** @param array{
+     *     code: int,
+     *     content: ?string
+     * } $body
+     */
     public function setBody(array $body): self
     {
         $this->body = $body;
@@ -68,7 +78,7 @@ class LinkCrawlerParser
         return $this;
     }
 
-    public function setTargetUrl(string  $targetUrl): self
+    public function setTargetUrl(string $targetUrl): self
     {
         $this->targetUrl = $targetUrl;
         return $this;
@@ -112,6 +122,7 @@ class LinkCrawlerParser
             $parsingItems = $crawler->filter($this->link);
 
             if (count($parsingItems)) {
+                /** @var DOMNode $parsingItem */
                 foreach ($parsingItems as $parsingItem) {
                     $parsingLink = $parsingItem->getAttribute('href');
                     if (!$parsingLink) {
@@ -165,7 +176,7 @@ class LinkCrawlerParser
 
             $body = [
                 'code' => $code,
-                'content' => null
+                'content' => null,
             ];
 
             if (in_array($code, [200, 301])) {

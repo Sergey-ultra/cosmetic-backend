@@ -78,7 +78,7 @@ class ProductCardCrawlerParser extends AbstractProductCardParser
     protected function getImages(): void
     {
         $urlArray = parse_url($this->currentLink->link);
-        $storeUrl =  $urlArray['scheme'] . '://' . $urlArray['host'];
+        $storeUrl = $urlArray['scheme'] . '://' . $urlArray['host'];
 
 
         $imgLinks = $this->crawler->filter($this->currentLink->imgTag);

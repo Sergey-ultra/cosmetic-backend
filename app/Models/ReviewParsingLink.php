@@ -4,6 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int    $id
+ * @property array  $content
+ * @property int    $category_id
+ * @property string $link
+ */
 class ReviewParsingLink extends Model
 {
     public const UNPARSED = 0;
