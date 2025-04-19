@@ -67,7 +67,7 @@ class FavoritesController extends Controller
     {
         $id = $request->id;
 
-        SkuUser::create([
+        SkuUser::query()->create([
             'user_id' => Auth::id(),
             'sku_id' => $id
         ]);

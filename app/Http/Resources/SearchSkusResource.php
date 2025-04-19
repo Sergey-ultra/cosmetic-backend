@@ -15,16 +15,16 @@ class SearchSkusResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         $transformImagePathService = app(TransformImagePathService::class);
         return [
             'id' => $this->id,
+            'sku_id' => $this->sku_id,
             'volume' => $this->volume,
             'name' => $this->name,
-            'url' => $this->url,
+            'sku_code' => $this->sku_code,
             'image' => $transformImagePathService->getDestinationPath($this->image, 'small'),
-            'min_price' =>$this->min_price
         ];
     }
 }

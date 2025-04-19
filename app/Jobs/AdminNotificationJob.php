@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Services\TelegramBotService;
+use App\Services\TelegramApiService\TelegramAdminNotificationApiService;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Throwable;
 
 class AdminNotificationJob implements ShouldQueue
 {
@@ -29,8 +29,12 @@ class AdminNotificationJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(TelegramBotService $telegramBotService)
+    public function handle(TelegramAdminNotificationApiService $telegramBotService): void
     {
-        $telegramBotService->sendMessage(config('telegrambot.telegram_chat_id'), $this->message);
+        try {
+            $telegramBotService->sendMessage(config('telegrambot.admin_user_id'), $this->message);
+        } catch (Throwable $e) {
+            logger()->error($e);
+        }
     }
 }

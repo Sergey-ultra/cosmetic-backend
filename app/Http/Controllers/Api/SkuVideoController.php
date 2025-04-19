@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Api;
 
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Requests\ReviewVideoWithBase64;
 use App\Http\Requests\ReviewVideoWithUrlsRequest;
 use App\Http\Resources\MyVideoCollection;
@@ -15,10 +16,11 @@ use App\Services\VideoSavingService\VideoSavingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class SkuVideoController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     const VIDEO_FOLDER = 'public/video/sku/';
 
@@ -48,10 +50,14 @@ class SkuVideoController extends Controller
             ->where([
                 'sku_videos.user_id' => Auth::id(),
                 ['sku_videos.status', '<>', 'deleted']
-            ])
-        ;
+            ]);
 
-        $result = $this->prepareModel($request, $query)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return new MyVideoCollection($result);
     }
@@ -75,7 +81,7 @@ class SkuVideoController extends Controller
             ->updateOrCreate(
                 [
                     'sku_id' => $skuId,
-                    'user_id' => Auth::guard('sanctum')->user()->id
+                    'user_id' => Auth::guard('api')->user()->id
                 ],
                 [
                     'video' => $request->file_path,
@@ -90,7 +96,7 @@ class SkuVideoController extends Controller
                 'status'=> 'success',
                 'data' => $skuVideo
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     public function addOrUpdateVideoWithBase64Data(ReviewVideoWithBase64 $request, VideoSavingService $videoSavingService): JsonResponse
@@ -124,7 +130,7 @@ class SkuVideoController extends Controller
             ->updateOrCreate(
                 [
                     'sku_id' => $skuId,
-                    'user_id' => Auth::guard('sanctum')->user()->id
+                    'user_id' => Auth::guard('api')->user()->id
                 ],
                 [
                     'video' => $videoFilePath,
@@ -139,6 +145,6 @@ class SkuVideoController extends Controller
                 'status'=> 'success',
                 'data' => $skuVideo
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 }

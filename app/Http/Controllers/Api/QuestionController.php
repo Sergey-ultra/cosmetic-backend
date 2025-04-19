@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Requests\QuestionRequest;
 use App\Http\Resources\MyQuestionCollection;
 use App\Models\Question;
@@ -14,35 +16,40 @@ use Illuminate\Support\Facades\Auth;
 
 class QuestionController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     public function my(Request $request): ResourceCollection
     {
-        $perPage = (int) ($request->per_page ?? 10);
+        $perPage = (int)($request->per_page ?? 10);
 
-        $query = Question::select([
-            'products.name AS sku_name',
-            'products.code AS product_code',
-            'skus.id AS sku_id',
-            'skus.volume',
-            'skus.images AS sku_images',
-            'questions.body',
-            'questions.status',
-            'questions.created_at',
-            'users.name AS user_name',
-            'user_infos.avatar'
-        ])
+        $query = Question::query()
+            ->select([
+                'products.name AS sku_name',
+                'products.code AS product_code',
+                'skus.id AS sku_id',
+                'skus.volume',
+                'skus.images AS sku_images',
+                'questions.body',
+                'questions.status',
+                'questions.created_at',
+                'users.name AS user_name',
+                'user_infos.avatar'
+            ])
             ->join('skus', 'skus.id', '=', 'questions.sku_id')
             ->join('products', 'skus.product_id', '=', 'products.id')
             ->join('users', 'users.id', '=', 'questions.user_id')
             ->leftjoin('user_infos', 'users.id', '=', 'user_infos.user_id')
             ->where([
-                'questions.user_id' => Auth::id(),
+                'questions.user_id' => Auth::guard('api')->id(),
                 ['questions.status', '!=', 'deleted']
-            ])
-        ;
+            ]);
 
-        $result = $this->prepareModel($request, $query)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return new MyQuestionCollection($result);
     }
@@ -53,15 +60,21 @@ class QuestionController extends Controller
      */
     public function bySkuId(Request $request): JsonResponse
     {
-        $perPage = (int) ($request->per_page ?? 10);
+        $perPage = (int)($request->per_page ?? 10);
 
-        $query = Question::where([
-            'sku_id' => $request->sku_id,
-            'status' => 'published'
+        $query = Question::query()
+            ->where([
+                'sku_id' => $request->input('sku_id'),
+                'status' => 'published'
             ])
-        ->orderBy('created_at', 'DESC');
+            ->orderBy('created_at', 'DESC');
 
-        $result = $this->prepareModel($request, $query)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return response()->json(['data' => $result]);
     }
@@ -75,7 +88,7 @@ class QuestionController extends Controller
     public function store(QuestionRequest $request): JsonResponse
     {
         $skuId = $request->sku_id;
-        $user = Auth::guard('sanctum')->user();
+        $user = Auth::guard('api')->user();
         $visitorIp = request()->ip();
 
         $question = Question::create(

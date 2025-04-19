@@ -5,8 +5,8 @@
                 <div class="modal__dialog" :style="{'top': `${top}%`, 'left': `${left}%`,'width': `${width}%`}"
                      ref="modalWrapper">
                     <div
-                            class="modal__header"
-                            @mousedown.prevent="move($event)"
+                        class="modal__header"
+                        @mousedown.prevent="move($event)"
                     >
                     <span class="modal__title">
                          <slot name="header"></slot>

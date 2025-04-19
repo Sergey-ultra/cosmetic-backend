@@ -17,12 +17,26 @@
 
             <dropdown class="header__item header__item-profile">
                 <template v-slot:activator="{ on }">
-                    <span>{{ userName }}</span>
+
+                    <router-link v-if="isAdmin" :to="{ name: 'messages' }" style="position:relative;">
+                        <fa class="dropdown__icon" icon="envelope"></fa>
+                        <span v-if="myUser && myUser.unreadMessageCount" class="badge">
+                            {{ myUser.unreadMessageCount }}
+                        </span>
+                    </router-link>
+                    <div class="header__user">{{ userName }}</div>
                     <div class="avatar" @click="on">
                         <img class="avatar__img" :src="userAvatar" :alt="userAvatar">
                     </div>
                 </template>
 
+                <div class="dropdown__el">
+                    <svg class="dropdown__icon" viewBox="0 0 24 24">
+                        <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path>
+                        <path d="m22.215 7.759-1.427-2.483a1.398 1.398 0 0 0-1.755-.591l-2.22.93-1.69-.97-.307-2.422A1.403 1.403 0 0 0 13.426 1h-2.853a1.403 1.403 0 0 0-1.39 1.224L8.88 4.622l-1.72.982-2.191-.92a1.4 1.4 0 0 0-1.756.593L1.787 7.756a1.403 1.403 0 0 0 .364 1.814l1.855 1.41.003 2.038-1.859 1.413a1.402 1.402 0 0 0-.365 1.81l1.427 2.482a1.398 1.398 0 0 0 1.754.592l2.22-.93 1.69.97.308 2.421A1.404 1.404 0 0 0 10.574 23h2.853a1.403 1.403 0 0 0 1.39-1.224l.304-2.398 1.72-.982 2.192.92a1.402 1.402 0 0 0 1.755-.593l1.425-2.479a1.401 1.401 0 0 0-.365-1.814l-1.854-1.41-.002-2.038L21.85 9.57a1.402 1.402 0 0 0 .365-1.81zm-4.226 2.233.007 4.023 2.222 1.687-.9 1.565-2.613-1.097-3.443 1.966L12.898 21h-1.796l-.367-2.886-3.412-1.956-2.641 1.109-.9-1.565 2.229-1.694-.007-4.02-2.222-1.69.9-1.565L7.294 7.83l3.444-1.966L11.102 3h1.796l.367 2.886 3.412 1.956 2.641-1.109.9 1.565-2.229 1.694z"></path>
+                    </svg>
+                    <span>Настройки</span>
+                </div>
 
                 <div class="dropdown__el" @click="logout">
                     <svg class="dropdown__icon" viewBox="0 0 24 24">
@@ -39,12 +53,10 @@
             <nav class="navbar__wrapper" >
                 <ul class="menu__items">
                     <li
-                            v-for="(route, index) in routes"
-                            :key="index"
-                            class="menu__item"
-                            :class="{'active': getIsActive(route)}"
-
-                    >
+                        v-for="(route, index) in menu"
+                        :key="index"
+                        class="menu__item"
+                        :class="{'active': getIsActive(route)}">
                         <router-link class="menu__link" v-if="!route.children" :to="route.link">
                             <span class="menu__icon" v-html="route.icon"></span>
                             <span class="menu__name">{{ route.name }}</span>
@@ -57,12 +69,12 @@
                             </div>
                             <ul class="menu__items" v-if="route.isShowChild && !isCompactMenu">
                                 <li
-                                        v-for="(childRoute, childIndex) in route.children"
-                                        :key="childIndex"
-                                        class="menu__item-sub"
-                                        :class="{'subactive': childRoute.link && childRoute.link.name === $route.name}"
-                                >
-                                    <router-link class="menu__sublink" v-if="!childRoute.children" :to="childRoute.link">
+                                    v-for="(childRoute, childIndex) in route.children"
+                                    :key="childIndex"
+                                    class="menu__item-sub"
+                                    :class="{'subactive': childRoute.link && childRoute.link.name === $route.name}">
+                                    <router-link class="menu__sublink" v-if="!childRoute.children"
+                                                 :to="childRoute.link">
                                         <span>{{ childRoute.name }}</span>
                                     </router-link>
                                 </li>
@@ -83,7 +95,7 @@
 
 <script>
     import dropdown from "../dropdown.vue";
-    import {mapActions, mapState} from "vuex";
+    import {mapActions, mapGetters, mapState} from "vuex";
     import adminRoutes from '../../router/admin';
 
     export default {
@@ -94,9 +106,20 @@
         data() {
             return {
                 isCompactMenu: false,
-                routes: [
+                menu: [
                     {
-                        name: 'Сводка',
+                        name: 'Парсер отзывов',
+                        icon: '<svg class="menu__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8.333 2.75a.75.75 0 1 1 0-1.5H12.6a.75.75 0 0 1 .75.75v4.267a.75.75 0 0 1-1.5 0V3.81l-8.32 8.32a.75.75 0 1 1-1.06-1.061l8.32-8.32H8.332zM2 15.25a.75.75 0 0 1 .75.75v2a.75.75 0 1 1-1.5 0v-2a.75.75 0 0 1 .75-.75zM7.75 14a.75.75 0 0 0-1.5 0v4a.75.75 0 1 0 1.5 0v-4zm4.916-4.75a.75.75 0 0 1 .75.75v8a.75.75 0 1 1-1.5 0v-8a.75.75 0 0 1 .75-.75zM18.75 2a.75.75 0 0 0-1.5 0v16a.75.75 0 1 0 1.5 0V2z"></path></svg>',
+                        children: [
+                            {name: 'Парсинг ссылок на отзывы',  link: {name: 'review-link-parser'}},
+                            {name: 'Парсинг отзывов',  link: {name: 'review-parser'}},
+                            {name: 'Публикация',  link: {name: 'review-publishing-list'}},
+                        ],
+                    },
+                ],
+                adminMenu: [
+                    {
+                        name: 'Дашборд',
                         link: {name: 'main'},
                         icon: '<svg class="menu__icon" viewBox="0 0 24 24" fill="currentColor"><path  d="M19 21H5V3h9.172l2.414 2.414L19 7.828V21zM3 3a2 2 0 0 1 2-2h9.172a2 2 0 0 1 1.414.586L18 4l2.414 2.414A2 2 0 0 1 21 7.828V21a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3zm5 14a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8zm-1-2a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H8a1 1 0 0 1-1-1zm7-7a3 3 0 0 0-3-3v3h3zm-1 1h-2a1 1 0 1 1-1-1V6a3 3 0 1 0 3 3z"></path></svg>'
                     },
@@ -112,29 +135,61 @@
                             {name: 'Отзывы на статьи', link: {name: 'article-comment'}},
                             {name: 'Отслеживаемые', link: {name: 'trackings'}},
                         ]
-                    }
+                    },
+                    {
+                        name: 'Справочники',
+                        icon: '<svg  class="menu__icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M18 1.5a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1h16zM2.5 17V3H7v6.5L13 8V3h4.5v14h-15zm9-14h-3v4.579l3-.75V3z"></path></svg>',
+                        children: [
+                            {name: 'Теги статей', link: {name: 'tag'}},
+                            {name: 'Магазины', link: {name: 'store'}},
+                            {name: 'Магазины поставщиков', link: {name: 'supplier'}},
+                            {name: 'Категории', link: {name: 'categories'}},
+                            {name: 'Бренды', link: {name: 'brands'}},
+                            {name: 'Страны', link: {name: 'countries'}},
+                            {name: 'Товарные предложения', link: {name: 'skus'}},
+                            {name: 'Ингредиенты', link: {name: 'ingredients'}},
+                            {name: 'Пользователи', link: {name: 'users'}},
+                            {name: 'Test', link: {name: 'test'}},
+                        ],
+                    },
+                    {
+                        name: 'Парсер',
+                        icon: '<svg class="menu__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8.333 2.75a.75.75 0 1 1 0-1.5H12.6a.75.75 0 0 1 .75.75v4.267a.75.75 0 0 1-1.5 0V3.81l-8.32 8.32a.75.75 0 1 1-1.06-1.061l8.32-8.32H8.332zM2 15.25a.75.75 0 0 1 .75.75v2a.75.75 0 1 1-1.5 0v-2a.75.75 0 0 1 .75-.75zM7.75 14a.75.75 0 0 0-1.5 0v4a.75.75 0 1 0 1.5 0v-4zm4.916-4.75a.75.75 0 0 1 .75.75v8a.75.75 0 1 1-1.5 0v-8a.75.75 0 0 1 .75-.75zM18.75 2a.75.75 0 0 0-1.5 0v16a.75.75 0 1 0 1.5 0V2z"></path></svg>',
+                        children: [
+                            {name: 'Парсинг ссылок', link: {name: 'link-parser'}},
+                            {name: 'Парсинг цен', link: {name: 'price-parser'}},
+                            {name: 'Парсинг товаров', link: {name: 'product-parser'}}
+                        ],
+                    },
+                    {
+                        name: 'Настройки',
+                        icon: '<svg class="menu__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path><path d="m22.215 7.759-1.427-2.483a1.398 1.398 0 0 0-1.755-.591l-2.22.93-1.69-.97-.307-2.422A1.403 1.403 0 0 0 13.426 1h-2.853a1.403 1.403 0 0 0-1.39 1.224L8.88 4.622l-1.72.982-2.191-.92a1.4 1.4 0 0 0-1.756.593L1.787 7.756a1.403 1.403 0 0 0 .364 1.814l1.855 1.41.003 2.038-1.859 1.413a1.402 1.402 0 0 0-.365 1.81l1.427 2.482a1.398 1.398 0 0 0 1.754.592l2.22-.93 1.69.97.308 2.421A1.404 1.404 0 0 0 10.574 23h2.853a1.403 1.403 0 0 0 1.39-1.224l.304-2.398 1.72-.982 2.192.92a1.402 1.402 0 0 0 1.755-.593l1.425-2.479a1.401 1.401 0 0 0-.365-1.814l-1.854-1.41-.002-2.038L21.85 9.57a1.402 1.402 0 0 0 .365-1.81zm-4.226 2.233.007 4.023 2.222 1.687-.9 1.565-2.613-1.097-3.443 1.966L12.898 21h-1.796l-.367-2.886-3.412-1.956-2.641 1.109-.9-1.565 2.229-1.694-.007-4.02-2.222-1.69.9-1.565L7.294 7.83l3.444-1.966L11.102 3h1.796l.367 2.886 3.412 1.956 2.641-1.109.9 1.565-2.229 1.694z"></path></svg>',
+                        children: [
+                            {name: 'Настройки', link: {name: 'settings'}},
+                        ],
+                    },
                 ]
             }
         },
         computed: {
-            ...mapState('auth', ['userName', 'userRole', 'userAvatar']),
+            ...mapState('auth', ['userName', 'userAvatar']),
+            ...mapGetters('auth', ['isAdminRole']),
+            ...mapState('user', ['myUser']),
         },
         created() {
-            if (this.userRole.toLowerCase() === 'admin') {
-                adminRoutes.forEach(el => this.$router.addRoute(el))
-               // this.$router.addRoute(adminRoutes);
+            if (this.isAdminRole) {
+                this.loadMyUser();
             }
-
             this.initMenu()
         },
         watch:{
-            userRole(value) {
-                if (value.toLowerCase() === 'admin') {
-                    this.$router.addRoute(adminRoutes);
-                }
-            },
+            // isAdminRole(value) {
+            //     if (value) {
+            //         this.$router.addRoute(adminRoutes);
+            //     }
+            // },
             isCompactMenu() {
-                this.routes = this.routes.map(route => {
+                this.menu = this.menu.map(route => {
                     if (route.isShowChild) {
                         route.isShowChild = false
                     }
@@ -144,56 +199,24 @@
         },
         methods: {
             ...mapActions('auth', ['logout']),
+            ...mapActions('user', ['loadMyUser']),
             initMenu() {
-                if (this.userRole.toLowerCase() === 'admin') {
-                    this.routes = this.routes.concat([
-                        {
-                            name: 'Справочники',
-                            icon: '<svg  class="menu__icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M18 1.5a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1h16zM2.5 17V3H7v6.5L13 8V3h4.5v14h-15zm9-14h-3v4.579l3-.75V3z"></path></svg>',
-                            children:[
-                                {name: 'Теги статей', link: {name: 'tag'}},
-                                {name: 'Магазины', link: {name: 'store'}},
-                                {name: 'Магазины поставщиков', link: {name: 'supplier'}},
-                                {name: 'Категории', link: {name: 'categories'}},
-                                {name: 'Бренды', link: {name: 'brands'}},
-                                {name: 'Страны', link: {name: 'countries'}},
-                                {name: 'Товарные предложения', link: {name: 'skus'}},
-                                {name: 'Ингредиент', link: {name: 'ingredients'}},
-                                {name: 'Пользователи', link: {name: 'users'}},
-                                {name: 'Test', link: {name: 'test'}},
-                            ]
-                        },
-                        {
-                            name: 'Настройки',
-                            icon: '<svg class="menu__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path><path d="m22.215 7.759-1.427-2.483a1.398 1.398 0 0 0-1.755-.591l-2.22.93-1.69-.97-.307-2.422A1.403 1.403 0 0 0 13.426 1h-2.853a1.403 1.403 0 0 0-1.39 1.224L8.88 4.622l-1.72.982-2.191-.92a1.4 1.4 0 0 0-1.756.593L1.787 7.756a1.403 1.403 0 0 0 .364 1.814l1.855 1.41.003 2.038-1.859 1.413a1.402 1.402 0 0 0-.365 1.81l1.427 2.482a1.398 1.398 0 0 0 1.754.592l2.22-.93 1.69.97.308 2.421A1.404 1.404 0 0 0 10.574 23h2.853a1.403 1.403 0 0 0 1.39-1.224l.304-2.398 1.72-.982 2.192.92a1.402 1.402 0 0 0 1.755-.593l1.425-2.479a1.401 1.401 0 0 0-.365-1.814l-1.854-1.41-.002-2.038L21.85 9.57a1.402 1.402 0 0 0 .365-1.81zm-4.226 2.233.007 4.023 2.222 1.687-.9 1.565-2.613-1.097-3.443 1.966L12.898 21h-1.796l-.367-2.886-3.412-1.956-2.641 1.109-.9-1.565 2.229-1.694-.007-4.02-2.222-1.69.9-1.565L7.294 7.83l3.444-1.966L11.102 3h1.796l.367 2.886 3.412 1.956 2.641-1.109.9 1.565-2.229 1.694z"></path></svg>',
-                            children: [
-                                {name: 'Настройки', link: {name: 'settings'}},
-                            ]},
-                        {
-                            name: 'Парсер',
-                            icon: '<svg class="menu__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8.333 2.75a.75.75 0 1 1 0-1.5H12.6a.75.75 0 0 1 .75.75v4.267a.75.75 0 0 1-1.5 0V3.81l-8.32 8.32a.75.75 0 1 1-1.06-1.061l8.32-8.32H8.332zM2 15.25a.75.75 0 0 1 .75.75v2a.75.75 0 1 1-1.5 0v-2a.75.75 0 0 1 .75-.75zM7.75 14a.75.75 0 0 0-1.5 0v4a.75.75 0 1 0 1.5 0v-4zm4.916-4.75a.75.75 0 0 1 .75.75v8a.75.75 0 1 1-1.5 0v-8a.75.75 0 0 1 .75-.75zM18.75 2a.75.75 0 0 0-1.5 0v16a.75.75 0 1 0 1.5 0V2z"></path></svg>',
-                            children: [
-                                {name: 'Парсинг ссылок',  link: {name: 'link-parser'}},
-                                {name: 'Парсинг цен',  link: {name: 'price-parser'}},
-                                {name: 'Парсинг товаров',  link: {name: 'product-parser'}}
-                            ],
-
-                        },
-                    ])
+                if (this.isAdminRole) {
+                    this.menu = this.menu.concat(this.adminMenu)
                 }
 
-                this.routes = this.routes.map(route => {
+                this.menu = this.menu.map(route => {
                     if (route.children) {
-                        route.isShowChild = false
+                        route.isShowChild = false;
                     }
-                    return route
+                    return route;
                 })
             },
             toggleMenu() {
-                this.isCompactMenu = !this.isCompactMenu
+                this.isCompactMenu = !this.isCompactMenu;
             },
             toggleChild(index) {
-                this.routes[index].isShowChild = !this.routes[index].isShowChild
+                this.menu[index].isShowChild = !this.menu[index].isShowChild
             },
             getIsActive(route) {
                 if (route.children) {
@@ -228,6 +251,11 @@
             display:flex;
             align-items:center;
         }
+        &__user {
+            color: #26325c;
+            font-size:18px;
+            font-weight: 700;
+        }
         &__item {
             &:not(:last-child) {
                 margin-right: 15px;
@@ -240,9 +268,6 @@
                 display: flex;
                 align-items:center;
                 margin-left: auto;
-                & > :not(:last-child) {
-                    margin-right: 15px;
-                }
             }
             &-burger {
                 color: #212121;
@@ -321,7 +346,24 @@
         display:flex;
     }
 
-
+    .badge {
+        position: absolute;
+        left: 9px;
+        top: -7px;
+        height: 20px;
+        line-height: 20px;
+        min-width: 20px;
+        padding: 0 5px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        background-image: linear-gradient(to bottom, #ffd6e7, rgb(248, 140, 182));
+        color: #fff;
+        font-size: 12px;
+        font-weight: bolder;
+        text-align: center;
+    }
     .navbar {
         display:block;
         overflow-y:auto;
@@ -330,6 +372,7 @@
         background-color: rgb(5, 30, 52);
         flex-shrink: 0;
         width: 256px;
+        transition: width 0.3s ease 0s;
         /*&:hover .navbar__wrapper-compact {*/
         /*        width: 256px;*/
         /*    & .menu__name,*/

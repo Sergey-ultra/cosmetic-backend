@@ -15,14 +15,7 @@ class ActualPriceParsingService
 
     public function index(int $count): Collection
     {
-        return ActualPriceParsing::select('id', 'links_by_time')->limit($count)->get();
-        return array_map(
-            function($el) {
-                $el['links_by_time'] = json_decode($el['links_by_time'], true);
-                return $el;
-            },
-            ActualPriceParsing::select('id', 'links_by_time')->limit($count)->get()->toArray()
-        );
+        return ActualPriceParsing::query()->select('id', 'links_by_time')->limit($count)->get();
     }
 
 

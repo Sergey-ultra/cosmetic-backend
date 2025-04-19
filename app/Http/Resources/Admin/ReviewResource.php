@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-
 namespace App\Http\Resources\Admin;
 
-
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class ReviewResource extends JsonResource
 {
@@ -16,23 +16,23 @@ class ReviewResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
-            'sku_rating_id' => $this->sku_rating_id,
-            'rating_status' => $this->rating_status,
-            'product_name' => $this->name,
-            'product_link' => "/product/{$this->code}-{$this->sku_id}",
+            'id' => $this->id,
+            'product_name' => $this->sku_name,
+            'product_link' => "/product/{$this->product_code}-{$this->sku_id}",
+            'sku_image' => $this->sku_images
+                ? json_decode($this->sku_images, true)[0]
+                : null,
+            'sku_status' => $this->sku_status,
             'rating' => $this->rating,
-            'user' => $this->user,
-            'review_id' => $this->review_id,
-            'comment' => $this->comment ? substr($this->comment, 0, 100): null,
-            'minus' => $this->minus ? substr($this->minus, 0, 100): null,
-            'plus' =>  $this->plus ? substr($this->plus, 0, 100): null,
-            'anonymously' => $this->anonymously ?? null,
-            //'images' => $this->images ? json_decode($this->images, true) : null,
-            'images' => $this->images ? json_decode($this->images, true):  [],
-            'review_status' => $this->review_status
+            'views_count' => $this->views_count,
+            'likes_count' => $this->likes_count,
+            'user' => $this->user_name,
+            'title' => $this->title,
+            'review_status' => $this->review_status,
+            'created_at' => (new Carbon($this->created_at))->format('Y-m-d'),
         ];
     }
 }

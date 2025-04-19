@@ -10,7 +10,7 @@ export default {
         loadedReview:{},
         tableOptions: {
             page: 1,
-            perPage: 10,
+            perPage: 20,
             sortBy: '',
             sortDesc: false,
         },
@@ -20,6 +20,7 @@ export default {
             review_status: { value: 'null' },
             rating: { value: 'null' }
         },
+        rejectedReasons: [],
     },
     mutations:{
         setReviewsDynamics: (state, payload) => state.reviewsDynamics = payload,
@@ -29,14 +30,14 @@ export default {
             state.filterOptions = {...payload}
             state.tableOptions = {
                 page: 1,
-                perPage: 10,
+                perPage: 20,
                 sortBy: '',
                 sortDesc: false
             }
         },
         setTableOptionsToDefault: state => state.tableOptions = {
             page: 1,
-            perPage: 10,
+            perPage: 20,
             sortBy: '',
             sortDesc: false,
         },
@@ -45,8 +46,8 @@ export default {
             state.reviews = [...payload.data]
             state.total = payload.meta.total
         },
-        setLoadedReview: (state, payload) => state.loadedReview = {...payload}
-
+        setLoadedReview: (state, payload) => state.loadedReview = {...payload},
+        setRejectedReasons: (state, payload) => state.rejectedReasons = [...payload],
     },
     actions:{
         loadAllReviews: async({ commit }) => {
@@ -83,10 +84,11 @@ export default {
             }
         },
         createItem: async({ dispatch }, object) => {
-            const { data } = await api.post('/reviews', object)
-            if (data) {
-                dispatch('reloadReviews')
-            }
+            const { data } = await api.post('/reviews', object);
+            return data;
+            // if (data) {
+            //     dispatch('reloadReviews')
+            // }
         },
         updateItem: async ({ dispatch }, object) => {
             const { data } = await api.put(`/reviews/${object.id}`, object)
@@ -99,6 +101,19 @@ export default {
             if (data.status === 'success') {
                 dispatch('notification/setSuccess', 'Статус успешно изменен', { root: true })
                 dispatch('reloadReviews')
+            }
+        },
+        reject: async({ dispatch }, obj) => {
+            const { data } = await api.post(`/reviews/reject/${obj.id}`, obj)
+            if (data.status === 'success') {
+                dispatch('notification/setSuccess', 'Статус успешно отклонен', { root: true })
+                dispatch('reloadReviews')
+            }
+        },
+        loadRejectedReasons: async({ commit }) => {
+            const { data } = await api.get(`/rejected-reasons`);
+            if (data && Array.isArray(data)) {
+                commit('setRejectedReasons', data);
             }
         }
     }

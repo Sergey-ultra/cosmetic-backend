@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\CompressImageService;
 
 
+use Illuminate\Support\Facades\Log;
 use Imagick;
 use ImagickException;
 
@@ -27,6 +28,7 @@ class CompressImageService implements CompressImageInterface
 
             return ['status' => true];
         } catch (ImagickException $e) {
+            Log::error((string)$e);
             return ['status' => false, 'message' => $e->getMessage()];
         }
 
@@ -48,10 +50,10 @@ class CompressImageService implements CompressImageInterface
         $imageName = $imagePathParts[count($imagePathParts) - 1];
         $imagePathParts[count($imagePathParts) - 1] = $folder;
 
-        $newFolderPath = implode('/',$imagePathParts);
+        $newFolderPath = implode('/', $imagePathParts);
         $this->checkNewFolder($newFolderPath);
         $imagePathParts[] = $imageName;
-        return implode('/',$imagePathParts);
+        return implode('/', $imagePathParts);
     }
 
     protected function checkNewFolder(string $path): void

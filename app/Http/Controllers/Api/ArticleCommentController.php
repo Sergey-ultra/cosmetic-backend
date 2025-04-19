@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Requests\ArticleCommentRequest;
 use App\Models\ArticleComment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 class ArticleCommentController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     /**
      * @param Request $request
@@ -26,19 +27,24 @@ class ArticleCommentController extends Controller
     {
         $perPage = (int)($request->per_page ?? 10);
 
-        $query = ArticleComment::select([
-            'articles.title as body',
-            DB::raw("CONCAT('/article/',articles.slug) AS url"),
-            'article_comments.comment',
-            'article_comments.id',
-            'article_comments.status',
-        ])
+        $query = ArticleComment::query()
+            ->select([
+                'articles.title as body',
+                DB::raw("CONCAT('/article/',articles.slug) AS url"),
+                'article_comments.comment',
+                'article_comments.id',
+                'article_comments.status',
+            ])
             ->join('articles', 'article_comments.article_id', '=', 'articles.id')
             ->where('article_comments.user_id', Auth::id())
-            ->where('article_comments.status', '<>', 'deleted')
-            ;
+            ->where('article_comments.status', '<>', 'deleted');
 
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return response()->json([ 'data'=> $result ]);
     }
@@ -54,17 +60,16 @@ class ArticleCommentController extends Controller
         $params = $request->all();
         $user = Auth::user();
         $params['user_id'] = $user->id;
-        $params['user_name'] =  $user->name;
-        $params['user_avatar'] =  $user->info->avatar ?? null;
 
-        $newRecord = ArticleComment::create($params);
+
+        $newRecord = ArticleComment::query()->create($params);
 
         return response()->json([
             'data' => [
                 'status' => true,
                 'data' => $newRecord
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     /**

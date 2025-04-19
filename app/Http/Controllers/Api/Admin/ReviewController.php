@@ -6,81 +6,74 @@ namespace App\Http\Controllers\Api\Admin;
 
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
+use App\Http\Requests\RejectReviewRequest;
+use App\Http\Requests\ReviewRequest;
+use App\Http\Requests\StatusRequest;
 use App\Http\Resources\Admin\ReviewCollection;
 use App\Http\Resources\Admin\ReviewOneResource;
+use App\Jobs\ReviewPublishedJob;
+use App\Jobs\UpdateSkuRatingJob;
 use App\Models\Review;
-use App\Models\Sku;
-use App\Models\SkuRating;
+use App\Models\User;
+use App\Repositories\ReviewRepository\IReviewRepository;
 use App\Services\ImageSavingService\ImageSavingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class ReviewController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     const IMAGES_FOLDER = 'public/image/premoderatedReviews/';
 
     /**
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \App\Http\Resources\Admin\ReviewCollection
+     * @param  IReviewRepository $reviewRepository
+     * @param  Request $request
+     * @return ReviewCollection
      */
-    public function index(Request $request): ReviewCollection
+    public function index(IReviewRepository $reviewRepository, Request $request): ReviewCollection
     {
-        $perPage = (int)  ($request->per_page ?? 10);
+        $perPage = $request->integer('per_page', 10);
 
-        $query = DB::table('reviews')
-            ->select([
-            'reviews.id AS review_id',
-            'sku_ratings.rating',
-            'sku_ratings.id AS sku_rating_id',
-            'sku_ratings.user_name AS user',
-            'sku_ratings.status AS rating_status',
-            'skus.id AS sku_id',
-            'products.name',
-            'products.code',
-            'reviews.comment',
-            'reviews.minus',
-            'reviews.plus',
-            'reviews.anonymously',
-            'reviews.images',
-            'reviews.status AS review_status'
-        ])
-            ->rightJoin('sku_ratings', 'reviews.sku_rating_id', '=', 'sku_ratings.id')
-            ->join('skus', 'sku_ratings.sku_id', '=', 'skus.id')
-            ->join('products', 'skus.product_id', '=', 'products.id')
-            ->whereNotNull('sku_ratings.user_id')
-        ;
+        $query = $reviewRepository->getAdminReviewListQuery();
 
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
 
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return new ReviewCollection($result);
     }
 
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \App\Services\ImageSavingService\ImageSavingService $imageSavingService
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(Request $request, ImageSavingService $imageSavingService): JsonResponse
+    public function store(ReviewRequest $request, ImageSavingService $imageSavingService): JsonResponse
     {
         $params = $request->all();
 
-        $params['images'] = null;
-        if ($request->has('images')) {
-            $fileName = 'review_' . $params['id'];
-            $params['images'] = $imageSavingService->imageSave($request->images, self::IMAGES_FOLDER, $fileName);
-        }
+//        $params['images'] = null;
+//        if ($request->has('images')) {
+//            $fileName = 'review_' . $params['id'];
+//            $params['images'] = $imageSavingService->saveImages($request->images, self::IMAGES_FOLDER, $fileName);
+//        }
 
-        $createdReview = Review::create($params);
+        $botUserIds = User::query()
+            ->select('id')
+            ->where('role_id', User::ROLE_BOT)
+            ->get()
+            ->pluck('id')
+            ->all();
+
+        $params['user_id'] = $botUserIds[rand(0, count($botUserIds) - 1)];
+        $params['status'] = 'published';
+
+        $createdReview = Review::query()->create($params);
+        UpdateSkuRatingJob::dispatch($createdReview, 'plus');
 
         return response()->json([
             'data' => [
@@ -88,7 +81,7 @@ class ReviewController extends Controller
                 'message' => 'Отзыв успешно создан',
                 'data' => $createdReview
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -120,7 +113,7 @@ class ReviewController extends Controller
 
             $fileName = 'review_' . $params['id'];
 
-            $params['images'] = $imageSavingService->imageSave($request->images, self::IMAGES_FOLDER, $fileName);
+            $params['images'] = $imageSavingService->saveImages($request->images, self::IMAGES_FOLDER, $fileName);
         }
 
 
@@ -135,13 +128,12 @@ class ReviewController extends Controller
     }
 
     /**
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function dynamics(): JsonResponse
     {
         $result = DB::table('reviews')
-            ->select(DB::raw("count(sku_rating_id) AS count, DATE(created_at) AS date "))
+            ->select(DB::raw("count(sku_id) AS count, DATE(created_at) AS date "))
             ->groupBy(DB::raw('WEEK(created_at)'))
             ->orderBy(DB::raw('WEEK(created_at)'))
             ->get();
@@ -151,38 +143,71 @@ class ReviewController extends Controller
 
     /**
      * @param int $id
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param  StatusRequest $request
+     * @return JsonResponse
      */
-    public function setStatus(int $id, Request $request): JsonResponse
+    public function setStatus(int $id, StatusRequest $request): JsonResponse
     {
-        $reviewInfo = SkuRating::select(
-            'reviews.id AS review_id',
-            'reviews.status AS review_status',
-            'skus.id AS sku_id'
-        )
-            ->join('skus', 'skus.id', '=', 'sku_ratings.sku_id')
-            ->leftJoin('reviews', 'sku_ratings.id', '=', 'reviews.sku_rating_id')
-            ->where('sku_ratings.id', $id)
-            ->first();
+        $review = Review::query()
+            ->with('sku')
+            ->select('id', 'status', 'sku_id', 'user_id')
+            ->find($id);
 
 
-        if ($request->status === 'deleted') {
-            SkuRating::where('id', $id)->update(['status' => 'deleted']);
-        } else {
-            SkuRating::where('id', $id)->update(['status' => 'published']);
-        }
+        if ($review) {
+            $status = $request->input('status');
+            $review->update(['status' => $status]);
 
-        if ($reviewInfo->review_id) {
-            Review::where('id', $reviewInfo->review_id)->update(['status' => $request->status]);
+            if ($status === 'published') {
+                if ($review->sku->user_id === $review->user_id && $review->sku->status !== 'published') {
 
-            if ($request->status === 'published') {
-                Sku::where('id', $reviewInfo->sku_id)->update(['reviews_count' => DB::raw('reviews_count + 1')]);
-            } else if ($reviewInfo->review_status === 'published' && $request->status !== 'published') {
-                Sku::where('id', $reviewInfo->sku_id)->update(['reviews_count' => DB::raw('reviews_count - 1')]);
+                    $review->sku->update(['status' => 'published']);
+                }
+
+                ReviewPublishedJob::dispatch($review->user_id, $review->id);
+                UpdateSkuRatingJob::dispatch($review, 'plus');
+            } else if ($review->status === 'published') {
+                UpdateSkuRatingJob::dispatch($review, 'minus');
             }
         }
 
         return response()->json(['data' => ['status' => 'success']]);
+    }
+
+    public function reject(int $id, RejectReviewRequest $request): JsonResponse
+    {
+        $review = Review::query()
+            ->select('id', 'status', 'sku_id', 'user_id')
+            ->find($id);
+
+        if (!$review) {
+            return response()->json(['message' => 'NotFound'], Response::HTTP_NOT_FOUND);
+        }
+
+
+        $reasonIds = $request->input('reason_ids');
+        $review->update(['status' => 'rejected']);
+        $review->rejectedReasons()->sync($reasonIds);
+
+        if ($review->status === 'published') {
+            UpdateSkuRatingJob::dispatch($review, 'minus');
+        }
+
+        return response()->json(['data' => ['status' => 'success']]);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function dynamic(): JsonResponse
+    {
+        $result = DB::table('reviews')
+            ->select(DB::raw("count(id) AS count, DATE(created_at) AS date"))
+            ->where('user_id', '<>', 1)
+            ->groupBy(DB::raw('WEEK(created_at)'))
+            ->orderBy('date')
+            ->get();
+
+        return response()->json(['data'=> $result]);
     }
 }

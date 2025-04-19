@@ -3,24 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Resources\ArticleCollection;
 use App\Http\Resources\ArticleSingleResource;
 use App\Http\Resources\ArticleWithTagsCollection;
+use App\Jobs\ArticleViewJob;
 use App\Models\Article;
 use App\Models\ArticleCategory;
-use App\Models\ArticleView;
 use App\Models\Tag;
+use App\Repositories\ArticleRepository\IArticleRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 
 class ArticleController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     public function index(Request $request): ArticleWithTagsCollection
     {
@@ -58,16 +58,20 @@ class ArticleController extends Controller
                 ['articles.status', '<>', 'deleted'],
                 'articles.user_id' => Auth::id()
             ])
-            ->orderBy('articles.created_at', 'DESC')
-        ;
+            ->orderBy('articles.created_at', 'DESC');
 
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return response()->json([ 'data'=> $result ]);
     }
 
 
-    public function byTag(string $tag)
+    public function byTag(string $tag): ArticleWithTagsCollection
     {
         $perPage = (int)($request->per_page ?? 10);
 
@@ -80,55 +84,30 @@ class ArticleController extends Controller
         return new ArticleWithTagsCollection($result, ['tag' => Tag::where('tag', $tag)->first()]);
     }
 
-    public function show(Request $request, string $slug)
+    public function byCategoryId(Request $request, int $categoryId): ArticleWithTagsCollection
     {
-        $viewsCountSubQuery = DB::table('article_views')
-            ->select([DB::raw('count(ip_address) as count'), 'article_id'])
-            ->groupBy('article_id');
+        $perPage = (int)($request->per_page ?? 10);
 
-        $article = Article::select(
-            'articles.id',
-            'articles.title',
-            'articles.slug',
-            'articles.preview',
-            'articles.body',
-            'articles.image',
-            'articles.created_at',
-            'users.name AS user_name',
-            'user_infos.avatar AS user_avatar',
-             DB::raw('IF(article_views.count IS NOT NULL, article_views.count, 0) AS views_count')
-        )
-            ->with([
-                'tags',
-                'comments' => function ($query) {
-                    $query
-                        ->select(
-                            'id',
-                            'user_name',
-                            'user_avatar',
-                            'reply_id',
-                            'article_id',
-                            'comment',
-                            DB::raw('DATE(created_at) AS created_at')
-                        )
-                        ->where('status', 'published')
-                        ->orderBy('created_at', 'DESC');
-                }])
-            ->leftJoinSub($viewsCountSubQuery, 'article_views', function ($join) {
-                $join->on('articles.id', '=', 'article_views.article_id');
-            })
-            ->join('users', 'articles.user_id', '=', 'users.id')
-            ->leftJoin('user_infos', 'users.id', '=', 'user_infos.user_id')
-            ->where(['articles.slug' => $slug, 'articles.status' => 'published'])
-            ->first();
+        $result = Article::withTags()
+            ->where(['article_categories.id' => $categoryId, 'articles.status' => 'published'])
+            ->orderBy('articles.created_at', 'DESC')
+            ->paginate($perPage);
 
 
+        return new ArticleWithTagsCollection($result, ['category' => ArticleCategory::query()->find($categoryId)]);
+    }
 
+    /**
+     * @param Request $request
+     * @param string $slug
+     * @param IArticleRepository $articleRepository
+     * @return ArticleSingleResource
+     */
+    public function show(Request $request, string $slug, IArticleRepository $articleRepository): ArticleSingleResource
+    {
+        $article = $articleRepository->getSingleArticleBySlug($slug);
 
-        ArticleView::updateOrCreate([
-            'article_id' => $article->id,
-            'ip_address' => $request->ip()
-        ],[]);
+        ArticleViewJob::dispatch($article->id, $request->ip());
 
         return new ArticleSingleResource($article);
     }
@@ -138,7 +117,7 @@ class ArticleController extends Controller
      */
     public function articleCategories(): JsonResponse
     {
-        $result = ArticleCategory::select('id', 'name', 'color')->get();
+        $result = ArticleCategory::query()->select('id', 'name', 'color')->get();
         return response()->json(['data' => $result]);
     }
 
@@ -147,7 +126,7 @@ class ArticleController extends Controller
      */
     public function tags(): JsonResponse
     {
-        $result = Tag::select('id', 'tag', 'parent_id')->get();
+        $result = Tag::query()->select('id', 'tag', 'parent_id')->get();
         return response()->json(['data' => $result]);
     }
 }

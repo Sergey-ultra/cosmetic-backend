@@ -3,193 +3,133 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SkuListRequest;
+use App\Http\Requests\SkuRequest;
 use App\Http\Resources\ComparedSkuResource;
 use App\Http\Resources\ProductResource;
+use App\Jobs\AdminNotificationJob;
+use App\Jobs\SearchLogJob;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Sku;
-use App\Services\SkuService\SkuService;
+use App\Models\UserMessage;
+use App\Repositories\SkuRepository\DTO\SkuDTO;
+use App\Repositories\SkuRepository\SkuRepository;
+use App\Services\EntityStatus;
+use App\Services\MessageService\MessageServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 
 class SkuController extends Controller
 {
     const SMALL_IMAGES_FOLDER = 'small';
 
+
     /**
-     * Display a listing of the resource.
-     *
-     * @params \Illuminate\Http\Request $request
-     * @params \App\Services\SkuService $skuService
-     * @return \Illuminate\Http\JsonResponse
+     * @param SkuListRequest $request
+     * @param SkuRepository $skuRepository
+     * @return JsonResponse
      */
-    public function mainIndex(Request $request, SkuService $skuService): JsonResponse
+    public function mainIndex(SkuListRequest $request, SkuRepository $skuRepository): JsonResponse
     {
-        $categoryCode = $request->category_code;
-        $brandCode = $request->brand_code;
-
-
-        $brandIds =  $request->brand_ids;
-        $categoryIds =  $request->category_ids;
-        $activeIngredientsGroupIds =  $request->active_ingredients_group_ids;
-        $countryIds =  $request->country_ids;
-        $volumes =  $request->volumes;
-        $maxPrice =  $request->max_price;
-        $minPrice =  $request->min_price;
-
-        $sort = $request->sort;
-        $perPage = (int) ($request->per_page ?? 24);
-        $page =  $request->page;
-
-        $search = $request->search;
-
-        if ($search) {
-
-        }
+        $categoryCode = $request->input('category_code');
+        $brandCode = $request->input('brand_code');
+        $search = $request->input('search');
 
 
         $result = [];
-
-        //$productQuery = Product::with(['skus', 'brand'])->where('category_id' , $category->id);
-        //$products = ProductsWithBrandAndSkuResource::collection($productData)->response()->getData();
-        //$productData = $productData->paginate($perPage);
-        //$products = ProductsWithBrandAndSkuResource::collection($productData)->response()->getData();
-
-        $productQuery = Product::select(
-            'products.id as id',
-            'products.name as name',
-            'products.code as code',
-            'products.category_id as category_id',
-            'categories.name as category',
-            'brands.name as brand',
-            'skus.id as sku_id',
-            'skus.volume as volume',
-            'skus.images as images',
-            'skus.rating as rating',
-            'sku_store.price as price',
-            'links.code as link_code',
-            'stores.name as store_name',
-            'stores.image as store_image',
-            'skus.reviews_count as reviews_count'
-        )
-            ->join('categories', 'products.category_id', '=', 'categories.id')
-            ->join('skus', 'products.id', '=', 'skus.product_id')
-            ->join('sku_store', 'skus.id', '=', 'sku_store.sku_id')
-            ->join('stores', 'sku_store.store_id', '=', 'stores.id')
-            ->join('links', 'sku_store.link_id', '=', 'links.id')
-            ->join('brands', 'products.brand_id', '=', 'brands.id');
-
-
-        if ($activeIngredientsGroupIds) {
-            $activeIngredientsQuery = DB::table('active_ingredients_group_ingredient')
-                ->select('ingredient_product.product_id AS product_id')
-                ->join('ingredient_product', 'ingredient_product.ingredient_id', '=', 'active_ingredients_group_ingredient.ingredient_id')
-                ->whereIn('active_ingredients_group_ingredient.active_ingredients_group_id', $activeIngredientsGroupIds)
-                ->groupBy('ingredient_product.product_id')
-            ;
-
-
-            $productQuery = $productQuery
-                ->joinSub($activeIngredientsQuery,'ingredients', function($join) {
-                    $join->on('products.id', '=', 'ingredients.product_id');
-                });
-        }
-
-        $productQuery = $productQuery->whereNotNull('sku_store.price');
-
-
+        $entityId = null;
         if ($categoryCode) {
 
-            $category = Category::select(['id', 'name'])->where('code', $categoryCode)->first();
+            $category = Category::query()->select(['id', 'name'])->where('code', $categoryCode)->first();
             if (!$category) {
-                return response()->json(['error' => 'Not Found'], 404);
+                return response()->json(['error' => 'Not Found'], Response::HTTP_NOT_FOUND);
             }
 
             $result["category"] = $category;
-            $productQuery = $productQuery->where('products.category_id', $category->id);
+            $mode = 'category';
+            $entityId = $category->id;
 
         } else if ($brandCode) {
 
-            $brand = Brand::select(['id', 'name'])->where('code', $brandCode)->first();
+            $brand = Brand::query()->select(['id', 'name'])->where('code', $brandCode)->first();
             if (!$brand) {
-                return response()->json(['error' => 'Not Found'], 404);
+                return response()->json(['error' => 'Not Found'], Response::HTTP_NOT_FOUND);
             }
-
-
             $result["brand"] = $brand;
-            $productQuery = $productQuery->where('products.brand_id', $brand->id);
-
+            $mode = 'brand';
+            $entityId = $brand->id;
         } else if ($search) {
-            $productQuery = $productQuery->where('products.name', 'LIKE', "%$search%");
-//            $productQuery = $productQuery->whereRaw(
-//                "MATCH(products.name, products.name_en, products.description, products.application) AGAINST(?)",
-//                [$search]
-//            );
+            SearchLogJob::dispatch($search);
+            $mode ='search';
         }
 
 
-        if ($brandIds) {
-            $productQuery = $productQuery->whereIn('products.brand_id', $brandIds);
-        }
-        if ($countryIds) {
-            $productQuery = $productQuery->whereIn('brands.country_id', $countryIds);
-        }
-        if ($categoryIds) {
-            $productQuery = $productQuery->whereIn('products.category_id', $categoryIds);
-        }
-        if ($volumes) {
-            $productQuery = $productQuery->whereIn('skus.volume', $volumes);
-        }
-        if ($minPrice) {
-            $productQuery = $productQuery->where('sku_store.price', '>', $minPrice);
-        }
-        if ($maxPrice) {
-            $productQuery = $productQuery->where('sku_store.price', '<', $maxPrice);
-        }
-
-        $rawProductData = $productQuery->get()->toArray();
-
-
-
-        $skuService->setAllSkus($rawProductData);
-        $skuService->setSmallImagesFolder(self::SMALL_IMAGES_FOLDER);
-
-        $productsWithSkus = $skuService
-            ->groupAllSkusWithPricesToOneSku()
-            ->groupSkusToOneProduct()
-            ->sort($sort)
-            ->paginate($page, $perPage);
-
-        $result['products'] = $productsWithSkus;
+        $skuRepository->setSmallImagesFolder(self::SMALL_IMAGES_FOLDER);
+        $result['products'] = $skuRepository
+            ->setMode($mode, $entityId)
+            ->getList($request->getDto());
 
         return response()->json($result);
     }
 
+    public function popularTenSkus(SkuRepository $skuRepository): JsonResponse
+    {
+        $result = $skuRepository->popularTenSkus();
+        return response()->json(['data' => $result]);
+    }
+
+    public function mySkus(): JsonResponse
+    {
+        $userId = Auth::guard('api')->id();
+        $result = Sku::query()
+            ->select(
+                sprintf('%s.id', Sku::TABLE),
+                sprintf('%s.volume', Sku::TABLE),
+                sprintf('%s.name', Product::TABLE),
+                sprintf('%s.code AS product_code', Product::TABLE),
+            )
+            ->join(
+                Product::TABLE,
+                sprintf('%s.product_id', Sku::TABLE),
+                '=',
+                sprintf('%s.id', Product::TABLE)
+            )
+            ->where(sprintf('%s.user_id', Sku::TABLE), $userId)
+            ->whereNot(sprintf('%s.status', Sku::TABLE), EntityStatus::PUBLISHED)
+            ->get();
+
+        return response()->json(['data' => $result]);
+    }
+
 
     /**
-     *
-     * @params \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @params Request $request
+     * @return JsonResponse
      */
     public function viewed(Request $request): JsonResponse
     {
         $ids = $request->ids;
 
-        $result = Product::select(
-            'skus.id as id',
-            'products.name as name',
-            'products.code as code',
-            'brands.name as brand',
-            'skus.volume as volume',
-            'skus.images as image',
-            'skus.rating as rating',
-            'skus.reviews_count as reviews_count',
-            DB::raw('MIN(sku_store.price) as min_price')
-        )
+        $result = Product::query()
+            ->select(
+                'skus.id as id',
+                'products.name as name',
+                'products.code as code',
+                'brands.name as brand',
+                'skus.volume as volume',
+                'skus.images as image',
+                'skus.rating as rating',
+                'skus.reviews_count as reviews_count',
+                DB::raw('MIN(sku_store.price) as min_price')
+            )
             ->join('skus', 'products.id', '=', 'skus.product_id')
             ->join('sku_store', 'skus.id', '=', 'sku_store.sku_id')
             ->join('links', 'sku_store.link_id', '=', 'links.id')
@@ -208,13 +148,12 @@ class SkuController extends Controller
     }
 
     /**
-     *
      * @params int $skuId
-     * @params \Illuminate\Http\Request $request
-     * @return \App\Http\Resources\ProductResource | \Illuminate\Http\JsonResponse
+     * @params Request $request
+     * @return ProductResource | JsonResponse
      */
 
-    public function bySkuId($skuId, Request $request): ProductResource|JsonResponse
+    public function bySkuId(int $skuId, Request $request): ProductResource|JsonResponse
     {
         if ($request->view === 'compact') {
             $currentSku = Sku::with('product')->find($skuId);
@@ -224,7 +163,7 @@ class SkuController extends Controller
                     'name' => $currentSku->product->name,
                     'code' => $currentSku->product->code,
                     'volume' => $currentSku->volume,
-                    'rating' => $currentSku->rating,
+                    'rating' => round($currentSku->rating, 1),
                     'reviews_count' => $currentSku->reviews_count,
                     'question_count' => 0,
                     'images' => $currentSku->images ?? []
@@ -258,8 +197,11 @@ class SkuController extends Controller
             )
                 ->with([
                     'skus',
-                    'ingredients' => function ($q) {
-                        $q->orderBy('order', 'asc');
+                    'ingredients' => function ($query) {
+                        $query
+                            ->with('activeIds')
+                            ->orderBy('order', 'asc')
+                        ;
                     }
                 ])
                 ->join('skus', 'skus.product_id', '=', 'products.id')
@@ -305,5 +247,47 @@ class SkuController extends Controller
             ->get();
 
         return ComparedSkuResource::collection($skus);
+    }
+
+    public function store(
+        SkuRequest $request,
+        SkuRepository $skuService,
+        MessageServiceInterface $messageService
+    ): JsonResponse
+    {
+        $brand = Brand::query()->find($request->input('brand_id'));
+
+        $skuDto = new SkuDTO(
+            $request->input('category_id'),
+            $request->input('brand_id'),
+            $request->input('name'),
+            $brand->name,
+            $request->input('description'),
+            $request->input('volume'),
+            $request->input('images'),
+            'moderated'
+        );
+
+        try {
+            $newSku = $skuService->createNewSku($skuDto);
+
+            $messageService->addSku($newSku['sku_code'], $newSku['name'], Auth::guard('api')->user()->id);
+
+            $message = sprintf('Добавлен новый sku c именем %s', $newSku['name']);
+            AdminNotificationJob::dispatch($message);
+
+            return response()->json(['data' => $newSku], Response::HTTP_CREATED);
+        } catch(Throwable $e) {
+            $message = $e->getMessage();
+            if (23000 === (int)$e->getCode()) {
+                $message = sprintf(
+                    'Товарное предложение с именем %s и брендом %s уже существует',
+                    $request->input('name'),
+                    $brand->name,
+                );
+            }
+            $response['error'] = ['message' => $message];
+            return response()->json($response,Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

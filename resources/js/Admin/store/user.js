@@ -11,19 +11,23 @@ export default {
         loadedUser:{},
         tableOptions: {
             page: 1,
-            perPage: 10,
+            perPage: 50,
             sortBy:'',
             sortDesc: false
         },
         filterOptions: {
-            role: { value: 'null'}
+            role_id: { value: 'null'}
         },
-        availableRoles: []
+        availableRoles: [],
+        masterPassword: '',
+        savingBotsStatus: '',
+        myUser: null,
     },
     getters: {
-        availableRoleNames: state => state.availableRoles.map(el => el.name)
+        availableRoleNames: state => state.availableRoles.map(el => el.name),
+        availableRoleIds: state => state.availableRoles.map(el => el.id),
     },
-    mutations:{
+    mutations: {
         setIsLoading: (state, data) => state.isLoading = data,
         setUsers: (state, payload) => {
             state.users = [...payload.data]
@@ -34,26 +38,47 @@ export default {
             state.filterOptions = {...payload}
             state.tableOptions = {
                 page: 1,
-                perPage: 10,
+                perPage: 50,
                 sortBy: '',
                 sortDesc: false
             }
         },
         setTableOptionsToDefault: state => state.tableOptions = {
             page: 1,
-            perPage: 10,
+            perPage: 50,
             sortBy:'',
             sortDesc: false
         },
         setAllUsers: (state, payload) => state.allUsers = [...payload],
         setLoadedUser: (state, payload) => state.loadedUser = {...payload},
-        setAvailableRoles: (state, payload) => state.availableRoles = [...payload]
+        setAvailableRoles: (state, payload) => state.availableRoles = [...payload],
+        setMasterPassword: (state, payload) => state.masterPassword = payload,
+        setSavingBotsStatus: (state, payload) => state.savingBotsStatus = payload,
+        setMyUser: (state, payload) => state.myUser = {...payload},
     },
-    actions:{
+    actions: {
+        loadMyUser: async({ commit }) => {
+            const { data } = await api.get('/users/my');
+            if (data) {
+                commit('setMyUser', data);
+            }
+        },
+        loadMasterPassword: async({ commit }) => {
+            const { data } = await api.get('/users/master-password');
+            if (data) {
+                commit('setMasterPassword', data);
+            }
+        },
+        saveUserBots: async({ commit }, payload)  => {
+            const { data } = await api.post('/users/save-bots', payload);
+            if (data) {
+                commit('setSavingBotsStatus', data);
+            }
+        },
         loadAvailableRoles: async ({ commit }) => {
             const { data } = await api.get(`/users/show-available-roles`)
             if (data) {
-                commit('setAvailableRoles', data)
+                commit('setAvailableRoles', data);
             }
         },
         reloadUsers: ({commit, dispatch}) => {
@@ -63,7 +88,7 @@ export default {
         loadAllUsers: async({ commit }) => {
             const { data } = await api.get(`/users`, { params: { per_page: -1 } })
             if (data) {
-                commit('setAllUsers', data)
+                commit('setAllUsers', data);
             }
         },
         loadUsers: async ({ commit, state }) => {
@@ -73,33 +98,33 @@ export default {
 
             const { data } = await api.get(`/users`, { params })
             if (data) {
-                commit('setUsers', data)
+                commit('setUsers', data);
             }
-            commit('setIsLoading', false)
+            commit('setIsLoading', false);
         },
         loadItem: async({ commit }, id) =>  {
             const { data } = await api.get(`/users/${id}`)
             if (data) {
-                commit('setLoadedUser', data)
+                commit('setLoadedUser', data);
             }
         },
         createItem: async({ dispatch }, object) => {
             const { data } = await api.post('/users', object)
             if (data) {
-                dispatch('reloadUsers')
+                dispatch('reloadUsers');
             }
         },
         updateItem: async ({ dispatch }, object) => {
             const { data } = await api.put(`/users/${object.id}`, object)
             if (data) {
-                dispatch('reloadUsers')
+                dispatch('reloadUsers');
             }
         },
         deleteItem: async ({ dispatch }, id) => {
             //await api.delete(`/users/${id}`)
 
-            dispatch('reloadUsers')
-            dispatch('notification/setSuccess', 'Удаление временно невозможно', { root: true })
+            dispatch('reloadUsers');
+            dispatch('notification/setSuccess', 'Удаление временно невозможно', { root: true });
         }
     }
 }

@@ -4,18 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Exception;
+use App\Services\Parser\Token;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthSocialController extends Controller
 {
-    public const AVAILABLE_SERVICES = ['google', 'vk'];
+    public const AVAILABLE_SERVICES = ['google', 'vkontakte', 'facebook', 'instagram', 'mailru'];
 
     /**
      * @param string $service
@@ -31,7 +29,7 @@ class AuthSocialController extends Controller
      * @param string $service
      * @return Application|RedirectResponse|Redirector
      */
-    public function callback(string $service)
+    public function callback(string $service): Application|RedirectResponse|Redirector
     {
         //Socialite::driver($service)
         $user = Socialite::with($service)->stateless()->user();
@@ -53,6 +51,7 @@ class AuthSocialController extends Controller
                     'service' => $service,
                     'service_user_id' => $user->id,
                     'password' => encrypt('user'),
+                    'ref' => Token::getToken(12),
                 ]);
 
             $existedServiceUser->info()->create(['avatar' => $avatar]);

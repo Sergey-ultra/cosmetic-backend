@@ -22,7 +22,7 @@ export default {
         availableActiveIngredientsGroups:[]
     },
     getters: {
-        availableActiveIngredientsGroupNames: state => state.availableActiveIngredientsGroups.map(el => el.name)
+        //availableActiveIngredientsGroupNames: state => state.availableActiveIngredientsGroups.map(el => el.name)
     },
     mutations:{
         setIsLoading: (state, payload) => state.isLoading = payload,

@@ -17,7 +17,7 @@ class Configuration extends ParameterBag
             now()->addDay(),
             function () {
                 return array_reduce(
-                    ConfigurationOption::get()->toArray(),
+                    ConfigurationOption::query()->get()->toArray(),
                     function ($carry, $item) {
                         $carry[$item['key']] = $item['value'];
                         return $carry;
@@ -30,21 +30,36 @@ class Configuration extends ParameterBag
         parent::__construct($options);
     }
 
-    public function set(string $key, $value)
+    /**
+     * @param string $key
+     * @param $value
+     * @return void
+     */
+    public function set(string $key, $value): void
     {
-        ConfigurationOption::updateOrCreate(['key' => $key], ['value' => $value]);
+        ConfigurationOption::query()->updateOrCreate(['key' => $key], ['value' => $value]);
 
         $this->parameters[$key] = $value;
     }
 
-    public function getWeekStatus(): bool
-    {
-        return (bool)$this->get('week_status', false);
-    }
 
-    public function setWeekStatus(bool $value): void
+    /**
+     * @param string $key
+     * @param bool $value
+     * @return void
+     */
+    public function setBoolean(string $key, bool $value): void
     {
         $value = $value ? 'true' : 'false';
-        $this->set('week_status', $value);
+        $this->set($key, $value);
+    }
+
+    /**
+     * @return string
+     * Получить соль для мастер-пароля
+     */
+    public function getSaltMasterPassword(): string
+    {
+        return (string)env('SALT_MASTER_PASSWORD', 'c0210sovsecontej2022');
     }
 }

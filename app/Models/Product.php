@@ -3,23 +3,42 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
-    protected $fillable = ['category_id', 'brand_id', 'name', 'name_en', 'code', 'description',
-        'application', 'purpose', 'effect', 'age', 'type_of_skin'];
+    public const TABLE = 'products';
 
-    public function category()
+    protected $table = self::TABLE;
+
+    protected $fillable = [
+        'category_id',
+        'brand_id',
+        'name',
+        'name_en',
+        'code',
+        'user_id',
+        'description',
+        'application',
+        'purpose',
+        'effect',
+        'age',
+        'type_of_skin'
+    ];
+
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function brand()
+    public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);
     }
 
-    public function skus()
+    public function skus(): HasMany
     {
         return $this->hasMany(Sku::class)
             ->whereHas('prices')
@@ -27,10 +46,13 @@ class Product extends Model
             ->orderBy('volume');
     }
 
-    public function ingredients()
+    public function ingredients(): BelongsToMany
     {
         return $this->belongsToMany(Ingredient::class)->withPivot(['order']);
     }
 
-
+    public function ingredientIds(): HasMany
+    {
+        return $this->hasMany(IngredientProduct::class);
+    }
 }

@@ -18,12 +18,12 @@ class CreateConfigurationOptionsTable extends Migration
             $table->id();
             $table->string('key');
             $table->string('value');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->timestamps();
             $table->unique('key', 'key_unique');
         });
 
-        DB::table('configuration_options')->insert(['key' => 'week_status', 'value' => 'true']);
+        //DB::table('configuration_options')->insert(['key' => 'week_status', 'value' => 'true']);
     }
 
     /**

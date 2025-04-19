@@ -7,7 +7,8 @@ namespace App\Http\Controllers\Api\Admin;
 
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Models\StorePriceFile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class SupplierController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     const IMAGES_FOLDER = 'public/image/supplier/';
 
@@ -29,33 +30,35 @@ class SupplierController extends Controller
 //        }
 
 
+        $query = DB::table('store_price_files')
+            ->select(
+                'store_price_files.id',
+                DB::raw('IF(store_price_files.store_id, stores.name, store_price_files.name) AS name'),
+                DB::raw('IF(store_price_files.store_id, stores.link, store_price_files.link) AS link'),
+                DB::raw('IF(store_price_files.store_id, stores.image, store_price_files.image) AS image'),
+                'store_price_files.file_url',
+                'store_price_files.store_id',
+                'store_price_files.status'
+            )
+            ->leftJoin('stores', 'store_price_files.store_id', '=', 'stores.id');
 
-        $query =  DB::table('store_price_files')->select(
-            'store_price_files.id',
-            DB::raw('IF(store_price_files.store_id, stores.name, store_price_files.name) AS name'),
-            DB::raw('IF(store_price_files.store_id, stores.link, store_price_files.link) AS link'),
-            DB::raw('IF(store_price_files.store_id, stores.image, store_price_files.image) AS image'),
-            'store_price_files.file_url',
-            'store_price_files.store_id',
-            'store_price_files.status'
-        )
-            ->leftJoin('stores', 'store_price_files.store_id', '=', 'stores.id')
-           ;
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
 
-
-
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return response()->json(['data' => $result]);
     }
 
-    public function setStatus(int $id, Request $request)
+    public function setStatus(int $id, Request $request): JsonResponse
     {
         $supplier = StorePriceFile::find($id);
         if (!$supplier) {
             return response()->json(['data' => ['status' => 'error']], 404);
         }
-        $supplier->update(['status' => $request->status]);
+        $supplier->update(['status' => $request->input('status')]);
 
         return response()->json(['data' => ['status' => 'success']]);
     }

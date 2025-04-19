@@ -9,10 +9,14 @@ use App\Configuration;
 use App\Exceptions\BulkInsertException;
 use App\Exceptions\CurrentPriceInsertDataException;
 use App\Models\ActualPriceParsing;
+use App\Models\Link;
 use DateTime;
 
 class PriceParsingByCronService
 {
+    public const MIN_HOUR_COUNT = 10;
+    public const MAX_HOUR_COUNT = 17;
+    public const ATTEMPTS_PER_WEEK = 100;
     public function __construct(
         protected ActualPriceParsingService $actualPriceParsingService,
         protected Configuration $configuration,
@@ -25,17 +29,22 @@ class PriceParsingByCronService
        $res = 'start' . (new \DateTime())->format('Y-m-d H:i:s');
 
         try {
-            if ($this->configuration->getWeekStatus()) {
-                $linksWithSkuIdsAndStoreIds = $this->actualPriceParsingService->index(rand(10,17));
+            if ($this->configuration->getBoolean('week_status')) {
+                if (! ($minHourCount = (int)$this->configuration->get('min_hour_count'))) {
+                    $minHourCount = self::MIN_HOUR_COUNT;
+                }
+
+                if (! ($maxHourCount = (int)$this->configuration->get('max_hour_count'))) {
+                    $maxHourCount = self::MAX_HOUR_COUNT;
+                }
+
+                $linksWithSkuIdsAndStoreIds = $this->actualPriceParsingService->index(rand($minHourCount, $maxHourCount));
 
                 $linesCount = $linksWithSkuIdsAndStoreIds->count();
 
 
                 if ($linesCount === 0) {
-                    $this->actualPriceParsingService->copyLinksToActualPriceParsingTable();
-                    $this->configuration->setWeekStatus(false);
-
-
+                    $this->fillActualPriceParsingTable();
                 } else {
                     $start = microtime(true);
                     set_time_limit(7200);
@@ -119,5 +128,35 @@ class PriceParsingByCronService
             Logger::write($res);
             return $res;
         }
+    }
+
+    protected function fillActualPriceParsingTable(): void
+    {
+        $this->actualPriceParsingService->copyLinksToActualPriceParsingTable();
+        $this->configuration->setBoolean('week_status', false);
+        $this->setMinAndMaxHourCounts();
+    }
+
+    protected function setMinAndMaxHourCounts(): void
+    {
+        $maxLinkCount = $this->maxLinkCountPerStore();
+        $averageLinkCountPerAttempt = ceil($maxLinkCount / self::ATTEMPTS_PER_WEEK);
+
+        $minHourCount = floor($averageLinkCountPerAttempt * 0.9);
+        $maxHourCount = ceil($averageLinkCountPerAttempt * 1.55);
+
+        $this->configuration->set('min_hour_count', $minHourCount);
+        $this->configuration->set('max_hour_count', $maxHourCount);
+    }
+
+    public function maxLinkCountPerStore(): int
+    {
+        $sub = Link::query()
+            ->selectRaw('count(store_id) AS count')
+            ->groupBy('store_id');
+
+        $result = Link::query()->from($sub, 'counts')->selectRaw('max(count) as maxCount')->first();
+
+        return $result->maxCount;
     }
 }

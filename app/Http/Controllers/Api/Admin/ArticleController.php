@@ -3,50 +3,46 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Resources\Admin\ArticleCollection;
 use App\Http\Resources\Admin\ArticleSingleResource;
 use App\Models\Article;
 use App\Models\ArticleCategory;
+use App\Repositories\ArticleRepository\IArticleRepository;
 use App\Services\CodeService;
+use App\Services\EntityStatus;
 use App\Services\ImageSavingService\ImageSavingService;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class ArticleController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     const IMAGES_FOLDER = 'public/image/articles/';
 
     /**
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \App\Http\Resources\Admin\ArticleCollection
+     * @param  IArticleRepository $articleRepository
+     * @param  Request $request
+     * @return ArticleCollection
      */
-    public function index(Request $request): ArticleCollection
+    public function index(IArticleRepository $articleRepository, Request $request): ArticleCollection
     {
-        $perPage = (int) ($request->per_page ?? 10);
+        $perPage = (int)($request->per_page ?? 10);
 
-        $query = DB::table('articles')
-            ->select(
-            'articles.id as id',
-            'articles.title as title',
-            'articles.preview as preview',
-            'article_categories.name AS category_name',
-            'articles.status as status',
-            'articles.created_at as created_at',
-            'users.name as user'
-            )
-            ->leftJoin('article_categories', 'article_categories.id', '=', 'articles.article_category_id')
-            ->join('users', 'articles.user_id', '=', 'users.id');
+        $query = $articleRepository->getAdminArticleList();
 
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return new ArticleCollection($result);
     }
@@ -54,7 +50,7 @@ class ArticleController extends Controller
 
     public function articleCategories(): JsonResponse
     {
-        $result = ArticleCategory::select('id', 'name', 'color')->get();
+        $result = ArticleCategory::query()->select('id', 'name', 'color')->get();
         return response()->json(['data' => $result]);
     }
 
@@ -63,11 +59,12 @@ class ArticleController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return ArticleSingleResource
      */
     public function show(int $id): ArticleSingleResource
     {
-        $article = Article::select('id', 'title', 'slug', 'preview', 'body', 'article_category_id', 'status', 'image', 'user_id')
+        $article = Article::query()
+            ->select('id', 'title', 'slug', 'preview', 'body', 'article_category_id', 'status', 'image', 'user_id')
             ->where('id', $id)
             ->first();
 
@@ -91,14 +88,18 @@ class ArticleController extends Controller
 
         $params['image'] = [];
         if ($request->has('image')) {
-            $params['image'] = $imageSavingService->saveOneImage($request->image, self::IMAGES_FOLDER, $slugName);
+            $params['image'] = $imageSavingService->saveOneImage(
+                $request->input('image'),
+                self::IMAGES_FOLDER,
+                $slugName
+            );
         }
 
 
-        $article = Article::create($params);
+        $article = Article::query()->create($params);
 
-        if ($request->tags_ids) {
-            foreach($request->tags_ids as $tagId) {
+        if ($request->input('tags_ids')) {
+            foreach($request->input('tags_ids') as $tagId) {
                 $article->tags->create(['tag_id' => $tagId]);
             }
         }
@@ -108,7 +109,7 @@ class ArticleController extends Controller
                 'status' => true,
                 'data' => $article
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
 
@@ -161,7 +162,7 @@ class ArticleController extends Controller
         if (!$article) {
             return response()->json(['data' => ['status' => false]], 404);
         }
-        $article->update(['status' => 'published']);
+        $article->update(['status' => EntityStatus::PUBLISHED]);
 
         return response()->json(['data' => ['status' => true]]);
     }
@@ -177,7 +178,7 @@ class ArticleController extends Controller
         if (!$article) {
             return response()->json(['data' => ['status' => false]], 404);
         }
-        $article->update(['status' => 'moderated']);
+        $article->update(['status' => EntityStatus::MODERATED]);
 
         return response()->json(['data' => ['status' => true]]);
     }

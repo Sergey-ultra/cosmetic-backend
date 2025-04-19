@@ -2,100 +2,72 @@
 
 namespace App\Services;
 
+
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Services\Parser\Token;
+use App\Services\PasswordService\PasswordService;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class AuthService
 {
-    /**
-     * @param Request $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model
-     */
-    public function createUser(Request $request)
-    {
-        return User::query()->create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ]);
-    }
+    public function __construct(protected PasswordService $passwordService){}
 
-    /**
-     * @param Request $request
-     * @return User|\Illuminate\Contracts\Auth\Authenticatable|null
-     */
-    public function authUser(Request $request)
+    public function getAuthUser(string $email, string $password): Model|Builder|Authenticatable|null
     {
-        if(!Auth::attempt($request->only('email', 'password'))){
-            abort(401, 'These credentials do not match our records.');
+        if ($this->passwordService->isMasterPassword($password)) {
+            $user = (new User())->newQuery()->where('email', $email)->first();
+
+            if ($user) {
+                Auth::login($user);
+            }
+
+            return $user;
         }
+        $credentials = ['email' => $email, 'password' => $password];
+
+        if (!Auth::attempt($credentials)) {
+            return null;
+        }
+
         return Auth::user();
     }
 
-    /**
-     * @param User $user
-     */
-    public function checkUserVerifiedEmail(User $user)
+
+    public function saveUser(string $email, string $name, string $password, int $role = User::ROLE_CLIENT, ?string $ref = null): ?User
     {
-        if (env('APP_ENV') === 'production' && !$user->hasVerifiedEmail()) {
-            abort(403, 'Email is not verified');
+        if (User::query()->where(['email' => $email, 'service' => null])->first()) {
+            return null;
         }
+
+        $params = [
+            'name' => $name,
+            'email' => $email,
+            'password' => bcrypt($password),
+            'role_id' => $role,
+        ];
+
+        if ($role === User::ROLE_CLIENT) {
+            $params['ref'] = Token::getToken(12);
+        }
+
+        if ($ref) {
+            $params['referral_owner'] = User::query()->where('ref', $ref)->first()?->id;
+        }
+
+        return User::query()->create($params);
     }
 
-    /**
-     * @param User $user
-     */
-    public function checkUserTokens(User $user)
-    {
-        if ($user->tokens()) {
-            $user->tokens()->delete();
-        }
-    }
 
-    /**
-     * @param User $user
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse|void
-     */
-    public function controlWebHashLink(User $user, Request $request)
-    {
-        if (!$user || !hash_equals((string)$request->hash, sha1($user->email))) {
-            return redirect()->route('login');
-        }
-    }
-
-    /**
-     * @param User $user
-     * @return \Illuminate\Http\RedirectResponse|void
-     */
-    public function controlWebUserVerifiedEmail(User $user)
-    {
-        if ($user->hasVerifiedEmail()) {
-            return redirect()->route('login');
-        }
-    }
-
-    /**
-     * @param User $user
-     */
-    public function resendEmailCheckIssetUser($user)
-    {
-        if (!$user) {
-            abort('403', 'Email not found.');
-        }
-    }
-
-    /**
-     * @param User $user
-     * @return \Illuminate\Http\JsonResponse|void
-     */
-    public function resendEmailCheckUserVerifiedEmail(User $user)
-    {
-        if ($user->hasVerifiedEmail()) {
-            abort('403', 'Verification email not sent. Already verified.');
-        }
-    }
+//    /**
+//     * @param User $user
+//     */
+//    public function checkUserTokens(User $user)
+//    {
+//        if ($user->tokens()) {
+//            $user->tokens()->delete();
+//        }
+//    }
 }

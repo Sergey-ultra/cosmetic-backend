@@ -4,10 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @params $images картинки
+ */
 class Sku extends Model
 {
-    protected $fillable = ['product_id', 'images', 'volume', 'rating', 'reviews_count'];
+    public const TABLE = 'skus';
+
+    protected $table = self::TABLE;
+
+    protected $fillable = ['product_id', 'images', 'volume', 'rating', 'reviews_count', 'status', 'user_id'];
 
     protected $casts = [
         'images' => 'array'
@@ -20,12 +30,12 @@ class Sku extends Model
         );
     }
 
-    public function product()
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function stores()
+    public function stores(): BelongsToMany
     {
         return $this->belongsToMany(Store::class)
             ->withTimestamps()
@@ -33,17 +43,17 @@ class Sku extends Model
             ->using(SkuStore::class);
     }
 
-    public function priceDynamics()
+    public function priceDynamics(): HasMany
     {
         return $this->hasMany(PriceHistory::class, 'sku_id', 'id')->whereNotNull('price');
     }
 
-    public function prices()
+    public function prices(): HasMany
     {
         return $this->hasMany(SkuStore::class)->whereNotNull('price');
     }
 
-    public function reviews()
+    public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }

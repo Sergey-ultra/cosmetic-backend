@@ -6,27 +6,28 @@ namespace App\Http\Requests;
 class ReviewRequest extends JsonApiRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array
      */
     public function rules(): array
     {
+        if ($this->boolean('asDraft')) {
+            return [
+                'title' => 'nullable|string|max:256',
+                'plus' => 'nullable|string',
+                'minus' => 'nullable|string',
+                'sku_id' => 'required|numeric',
+                'is_recommend' => 'nullable|in:0,1',
+            ];
+        }
         return [
+            'title' => 'string|min:5|max:256',
             'plus' => 'string|min:5',
             'minus' => 'string|min:5',
-            'comment' => 'required|string|min:5',
-            'sku_id' => 'required|numeric'
+            'body' => 'required',
+            'sku_id' => 'required|numeric',
+            'is_recommend' => 'nullable|in:0,1',
         ];
     }
 }

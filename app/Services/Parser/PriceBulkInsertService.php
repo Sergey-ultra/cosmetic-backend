@@ -17,7 +17,7 @@ class PriceBulkInsertService
         try {
             DB::beginTransaction();
 
-            SkuStore::upsert(
+            SkuStore::query()->upsert(
                 $parsedPrices,
                 ['sku_id', 'store_id', 'link_id'],
                 [
@@ -27,7 +27,7 @@ class PriceBulkInsertService
             );
 
             DB::statement("SET foreign_key_checks=0");
-            PriceHistory::insert($parsedPrices, []);
+            PriceHistory::query()->insert($parsedPrices, []);
 
             DB::statement("SET foreign_key_checks=1");
             DB::commit();

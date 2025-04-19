@@ -16,11 +16,15 @@ export default {
         },
         total: 0,
         filterOptions:{
-            category: { value: 'null' }
-        }
+            category: { value: 'null' },
+            status: { value: 'null' }
+        },
+        suggestSkus: [],
+        isLoadingSuggests: false,
     },
     mutations:{
         setIsLoadingCurrentSku: (state, data) => state.isLoadingCurrentSku = data,
+        setIsLoadingSuggests: (state, data) => state.isLoadingSuggests = data,
         setLoadedSku: (state, payload) => state.loadedSku = {...payload},
         setIsLoading: (state, data) => state.isLoading = data,
         setTableOptions: (state, payload) => state.tableOptions = {...payload},
@@ -43,7 +47,9 @@ export default {
             state.skus = [...payload.data]
             state.total = payload.meta.total
         },
-
+        setSuggest: (state, payload) => {
+            state.suggestSkus = [...payload.skus];
+        },
     },
     actions:{
         reloadSkus: ({ commit, dispatch }) => {
@@ -74,7 +80,7 @@ export default {
         createItem: async({ dispatch }, object) => {
             const { data } = await api.post('/skus', object)
             if (data) {
-                dispatch('reloadSkus')
+                return data;
             }
         },
         updateItem: async ({ dispatch }, object) => {
@@ -88,6 +94,16 @@ export default {
             //await api.delete(`/skus/${id}`)
             dispatch('reloadSkus')
             dispatch('notification/setSuccess', 'Удаление временно невозможно', { root: true })
+        },
+        getSuggests: async({ commit }, search) => {
+            commit('setIsLoadingSuggests', true);
+            this.isLoadingSuggests = true;
+            const { data } = await api.get('/suggest', { params: { search }});
+            if (data) {
+                commit('setSuggest', data);
+            }
+            this.isLoadingSuggests = false;
+            commit('setIsLoadingSuggests', false);
         }
     }
 }

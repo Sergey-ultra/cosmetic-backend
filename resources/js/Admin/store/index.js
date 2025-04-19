@@ -17,6 +17,7 @@ import article from './article'
 import productParser from './product-parser'
 import priceParser from './price-parser'
 import linkParser from './link-parser'
+import reviewParser from './review-parser'
 import parsingLink from "./parsing-link";
 import productOptions from './product-options'
 import priceOptions from './price-options'
@@ -27,6 +28,9 @@ import supplier from './supplier'
 import tag from './tag'
 import articleComment from './article-comment'
 import video from './video'
+import settings from './settings'
+import message from './message'
+
 
 
 
@@ -51,6 +55,7 @@ export default createStore({
         productParser,
         priceParser,
         linkParser,
+        reviewParser,
         parsingLink,
         productOptions,
         priceOptions,
@@ -60,7 +65,9 @@ export default createStore({
         supplier,
         tag,
         articleComment,
-        video
+        video,
+        settings,
+        message,
     }
 })
 

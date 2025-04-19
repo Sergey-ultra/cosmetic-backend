@@ -37,7 +37,7 @@ const router =  createRouter({
             component:() => import('../views/401'),
         },
         {
-            path:'',
+            path: '',
             name:'main',
             meta: { title: 'Smart-Beautiful - агрегатор цен косметических товаров'},
             component:() => import('../views/index'),

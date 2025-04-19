@@ -3,47 +3,42 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\AdminNotificationJob;
 use App\Models\Link;
 use App\Models\LinkClick;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class LinkController extends Controller
 {
-    public function linkByCode($code)
+    public function linkByCode(string $code): JsonResponse|RedirectResponse
     {
-        $link = Link::where('code', $code)->first();
+        $link = Link::query()->where('code', $code)->first();
 
-        if ($link) {
-            try {
-                DB::beginTransaction();
-                $link->clicks++;
-                $link->save();
-
-                $visitorIp = request()->ip();
-
-                LinkClick::create([
-                    'ip' => $visitorIp,
-                    'link_id' => $link->id
-                ]);
-                DB::commit();
-
-                if ($visitorIp !== config('telegrambot.admin_ip')) {
-                    $message = "Кто-то c ip $visitorIp  перешел по ссылке  $link->link";
-                    AdminNotificationJob::dispatch($message);
-                }
-
-
-                $link =  $this->addQueryParams($link->link);
-
-                return redirect($link);
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return response()->json(['message' => 'Ошибка  LinkController'. $e->getMessage()], 500);
-            }
+        if (!$link) {
+            return response()->json(['message' => 'Not found'], Response::HTTP_NOT_FOUND);
         }
 
+        try {
+            DB::beginTransaction();
+            $link->clicks++;
+            $link->save();
+
+            $visitorIp = request()->ip();
+
+            LinkClick::query()->create([
+                'ip' => $visitorIp,
+                'link_id' => $link->id
+            ]);
+            DB::commit();
+
+            return redirect($this->addQueryParams($link->link));
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Ошибка  LinkController ' . $e->getMessage()], 500);
+        }
     }
 
     protected function addQueryParams(string $url): string

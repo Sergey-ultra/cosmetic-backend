@@ -27,11 +27,9 @@
         },
         created() {
             this.checkAuth()
-
         },
         methods: {
             ...mapActions('auth', ['checkAuth']),
-
         }
     }
 </script>

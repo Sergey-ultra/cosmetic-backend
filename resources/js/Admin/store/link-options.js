@@ -32,6 +32,6 @@ export default {
         },
         saveLinkOptions: async({ commit }, obj) => {
             const { status } = await api.post("/parser/link-option",obj)
-        }
+        },
     }
 }

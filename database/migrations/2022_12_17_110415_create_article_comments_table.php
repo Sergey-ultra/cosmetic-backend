@@ -17,8 +17,6 @@ class CreateArticleCommentsTable extends Migration
             $table->id();
             $table->unsignedInteger('article_id');
             $table->unsignedInteger('user_id');
-            $table->string('user_name')->nullable();
-            $table->text('user_avatar')->nullable();
             $table->unsignedInteger('reply_id')->nullable();
             $table->string('comment');
             $table->string('status')->default('moderated');

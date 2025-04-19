@@ -12,7 +12,10 @@ class Curl
 {
     //private const USER_AGENTS_FILE = __DIR__ . "/../config/user-agents.json";
 
-
+    public const USER_AGENTS = [
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0"
+    ];
 
 
     public function request(string $url, int $timeout = 12, int $connecttimeout = 10, array $startHeaders = []): CurlResponse
@@ -21,10 +24,6 @@ class Curl
         $domain = parse_url($url)['host'];
         $domain = preg_replace('#www#','', $domain);
 
-        $userAgents =  [
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36",
-            "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0"
-        ];
 
         //$userAgents = array_merge($userAgents, JsonFile::read(self::USER_AGENTS_FILE));
         // "Host: $domain",
@@ -58,7 +57,7 @@ class Curl
 
         //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $startHeaders);
-        curl_setopt($ch, CURLOPT_USERAGENT, $userAgents[rand(0, count($userAgents) - 1)]);
+        curl_setopt($ch, CURLOPT_USERAGENT, self::USER_AGENTS[rand(0, count(self::USER_AGENTS) - 1)]);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $connecttimeout);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 

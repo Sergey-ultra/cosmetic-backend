@@ -11,7 +11,6 @@ export default {
             sortBy: '',
             sortDesc: false
         },
-        availableStoresWithUnparsedLinks: [],
         storesWithLinksCount:[]
     },
     mutations: {
@@ -29,49 +28,57 @@ export default {
             pageSize: 20,
             sortBy: '',
             sortDesc: false,
-
         },
-        setAvailableStoresWithUnparsedLinks: (state, payload) => state.availableStoresWithUnparsedLinks = [...payload],
         setStoresWithLinksCount: (state, payload) => state.storesWithLinksCount = [...payload],
+        updateCountBeforeEnd: (state, payload) => {
+            const index = state.storesWithLinksCount.findIndex(el => el.id === payload.storeId);
+
+            if (index !== -1) {
+                state.storesWithLinksCount[index].count = payload.count
+            }
+        }
     },
     actions: {
         loadLinksWithPagination: async ({ commit, state }, obj) => {
-
-            let params = {
-                store_id: obj.store_id,
-                page: state.tableOptions.page,
-                pageSize: state.tableOptions.pageSize,
-            }
-
-            if (state.tableOptions.sortBy) {
-                let sortBy = state.tableOptions.sortBy
-                if (state.tableOptions.sortDesc) {
-                    sortBy = '-' + sortBy
+            if (! ['null', undefined, '', null].includes(obj.store_id)) {
+                let params = {
+                    store_id: obj.store_id,
+                    page: state.tableOptions.page,
+                    pageSize: state.tableOptions.pageSize,
                 }
-                params.sortBy = sortBy
-            }
 
-            if (obj.forPrice) {
-                params.forPrice = true
-            }
+                if (state.tableOptions.sortBy) {
+                    let sortBy = state.tableOptions.sortBy
+                    if (state.tableOptions.sortDesc) {
+                        sortBy = '-' + sortBy
+                    }
+                    params.sortBy = sortBy
+                }
 
-            const { data } = await api.get("/parser/parsed-links", { params })
+                if (obj.forPrice) {
+                    params.forPrice = true
+                }
 
-            if (data) {
-                commit('setLinksWithPagination', data)
+                const {data} = await api.get("/parser/parsed-links", {params})
+
+                if (data) {
+                    commit('setLinksWithPagination', data)
+                }
+            } else {
+                commit('setLinksWithPaginationToDefault');
             }
         },
-        loadStoresList: async({ commit }) => {
-            const { data } = await api.get("/parser/parsed-links/stores-with-unparsed-links-count")
-            if (data) {
-                commit('setAvailableStoresWithUnparsedLinks', data)
-            }
-        },
-        loadStoresWithLinksCount: async ({ commit }) => {
-            const { data } = await api.get("/parser/parsed-links/stores-with-links-count")
+        loadStoresWithLinksCount: async ({ commit }, forPrice) => {
+            const { data } = await api.get("/parser/parsed-links/stores-with-links-count",
+                { params: { parsed: forPrice ? 1 : 0 }}
+            )
             if (data) {
                 commit('setStoresWithLinksCount', data)
             }
         },
+        deleteBodyFromParsingLink: async ({ dispatch }, id) => {
+            await api.delete(`/parser/parsed-links/delete-body-from-parsing-link/${id}`);
+            dispatch('notification/setSuccess', 'Тело данной ссылки успешно удалено', { root: true })
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace App\Services\Parser;
 
 class Logger
 {
-    protected  const  PATH = __DIR__ . '/../../../price-log.txt';
+    protected const PATH = __DIR__ . '/../../../price-log.txt';
 
     public static function  write(string $text): void
     {

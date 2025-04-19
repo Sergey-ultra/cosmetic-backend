@@ -16,8 +16,8 @@ class ProductCardDTO
     public  string $country;
     public  string $brand;
     public  string $volume;
-    public  array $images = [];
-    public  array $imageLinks = [];
+    public  array $images;
+    public  array $imageLinks;
     public  int $price;
     public  string $code;
     public  string $description;

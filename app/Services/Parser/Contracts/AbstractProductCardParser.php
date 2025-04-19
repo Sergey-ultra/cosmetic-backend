@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Services\Parser\Contracts;
 
 use App\Models\ParsingLink;
-use App\Services\Parser\DTO\ParsingLinkWithOptionsDTO;
+use App\Repositories\LinkRepository\ParsingLinkWithOptionsDTO;
 use App\Services\Parser\DTO\ProductCardDTO;
 use App\Services\ProxyHttpClientService\ProxyHttpClientService;
-use GuzzleHttp\Client;
 
 
 abstract class AbstractProductCardParser
@@ -39,9 +38,9 @@ abstract class AbstractProductCardParser
 
             if ($code === 200) {
                 $body = $response->getBody()->getContents();
-                ParsingLink::where('id', $this->currentLink->id)->update(['body' => $body]);
+                ParsingLink::query()->where('id', $this->currentLink->id)->update(['body' => $body]);
             } else if ($code === 404) {
-                ParsingLink::where('id', $this->currentLink->id)->update(['parsed' => 2]);
+                ParsingLink::query()->where('id', $this->currentLink->id)->update(['parsed' => 2]);
             }
         }
         return $body;
@@ -78,7 +77,7 @@ abstract class AbstractProductCardParser
     abstract protected function extractValue(array $option): ?string;
 
 
-    protected function clearValues(string $current, string $name, string $tag)
+    protected function clearValues(string $current, string $name, string $tag): string|int|array
     {
         $volumePattern = '#(\d+\s+(х|x|\*)(\s+|\d+,)|\d+(\*\d+,|\*|х))\d+\s+([Мм][Лл]|[GgГг]|[Гг][Рр])|(\d+|\d+\s+)(капс|[Шш]т по \d+,d+\s+[Мм][Лл]|[Mm][Ll]|[GgГг](р?)|[Мм][Лл]|[Шш]т|капсул|capsules|(ампул|амп) по\s+\d+\s+[Мм][Лл])#u';
         $pricePattern = '#[^\d+]#';
@@ -169,11 +168,17 @@ abstract class AbstractProductCardParser
             case "ingredient":
                 if ((!$current || !$tag) && $this->ingredients) {
                     $current = $this->ingredients;
+                } else if (preg_match($ingredientPattern, $current, $ingredientsMatches)) {
+                    $current = $ingredientsMatches[0];
+                } else {
+                    return [];
                 }
                 if ($current) {
 
                     $current = html_entity_decode($current);
-                    //dd($current);
+
+
+
                     $current = trim(preg_replace('#\r|\n|\t#', '', $current));
                     $current = trim(preg_replace('#Состав:#', '', $current));
                     $current = trim(preg_replace('#Активные ингредиенты.#', '', $current));

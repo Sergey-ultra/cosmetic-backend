@@ -14,10 +14,10 @@ class CreateIngredientProduct extends Migration
     public function up()
     {
         Schema::create('ingredient_product', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedInteger('product_id');
+            $table->id();
+            $table->foreignId('product_id');
             $table->unsignedInteger('order');
-            $table->unsignedInteger('ingredient_id');
+            $table->foreignId('ingredient_id');
             $table->timestamps();
             $table->unique(['product_id', 'order', 'ingredient_id']);
         });

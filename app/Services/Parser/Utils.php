@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Parser;
 
 
+use App\Services\Parser\DTO\ExistingProductDTO;
+
 class Utils
 {
     public static function splitProductName (string $name): string
@@ -56,7 +58,7 @@ class Utils
     public static function findExistingProducts(array $existingProducts, array $nameValues, string $explodeChar): array
     {
         $idsAndName = [];
-        foreach ($existingProducts as  $product) {
+        foreach ($existingProducts as $product) {
             $currentName = '';
 
             foreach ($nameValues as $key => $name) {
@@ -78,10 +80,11 @@ class Utils
             }
 
             if ($currentName) {
-                $idsAndName[$currentName][] = [
-                    'id' => $product['id'],
-                    'brand_id' => $product['brand_id']
-                ];
+                $idsAndName[$currentName][] = new ExistingProductDTO(
+                    $product['id'],
+                    $product['brand_id'],
+                    count($product['ingredient_ids'])
+                );
             }
         }
 
@@ -89,16 +92,17 @@ class Utils
     }
 
 
-    public static function makeEnglishProductName($string, $brandName = "")
+    public static function makeEnglishProductName(string $string, string $brandName = ""): string
     {
         $string = preg_replace("#$brandName#", '', $string );
         $string = preg_replace('#[^a-zA-Z0-9\'\s+%.-]#', '', $string);
+        $string = preg_replace('#%#', ' ', $string );
         $string = preg_replace('#\s+#', ' ', $string );
         $string = trim(preg_replace('#\s+-#', '', $string));
         return  trim(trim($string, '.'));
     }
 
-    public static function knownLanguage($string)
+    public static function knownLanguage(string $string): string
     {
         preg_match_all( '/[а-яё]/ui', $string, $rusMatches);
         if (count($rusMatches[0]) / mb_strlen($string) > 0.5) {

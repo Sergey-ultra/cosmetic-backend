@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sku;
 use App\Models\Visit;
 use Illuminate\Http\Request;
 

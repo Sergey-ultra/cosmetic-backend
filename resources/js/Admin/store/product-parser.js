@@ -38,10 +38,12 @@ export default {
                 if (state.isOpenPreviewAfterParsing) {
                     commit('setIsShowPreview', true)
                 }
-
             }
 
             commit('setIsParsingProduct', false)
-        }
+        },
+        compressAllUncompressedImages: async({ commit }) => {
+            const res = await api.get("/parser/product/compress-all-uncompressed-images")
+        },
     }
 }

@@ -26,7 +26,7 @@ class ImageSavingService implements ImageSavingInterface
     public function __construct(protected CompressImageService $compressImageService)
     {}
 
-    public function imageSave(array $images, string $folder, string $fileName, bool $isCompress = true, array $options = []): array {
+    public function saveImages(array $images, string $folder, string $fileName, bool $isCompress = true, array $options = []): array {
         $imageUrls = [];
         if ($isCompress && !count($options)) {
             $options = $this->compressionOptions;
@@ -40,7 +40,7 @@ class ImageSavingService implements ImageSavingInterface
 
     public function saveOneImage(string $stringData, string $folder, string $fileName, bool $isCompress = true, array $options = []): string
     {
-        if (preg_match('/^data:image\/(.*);base64,/', $stringData)) {
+        if (preg_match('/^data:image\/(.*);base64,/', substr($stringData, 0, 100))) {
 
             $extension = explode('/', explode(':', substr($stringData, 0, strpos($stringData, ';')))[1])[1];
 
@@ -61,9 +61,9 @@ class ImageSavingService implements ImageSavingInterface
                 }
                 $this->compressImageService->compress(Storage::path($destinationPath), $options);
             }
-
             return Storage::url($destinationPath);
         }
+
         return $stringData;
     }
 }

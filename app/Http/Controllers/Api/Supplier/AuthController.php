@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Supplier\LoginRequest;
 use App\Http\Requests\Supplier\RegisterRequest;
 use App\Models\User;
+use App\Models\UserInfo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,11 +26,11 @@ class AuthController extends Controller
             ]);
         };
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role_id' => 5
+        User::query()->create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => bcrypt($request->input('password')),
+            'role_id' => User::ROLE_SUPPLIER,
         ]);
 
         return response()->json(['data' => [
@@ -66,9 +67,9 @@ class AuthController extends Controller
             'token' => $token,
             'message' => 'Пользователь успешно авторизирован',
             'avatar' => isset($user->info)
-                ? ($user->info->avatar ?? '/storage/icons/user_avatar.png')
-                : '/storage/icons/user_avatar.png',
-            'role' => $user->role->name,
+                ? $user->info->avatar ??  UserInfo::DEFAULT_AVATAR
+                :  UserInfo::DEFAULT_AVATAR,
+            'role' => $user->role(),
         ]);
     }
 

@@ -6,24 +6,15 @@
     import * as am4core from "@amcharts/amcharts4/core";
     import * as am4charts from "@amcharts/amcharts4/charts";
     import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+    import {mapActions, mapState} from "vuex";
 
     am4core.useTheme(am4themes_animated);
 
     export default {
-        name: "visitChart",
-        props: {
-            chartData: {
-                type:Array,
-                default: () => [{
-                    count: 0,
-                    date: 0,
-                }]
-            }
-        },
         computed: {
+            ...mapState('dynamics', ['visitStatistics']),
             preparedData() {
-
-                return this.chartData.map(el => {
+                return this.visitStatistics.map(el => {
                     return {
                         date: el.date,
                         name: "name" + el.date,
@@ -43,10 +34,14 @@
                 //this.chart.invalidateData()
             }
         },
+        created(){
+            this.loadVisitStatistics();
+        },
         mounted() {
             this.renderChart()
         },
         methods: {
+            ...mapActions('dynamics', ['loadVisitStatistics']),
             renderChart() {
                 let trackingChart = am4core.create(this.$refs.chartdiv, am4charts.XYChart);
 

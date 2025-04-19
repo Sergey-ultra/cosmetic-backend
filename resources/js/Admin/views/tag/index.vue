@@ -1,6 +1,6 @@
 <template>
     <div>
-        <btn @click="showForm(null)">Добавить</btn>
+        <buttonComponent :size="'small'" :color="'blue'" @click="showForm(null)">Добавить</buttonComponent>
         <div class="tag">
             <tagItem
                 @showForm="showForm"
@@ -25,17 +25,17 @@
 </template>
 
 <script>
-import btn from "../../components/btn.vue";
-import tagItem from "../../components/tag-item.vue";
-import deleteForm from '../../components/delete-form.vue'
-import tagForm from "./tag-form.vue";
-import {mapActions, mapState} from "vuex";
+    import tagItem from "../../components/tag-item.vue";
+    import deleteForm from '../../components/delete-form.vue'
+    import tagForm from "./tag-form.vue";
+    import {mapActions, mapState} from "vuex";
+    import buttonComponent from "../../components/button-component.vue";
 
 export default {
     name: "index",
     components: {
         tagItem,
-        btn,
+        buttonComponent,
         tagForm,
         deleteForm
     },

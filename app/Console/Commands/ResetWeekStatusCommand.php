@@ -39,7 +39,7 @@ class ResetWeekStatusCommand extends Command
      */
     public function handle(Configuration $configuration): int
     {
-        $configuration->setWeekStatus(true);
+        $configuration->setBoolean('week_status', true);
 
         $this->info('Сброс недельного статуса парсинга цен произошел успешно');
         return 1;

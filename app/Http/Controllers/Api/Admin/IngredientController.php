@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Models\ActiveIngredientsGroup;
 use App\Models\Ingredient;
 use Illuminate\Http\JsonResponse;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class IngredientController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     /**
      * Display a listing of the resource.
@@ -26,7 +27,7 @@ class IngredientController extends Controller
         $perPage = (int) ($request->per_page ?? 10);
 
         if ($perPage === -1) {
-            $result = Ingredient::select(['id', 'name', 'name_rus'])->orderBy('name')->get();
+            $result = Ingredient::query()->select(['id', 'name', 'name_rus'])->orderBy('name')->get();
             return response()->json( $result );
         }
 
@@ -44,7 +45,12 @@ class IngredientController extends Controller
             ->leftJoin('active_ingredients_groups', 'active_ingredients_group_ingredient.active_ingredients_group_id', '=', 'active_ingredients_groups.id')
         ;
 
-        $result = $this->prepareModel($request, $query,true)->paginate($perPage);
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
         return response()->json( $result );
     }
 
@@ -116,7 +122,7 @@ class IngredientController extends Controller
      *
      * @param  int  $id
      */
-    public function destroy($id): void
+    public function destroy(int $id): void
     {
         Ingredient::destroy($id);
     }

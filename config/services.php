@@ -54,6 +54,16 @@ return [
         'redirect' => env('INSTAGRAM_REDIRECT_URI')
     ],
 
+    'mailru' => [
+        'client_id' => env('MAILRU_CLIENT_ID'),
+        'client_secret' => env('MAILRU_CLIENT_SECRET'),
+        'redirect' => env('MAILRU_REDIRECT_URI')
+    ],
 
+
+    'mailjet' => [
+        'key' => env('MAILJET_APIKEY'),
+        'secret' => env('MAILJET_APISECRET'),
+    ]
 
 ];

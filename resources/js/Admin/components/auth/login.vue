@@ -40,7 +40,7 @@
 
                         <div class="form__group">
                             <div class="row">
-                                <btn @click="signIn" id="login-btn" class="">Логин</btn>
+                                <buttonComponent :color="'blue'" @click="signIn">Логин</buttonComponent>
                             </div>
                         </div>
                     </form>
@@ -52,14 +52,14 @@
 
 <script>
     import {mapActions} from "vuex";
-    import btn from '../btn.vue'
     import useVuelidate from "@vuelidate/core";
     import {email, helpers, minLength, required} from "@vuelidate/validators";
+    import buttonComponent from "../button-component.vue";
 
     export default {
         name: "login",
         components: {
-            btn
+            buttonComponent
         },
         setup () {
             return { v$: useVuelidate() }

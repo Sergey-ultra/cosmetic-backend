@@ -2,7 +2,7 @@ import api from '../utils/api'
 
 export default {
     namespaced: true,
-    state:{
+    state: {
         isAuth:false,
         mailVerification: {
             isRequired: true,
@@ -11,7 +11,7 @@ export default {
         },
         userName:'',
         userAvatar: '',
-        userRole:'',
+        userRole: '',
         isShowAuthModal: false
     },
     mutations: {

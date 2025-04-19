@@ -125,7 +125,6 @@
 </script>
 
 <style lang="scss" scoped>
-
     .row {
         height: 40px;
         display: flex;

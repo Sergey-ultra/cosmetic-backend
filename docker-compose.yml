@@ -8,10 +8,10 @@ services:
     restart: unless-stopped
     tty: true
     environment:
-      - VIRTUAL_PORT=80
+      - VIRTUAL_PORT=8000
       - VIRTUAL_HOST=smart-beautiful.local
     ports:
-      - "80:80"
+      - "8010:80"
     links:
       - app
     volumes:
@@ -27,7 +27,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/php/Dockerfile
     container_name: ${APP_NAME}_php
     restart: unless-stopped
     tty: true
@@ -39,9 +39,10 @@ services:
       - redis
     volumes:
       - ./:/var/www
-      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./docker/php/conf/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - cosmetic
+
 
   #MySQL Service
   db:
@@ -50,19 +51,44 @@ services:
       restart: unless-stopped
       tty: true
       ports:
-          - "3306:3306"
+          - "3316:3306"
       environment:
           MYSQL_ROOT_PASSWORD:
           MYSQL_ALLOW_EMPTY_PASSWORD: 1
           MYSQL_DATABASE: ${DB_DATABASE}
           MYSQL_PASSWORD: ${DB_PASSWORD}
-          MYSQL_USER: ${DB_USERNAME}
           SERVICE_TAGS: dev
           SERVICE_NAME: mysql
       volumes:
          - ./docker/mysql:/docker-entrypoint-initdb.d
       networks:
+         - cosmetic
+
+# docker exec -i db mysql -uroot -proot "$local_db_name" < "$db_file"
+# docker exec -i SmartAndBeautiful_mysql mysql -uroot -proot sanctum < sanctum_2024_03_23.sql
+
+  postgres:
+      image: postgres:15-alpine
+      container_name: ${APP_NAME}_postgres
+      restart: unless-stopped
+      tty: true
+      ports:
+          - "5439:5432"
+      environment:
+          - POSTGRES_DB=${DB_PGSQL_DATABASE}
+          - POSTGRES_USER=${DB_PGSQL_USERNAME}
+          - POSTGRES_PASSWORD=${DB_PGSQL_PASSWORD}
+      volumes:
+          - ./docker/postgres:/var/lib/postgresql
+          - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      healthcheck:
+          test: [ "CMD-SHELL", "pg_isready -d $${DB_PGSQL_DATABASE} -U $${DB_PGSQL_USERNAME}" ]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+      networks:
           - cosmetic
+
 
 #  #Postgres Service
 #  postgres:
@@ -86,13 +112,15 @@ services:
   redis:
     image: redis:alpine
     ports:
-      - "6379:6379"
+      - "6380:6379"
     container_name: ${APP_NAME}_redis
     networks:
-      - cosmetic
+       - cosmetic
 
 
 #Docker Networks
+
+
 networks:
   cosmetic:
     driver: bridge

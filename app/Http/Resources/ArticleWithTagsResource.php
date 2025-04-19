@@ -4,6 +4,7 @@
 namespace App\Http\Resources;
 
 
+use App\Models\Like;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ArticleWithTagsResource extends JsonResource
@@ -11,7 +12,7 @@ class ArticleWithTagsResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return array
      */
     public function toArray($request)
@@ -25,6 +26,7 @@ class ArticleWithTagsResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'category_id' => $this->category_id,
             'category_name' => $this->category_name,
             'category_color' => $this->category_color,
             'title' => $this->title,
@@ -32,6 +34,11 @@ class ArticleWithTagsResource extends JsonResource
             'preview' => $this->preview,
             'image' => $this->image,
             'tags' => $tags,
+            'likes' => $this->likes->count(),
+            'is_vote' => $this->likes
+                ->contains(function (Like $like) use ($request) {
+                    return $like->ip_address = $request->ip();
+                }),
             'user_name' => $this->user_name,
             'user_avatar' => $this->user_avatar,
             'views_count' => $this->views_count,

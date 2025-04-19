@@ -14,7 +14,9 @@ use PDOException;
 
 class ProductInsertReturnArrayService
 {
-    public function insertProductsInfo(array $parsedInfo, int $storeId, int $brandId): array
+    protected array $skuIdVolumesAndProductIds = [];
+    protected array $productIdsNamesAndBrandIds = [];
+    public function insertProductsInfo(array $parsedInfo, int $storeId, bool $isInsertIngredients = true, ?int $brandId = null): array
     {
 
         if (count($parsedInfo) > 0) {
@@ -138,7 +140,7 @@ class ProductInsertReturnArrayService
                     }
 
 
-                    if (!$this->isSkuExist($skuIdVolumesAndProductIds, $productId, $insertRow['volume'])) {
+                    if (!$this->isSkuExist($productId, $insertRow['volume'])) {
 
                         $skuId = $this->sku->insert([
                             "volume" => $insertRow['volume'],
@@ -187,39 +189,39 @@ class ProductInsertReturnArrayService
 
 
 
-    protected function isProductExist(array $productIdsNamesAndBrandIds,  int $brandId, string $insertedName): array
+    protected function isProductExist(int $brandId, string $insertedName): array
     {
         $insertedName = Utils::splitProductName($insertedName);
 
-        if (array_key_exists($insertedName, $productIdsNamesAndBrandIds)) {
-            foreach ($productIdsNamesAndBrandIds[$insertedName] as  $productName) {
-                if ((int) $productName['brand_id'] === $brandId) {
-                    return [true, (int) $productName['id']];
+        if (array_key_exists($insertedName, $this->productIdsNamesAndBrandIds)) {
+            foreach ($this->productIdsNamesAndBrandIds[$insertedName] as $productName) {
+                if ($productName->brandId === $brandId) {
+                    return [true, $productName->id, $productName->ingredientsCount];
+                }
+            }
+        }
+
+        return [false, null, 0];
+    }
+
+
+
+    protected function isSkuExist(int $productId, string $insertedVolume): array
+    {
+        if (array_key_exists($productId, $this->skuIdVolumesAndProductIds)) {
+            $insertingSkuVolume = preg_replace('#[^\d+]#', '', $insertedVolume);
+
+            foreach ($this->skuIdVolumesAndProductIds[$productId] as $skuByProductId) {
+                $existingSkuVolume = preg_replace('#[^\d+]#', '', $skuByProductId['volume']);
+
+                if ($existingSkuVolume === $insertingSkuVolume) {
+                    unset($this->skuIdVolumesAndProductIds[$productId]);
+                    return [true, (int)$skuByProductId['id']];
                 }
             }
         }
 
         return [false, null];
-    }
-
-
-
-    protected function isSkuExist(array &$skuIdVolumesAndProductIds, int $productId, string $insertedVolume): bool
-    {
-        if (array_key_exists($productId, $skuIdVolumesAndProductIds)) {
-            $insertingSkuVolume = preg_replace('#[^\d+]#', '', $insertedVolume);
-
-            foreach ($skuIdVolumesAndProductIds[$productId] as $skuByProductId) {
-                $existingSkuVolume = preg_replace('#[^\d+]#', '', $skuByProductId['volume']);
-
-                if ($existingSkuVolume === $insertingSkuVolume) {
-                    unset($skuIdVolumesAndProductIds[$productId]);
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
 
@@ -284,20 +286,24 @@ class ProductInsertReturnArrayService
 
     public function insertIngredientByName(string $ingredientName): int
     {
-        $code = Text::makeIngredientCode(trim($ingredientName));
+        $ingredientName = trim($ingredientName);
+        $code = Text::makeIngredientCode($ingredientName);
 
-        $currentIngredient = Ingredient::where(["code" => $code])->first();
+        $currentIngredient = Ingredient::query()
+            ->where("code",$code)
+            ->orWhere("name", $ingredientName)
+            ->first();
 
         if (!$currentIngredient) {
             $lang = Utils::knownLanguage($ingredientName);
             try {
                 if ($lang === 'en') {
-                    $currentIngredient = Ingredient::create([
+                    $currentIngredient = Ingredient::query()->create([
                         "name" => $ingredientName,
                         "code" => $code
                     ]);
                 } elseif ($lang === 'rus') {
-                    $currentIngredient = Ingredient::create([
+                    $currentIngredient = Ingredient::query()->create([
                         "name_rus" => $ingredientName,
                         "code" => $code
                     ]);

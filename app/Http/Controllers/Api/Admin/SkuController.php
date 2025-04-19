@@ -3,52 +3,80 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Http\Resources\Admin\ProductCollection;
 use App\Http\Resources\Admin\ProductSingleResource;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\Sku;
+use App\Models\SkuStore;
+use App\Models\User;
+use App\Repositories\SkuRepository\DTO\SkuDTO;
+use App\Repositories\SkuRepository\SkuRepository;
 use App\Services\ImageSavingService\ImageSavingService;
 use App\Services\Parser\Text;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class SkuController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     const IMAGES_FOLDER = 'public/image/sku/';
+
     /**
-     * Display a listing of the resource.
-     *
      * @param Request $request
-     * @return \App\Http\Resources\Admin\ProductCollection
+     * @return ProductCollection
      */
     public function index(Request $request): ProductCollection
     {
-        $perPage =  $request->per_page ?? 10;
+        $perPage = (int)($request->per_page ?? 10);
 
-        $query = DB::table('products')
+        $ingredientProductSubQuery = DB::table('ingredient_product')
+            ->select('product_id')
+            ->groupBy('product_id');
+
+        $currentPricesCountSubQuery = DB::table(SkuStore::TABLE)
+            ->select('sku_id', DB::raw('count(sku_id) AS link_count'))
+            ->groupBy('sku_id');
+
+        $query = Sku::query()
             ->select([
-                'skus.id as id',
+                'skus.id',
                 'categories.name as category',
                 'brands.name as brand',
-                'products.name as name',
-                'products.code as code',
-                'skus.volume as volume',
-                'skus.images as images',
-                'skus.created_at as created_at'
+                'products.name',
+                'products.code',
+                'skus.volume',
+                'skus.images',
+                'skus.created_at',
+                'skus.status',
+                'users.name as user_name',
+                'currentPrices.link_count',
+                DB::raw("IF(ip.product_id IS NULL, false, true) AS is_ingredients_exist"),
+
             ])
-            ->join('skus', 'skus.product_id', '=', 'products.id')
+            ->leftJoinSub($currentPricesCountSubQuery, 'currentPrices', function($join) {
+                $join->on('currentPrices.sku_id', '=', 'skus.id');
+            })
+            ->join('products', 'skus.product_id', '=', 'products.id')
             ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
+            ->leftJoin(User::TABLE, sprintf('%s.id', User::TABLE), '=', sprintf('%s.user_id', Sku::TABLE))
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
-        ;
+            ->leftJoinSub($ingredientProductSubQuery, 'ip', function ($join) {
+                $join->on('ip.product_id', '=', 'products.id');
+            });
 
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
 
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return new ProductCollection($result);
     }
@@ -57,10 +85,8 @@ class SkuController extends Controller
 
 
     /**
-     * Display the specified resource.
-     *
      * @param  int  $id
-     * @return \App\Http\Resources\Admin\ProductSingleResource
+     * @return ProductSingleResource
      */
     public function show(int $id): ProductSingleResource
     {
@@ -81,49 +107,56 @@ class SkuController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
      * @param Request $request
      * @param ImageSavingService $imageSavingService
      * @return JsonResponse
      */
-    public function store(Request $request, ImageSavingService $imageSavingService): JsonResponse
+    public function store(Request $request, SkuRepository $skuService, ImageSavingService $imageSavingService): JsonResponse
     {
-        $brand = Brand::find($request->brand_id);
-        $code = Text::makeProductCode($request->name, $brand->name);
-
+        $brand = Brand::query()->find($request->input('brand_id'));
 
         $imageUrls = [];
+
         if ($request->has('images')) {
-            $fileName = $code. '-' . preg_replace('#\s+#', '', $request->volume);
-            $imageUrls = $imageSavingService->imageSave(
-                $request->images,
+            $code = Text::makeProductCode($request->input('name'), $brand->name);
+
+            $fileName = sprintf('%s-%s', $code, preg_replace('#\s+#', '',  $request->input('volume')));
+
+            $imageUrls = $imageSavingService->saveImages(
+                $request->input('images'),
                 self::IMAGES_FOLDER,
                 $fileName
             );
         }
 
-        $imageUrls = json_encode($imageUrls);
+        $skuDto = new SkuDTO(
+            $request->input('category_id'),
+            $request->input('brand_id'),
+            $request->input('name'),
+            $brand->name,
+            $request->input('description'),
+            $request->input('volume'),
+            $imageUrls,
+            'published'
+        );
 
-        $createdProduct = Product::create([
-            'brand_id' => $request->brand_id,
-            'category_id' => $request->category_id,
-            'name' => $request->name,
-            'description' => $request->description,
-            'code' => $code
-        ]);
 
+        try {
+            $newSku = $skuService->createNewSku($skuDto);
 
-        //Sku::create([
-        //'volume' => $request->volume,
-        // 'product_id => $createdProduct->id
-         //]);
-        return response()->json([
-            'data' => [
-                'status' => 'success',
-                'data' => $createdProduct
-            ]
-        ], 201);
+            return response()->json(['data' => $newSku], Response::HTTP_CREATED);
+        } catch(Throwable $e) {
+            $message = $e->getMessage();
+            if (23000 === (int)$e->getCode()) {
+                $message = sprintf(
+                    'Товарное предложение с именем %s и брендом %s уже существует',
+                    $request->input('name'),
+                    $brand->name,
+                );
+            }
+            $response['error'] = ['message' => $message];
+            return response()->json($response,Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -136,44 +169,51 @@ class SkuController extends Controller
      */
     public function update(Request $request, Sku $sku, ImageSavingService $imageSavingService): JsonResponse
     {
-        if ($sku) {
-            $brand = Brand::find($request->brand_id);
-            $code = Text::makeProductCode($request->name, $brand->name);
-
-
-            $imageUrls = [];
-            if ($request->has('images') && count($request->images)) {
-                $fileName = $code . '-' . preg_replace('#\s+#', '', $request->volume);
-                $imageUrls = $imageSavingService->imageSave($request->images, self::IMAGES_FOLDER, $fileName);
-            }
-
-
-            $sku->update([
-                'volume' => $request->volume,
-                'images' => json_encode($imageUrls)
-            ]);
-
-
-            $sku->product->update([
-                'brand_id' => $request->brand_id,
-                'category_id' => $request->category_id,
-                'name' => $request->name,
-                'description' => $request->description,
-                'code' => $code
-            ]);
-
+        if (!$sku) {
             return response()->json([
-                'data' => [
-                    'status' => 'success',
-                    'message' => 'Товарное предложение успешно обновлено'
-                ]
-            ]);
+                'status'=> true,
+                'message' =>'Sku not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+        $brand = Brand::query()->find($request->input('brand_id'));
+
+        if (!$brand) {
+            return response()->json([
+                'status'=> true,
+                'message' =>'Brand not found'
+            ], Response::HTTP_NOT_FOUND);
         }
 
+        $code = Text::makeProductCode($request->input('name'), $brand->name);
+
+
+        $imageUrls = [];
+        if ($request->has('images') && count($request->images)) {
+            $fileName = $code . '-' . preg_replace('#\s+#', '', $request->volume);
+            $imageUrls = $imageSavingService->saveImages($request->images, self::IMAGES_FOLDER, $fileName);
+        }
+
+
+        $sku->update([
+            'volume' => $request->volume,
+            'images' => $imageUrls,
+        ]);
+
+
+        $sku->product->update([
+            'brand_id' => $request->brand_id,
+            'category_id' => $request->category_id,
+            'name' => $request->name,
+            'description' => $request->description,
+            'code' => $code
+        ]);
+
         return response()->json([
-            'status'=> true,
-            'message' =>'Not found'
-        ], 404);
+            'data' => [
+                'status' => 'success',
+                'message' => 'Товарное предложение успешно обновлено'
+            ]
+        ]);
     }
 
 

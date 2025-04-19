@@ -1,8 +1,7 @@
 <template>
     <modal
-            v-model:isShowForm="isShowForm"
-            :width="50"
-    >
+        v-model:isShowForm="isShowForm"
+        :width="50">
         <template v-slot:header>
            {{selectedReviewId ? 'Редактирование отзывы' : 'Создание нового отзыва'}}
         </template>
@@ -130,7 +129,7 @@
                 }
                 this.$emit('update:isShowForm', false)
             }
-        }
+        },
     }
 </script>
 

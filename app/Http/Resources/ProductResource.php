@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Ingredient;
 use App\Services\TransformImagePathService\TransformImagePathService;
 use Illuminate\Http\Resources\Json\JsonResource;
 use JetBrains\PhpStorm\Pure;
@@ -42,15 +43,14 @@ class ProductResource extends JsonResource
         }
 
         $prices = $this->skuPrices->pluck('price')->all();
-        $minPrice = min($prices);
-        $maxPrice = max($prices);
-
+        $minPrice = !empty($prices) ? min($prices) : 0;
+        $maxPrice = !empty($prices) ? max($prices) : 0;
 
         return [
             'id' => $this->sku_id,
             'volume' => $this->volume,
             'rating' => $this->rating,
-            'images' => $this->images? json_decode($this->images, true) : [],
+            'images' => $this->images ? json_decode($this->images, true) : [],
             'reviews_count' => $this->reviews_count,
             'name' => $this->name,
             'code' => $this->code,
@@ -67,7 +67,19 @@ class ProductResource extends JsonResource
             'prices' => $this->skuPrices,
             'minPrice' => $minPrice,
             'maxPrice' => $maxPrice,
-            'ingredients' => $this->ingredients->pluck('name'),
+            'ingredients' => $this->ingredients->pluck('name')->all(),
+            'active_ingredients' => $this->ingredients
+                ->filter(function($item) {
+                return !empty($item->activeIds->all());
+                 })
+                ->values()
+                ->map(function($item) {
+                    return [
+                      'id' => $item->id,
+                      'name' => $item->name
+                    ];
+                })->all(),
+            //'active_ingredients' => $this->ingredients,
             'skus' => SkuResource::collection($this->skus),
         ];
     }

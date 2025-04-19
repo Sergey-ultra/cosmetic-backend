@@ -8,6 +8,9 @@ export default {
         userRole:'',
         userAvatar: '',
     },
+    getters: {
+        isAdminRole: state =>  state.userRole.toLowerCase() === 'admin',
+    },
     mutations: {
         SET_USER: (state, { userName, role, avatar }) => {
             state.isAuth = true
@@ -27,11 +30,11 @@ export default {
             object.asAdmin = true
             const res = await api.post('/login', object)
 
-            if (res.status && !res.isRequiredEmailVerification && ['admin', 'moderator'].includes(res.role.toLowerCase())) {
+            if (res.status && !res.isRequiredEmailVerification) {
                 dispatch('notification/setSuccess', res.message, { root: true })
-                const { message, user_name, token, avatar, role } = res
-                localStorage.setItem('userData', JSON.stringify({ userName: user_name,  token, avatar, role }))
-                commit('SET_USER', { userName: user_name, avatar, role })
+                const { message, name, token, avatar, role } = res
+                localStorage.setItem('userData', JSON.stringify({ userName: name,  token, avatar, role }))
+                commit('SET_USER', { userName: name, avatar, role })
 
             } else {
                 dispatch('notification/setError', res.message, { root: true })
@@ -39,7 +42,7 @@ export default {
         },
         checkAuth: ({ commit }) => {
             const data = JSON.parse(localStorage.getItem('userData'))
-            if (data && ['admin', 'moderator'].includes(data.role.toLowerCase())) {
+            if (data) {
                 const { userName, role, avatar } = data
                 commit('SET_USER', { userName, role, avatar })
             }

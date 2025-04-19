@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
-
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\DataProvider;
+use App\Http\Controllers\Traits\DataProviderWithDTO;
+use App\Http\Controllers\Traits\ParamsDTO;
 use App\Models\Comment;
 use App\Services\TreeService\TreeInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 class CommentController extends Controller
 {
-    use DataProvider;
+    use DataProviderWithDTO;
 
     /**
      * @return \Illuminate\Http\JsonResponse
@@ -24,25 +25,25 @@ class CommentController extends Controller
         //$result = Comment::getNestedComments($request->review_id);
         $comments = DB::table('comments')
             ->select(
-            'comments.id',
-            'comments.user_name',
-            'comments.reply_id',
-            'comments.review_id',
-            'comments.comment',
-            DB::raw('DATE(comments.created_at) AS created_at'),
-            'user_infos.avatar as user_avatar'
+                'comments.id',
+                'comments.user_name',
+                'comments.reply_id',
+                'comments.review_id',
+                'comments.comment',
+                DB::raw('DATE(comments.created_at) AS created_at'),
+                'user_infos.avatar as user_avatar'
 
-        )
+            )
             ->leftjoin('user_infos', 'comments.user_id', '=', 'user_infos.user_id')
             ->where([
-                'comments.review_id' => $request->review_id,
+                'comments.review_id' => $request->input('review_id'),
                 'comments.status' => 'published',
             ])
             ->orderBy('created_at', 'DESC')
             ->get()
-            ->map(fn ($row) => get_object_vars($row))
+            ->map(fn($row) => get_object_vars($row))
             ->toArray();
-        ;
+
 
         $result = $treeService->buildTree($comments, 'reply_id');
 
@@ -57,22 +58,25 @@ class CommentController extends Controller
     public function my(Request $request): JsonResponse
     {
         $perPage = (int)($request->per_page ?? 10);
-        $query = Comment::select([
-            'reviews.comment as body',
-            'reviews.plus',
-            'reviews.minus',
-            'comments.comment',
-            'comments.id',
-            'comments.status',
-        ])
+        $query = Comment::query()
+            ->select([
+                'reviews.body',
+                'reviews.plus',
+                'reviews.minus',
+                'comments.comment',
+                'comments.id',
+                'comments.status',
+            ])
             ->join('reviews', 'comments.review_id', '=', 'reviews.id')
-            //->join('sku_ratings', 'reviews.sku_rating_id', '=', 'sku_ratings.id')
-            //->join('skus', 'sku_ratings.sku_id', '=', 'skus.id')
             //->join('products', 'skus.product_id', '=', 'products.id')
             ->where('comments.user_id', Auth::id())
-            ->where('comments.status', '<>', 'deleted')
-        ;
-        $result = $this->prepareModel($request, $query, true)->paginate($perPage);
+            ->where('comments.status', '<>', 'deleted');
+
+        $paramsDto = new ParamsDTO(
+            $request->input('filter', []),
+            $request->input('sort', ''),
+        );
+        $result = $this->prepareModel($paramsDto, $query)->paginate($perPage);
 
         return response()->json([ 'data'=> $result ]);
     }
@@ -88,16 +92,16 @@ class CommentController extends Controller
         $params = $request->all();
         $user = Auth::user();
         $params['user_id'] = $user->id;
-        $params['user_name'] =  $user->name;
 
-        $newComment = Comment::create($params);
+
+        $newComment = Comment::query()->create($params);
 
         return response()->json([
             'data' => [
                 'status' => true,
                 'data' => $newComment
             ]
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
 
@@ -120,7 +124,7 @@ class CommentController extends Controller
      *
      * @param  int  $id
      */
-    public function destroy(int $id)
+    public function destroy(int $id): void
     {
         Comment::where('id', $id)->update(['status' => 'deleted']);
     }

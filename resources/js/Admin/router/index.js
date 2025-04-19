@@ -58,7 +58,121 @@ const constantRoutes = [
         path: '/admin/test',
         name: 'test',
         component: () => import('../views/test/test.vue')
-    }
+    },
+    {
+        path:'/admin/parser-link',
+        name:'link-parser',
+        component:() => import('../views/parser-link/index.vue'),
+        meta: { title:'Парсинг ссылок на товарные предложения' }
+    },
+    {
+        path:'/admin/parser-product',
+        name:'product-parser',
+        component:() => import('../views/parser-product/index.vue'),
+        meta: { title:'Парсинг товарных предложений' }
+    },
+    {
+        path:'/admin/parser-price',
+        name:'price-parser',
+        component:() => import('../views/parser-price/index.vue'),
+        meta: { title:'Парсинг цен' }
+    },
+    {
+        path:'/admin/parser-review-link',
+        name:'review-link-parser',
+        component:() => import('../views/parser-review-link/index.vue'),
+        meta: { title:'Парсинг ссылок на отзывы' }
+    },
+    {
+        path:'/admin/parser-review',
+        name:'review-parser',
+        component:() => import('../views/parser-review/index.vue'),
+        meta: { title:'Парсинг отзывов' }
+    },
+    {
+        path:'/admin/parser-review-publishing',
+        name: 'review-publishing-list',
+        component:() => import('../views/parser-review-publishing/index.vue'),
+        meta: { title:'Публикация отзывов' }
+    },
+    {
+        path:'/admin/parser-review-publishing/:id',
+        name:'review-publishing',
+        component:() => import('../views/parser-review-publishing/item.vue'),
+        meta: { title:'Публикация отзыва' }
+    },
+    {
+        path: '/admin/settings',
+        name: 'settings',
+        component:() => import('../views/settings/index.vue'),
+        meta: { title:'Настройки' }
+    },
+    {
+        path:'/admin/tag',
+        name:'tag',
+        component:() => import('../views/tag/index.vue'),
+        meta: { title:'Теги статей' }
+    },
+    {
+        path:'/admin/store',
+        name:'store',
+        component:() => import('../views/store/index.vue'),
+        meta: { title:'Магазины' }
+    },
+    {
+        path:'/admin/supplier',
+        name:'supplier',
+        component:() => import('../views/supplier/index.vue'),
+        meta: { title:'Магазины поставщиков' }
+    },
+    {
+        path:'/admin/countries',
+        name:'countries',
+        component:() => import('../views/country/index.vue'),
+        meta: { title:'Страны' }
+    },
+    {
+        path:'/admin/ingredients',
+        name:'ingredients',
+        component:() => import('../views/ingredient/index.vue'),
+        meta: { title:'Ингредиенты' }
+    },
+    {
+        path:'/admin/brands',
+        name:'brands',
+        component:() => import('../views/brand/index.vue'),
+        meta: { title: 'Бренды' }
+    },
+    {
+        path:'/admin/categories',
+        name:'categories',
+        component:() => import('../views/category/index.vue'),
+        meta: { title: 'Категории' }
+    },
+    {
+        path:'/admin/skus',
+        name:'skus',
+        component:() => import('../views/sku/index.vue'),
+        meta: {title: 'Товарные предложения'}
+    },
+    {
+        path:'/admin/users',
+        name:'users',
+        component:() => import('../views/users/index.vue'),
+        meta: {title: 'Пользователи'}
+    },
+    {
+        path:'/admin/trackings',
+        name:'trackings',
+        component:() => import('../views/tracking/index.vue'),
+        meta: {title: 'Отслеживаемые'}
+    },
+    {
+        path:'/admin/messages',
+        name:'messages',
+        component:() => import('../views/message/index.vue'),
+        meta: {title: 'Сообщения'}
+    },
 ]
 
 

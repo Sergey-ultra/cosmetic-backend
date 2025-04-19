@@ -32,7 +32,7 @@ class PriceDropJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         try {
             $skus = Tracking::select(

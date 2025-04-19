@@ -26,8 +26,13 @@ Route::get('/clear-cache', function() {
 
 
 
+
+
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'emailVerify'])
     ->name('verification.verify');
+
+Route::get('/password.reset', [AuthController::class, 'passwordReset'])
+    ->name('password.reset');
 
 //Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'emailVerify'])
 //->middleware(['auth', 'signed'])->name('verification.verify');

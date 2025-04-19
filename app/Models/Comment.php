@@ -3,12 +3,38 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Comment extends Model
 {
-    protected $fillable = ['comment', 'review_id', 'user_id', 'user_name', 'reply_id', 'status'];
+    public const TABLE = 'comments';
+
+    protected $table = self::TABLE;
+
+    protected $fillable = ['comment', 'review_id', 'user_id', 'reply_id', 'status'];
+    protected $casts = [
+        'created_at'  => 'date:Y-m-d',
+    ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function likes(): MorphMany
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
 
 
+    /**
+     * @param $reviewId
+     * @return void
+     */
     public function nestedComments($reviewId)
     {
         $comments = self::select(
